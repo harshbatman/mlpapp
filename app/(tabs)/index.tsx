@@ -43,42 +43,42 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <View style={[styles.header, { backgroundColor: colors.tint }]}>
-        <View style={styles.headerTop}>
-          <Pressable
-            style={styles.locationInfo}
-            onPress={handleLocationRequest}
-          >
-            <ThemedText style={styles.locationLabel}>Current Location</ThemedText>
-            <View style={styles.cityRow}>
-              <ThemedText style={styles.cityText}>{city}</ThemedText>
-              <IconSymbol name="chevron.right" size={16} color="rgba(255,255,255,0.6)" />
-            </View>
-          </Pressable>
-          <Pressable
-            style={styles.notificationBell}
-            onPress={handleLocationRequest}
-          >
-            <IconSymbol name="mappin.and.ellipse" size={24} color="#fff" />
-          </Pressable>
-        </View>
-
-        <View style={styles.greetingContainer}>
-          <ThemedText style={styles.greeting}>Find your dream</ThemedText>
-          <ThemedText style={styles.subGreeting}>Property</ThemedText>
-        </View>
-      </View>
-
-      <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
-        <IconSymbol name="chevron.right" size={20} color={colors.icon} />
-        <TextInput
-          placeholder="Search properties, land..."
-          placeholderTextColor={colors.icon}
-          style={[styles.searchInput, { color: colors.text }]}
-        />
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={[styles.header, { backgroundColor: colors.tint }]}>
+          <View style={styles.headerTop}>
+            <Pressable
+              style={styles.locationInfo}
+              onPress={handleLocationRequest}
+            >
+              <ThemedText style={styles.locationLabel}>Current Location</ThemedText>
+              <View style={styles.cityRow}>
+                <ThemedText style={styles.cityText}>{city}</ThemedText>
+                <IconSymbol name="chevron.right" size={16} color="rgba(255,255,255,0.6)" />
+              </View>
+            </Pressable>
+            <Pressable
+              style={styles.notificationBell}
+              onPress={handleLocationRequest}
+            >
+              <IconSymbol name="mappin.and.ellipse" size={24} color="#fff" />
+            </Pressable>
+          </View>
+
+          <View style={styles.greetingContainer}>
+            <ThemedText style={styles.greeting}>Find your dream</ThemedText>
+            <ThemedText style={styles.subGreeting}>Property</ThemedText>
+          </View>
+        </View>
+
+        <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
+          <IconSymbol name="chevron.right" size={20} color={colors.icon} />
+          <TextInput
+            placeholder="Search properties, land..."
+            placeholderTextColor={colors.icon}
+            style={[styles.searchInput, { color: colors.text }]}
+          />
+        </View>
+
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <ThemedText style={styles.sectionTitle}>Categories</ThemedText>
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     backgroundColor: '#000000',
     marginHorizontal: 16,
-    marginTop: Platform.OS === 'ios' ? 60 : 40,
+    marginTop: 16,
     borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   scrollContent: {
-    paddingTop: 40,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingBottom: 100,
   },
   section: {
