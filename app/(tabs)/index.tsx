@@ -209,6 +209,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginHorizontal: 16,
     marginTop: 16,
+    marginBottom: 24,
     backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#EEEEEE',
@@ -229,6 +230,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   section: {
+    marginTop: 8,
     marginBottom: 40,
     paddingHorizontal: 20,
   },
