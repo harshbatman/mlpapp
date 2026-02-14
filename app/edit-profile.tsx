@@ -94,13 +94,18 @@ export default function EditProfileScreen() {
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.avatarSection}>
-                    <Pressable onPress={pickImage} style={[styles.avatarContainer, { backgroundColor: colors.secondary }]}>
-                        {image ? (
-                            <Image source={{ uri: image }} style={styles.avatarImage} />
-                        ) : (
-                            <IconSymbol name="person.fill" size={80} color={colors.tint} />
-                        )}
-                    </Pressable>
+                    <View style={styles.avatarWrapper}>
+                        <Pressable onPress={pickImage} style={[styles.avatarContainer, { backgroundColor: colors.secondary }]}>
+                            {image ? (
+                                <Image source={{ uri: image }} style={styles.avatarImage} />
+                            ) : (
+                                <IconSymbol name="person.fill" size={80} color={colors.tint} />
+                            )}
+                        </Pressable>
+                        <Pressable style={[styles.cameraBadge, { backgroundColor: colors.tint }]} onPress={pickImage}>
+                            <IconSymbol name="camera.fill" size={18} color="#FFFFFF" />
+                        </Pressable>
+                    </View>
                     <Pressable style={styles.changePhotoButton} onPress={pickImage}>
                         <ThemedText style={{ color: colors.tint, fontWeight: '600' }}>Change Photo</ThemedText>
                     </Pressable>
@@ -208,6 +213,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: 32,
     },
+    avatarWrapper: {
+        position: 'relative',
+    },
     avatarContainer: {
         width: 120,
         height: 120,
@@ -220,6 +228,23 @@ const styles = StyleSheet.create({
     avatarImage: {
         width: '100%',
         height: '100%',
+    },
+    cameraBadge: {
+        position: 'absolute',
+        bottom: 16,
+        right: 0,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 3,
+        borderColor: '#FFFFFF',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1.41,
     },
     changePhotoButton: {
         padding: 8,

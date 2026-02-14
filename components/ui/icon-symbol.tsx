@@ -36,6 +36,7 @@ const MAPPING = {
   'trash.fill': 'delete-forever',
   'chevron.left': 'chevron-left',
   'rectangle.portrait.and.arrow.right': 'logout',
+  'camera.fill': 'photo-camera',
 } as IconMapping;
 
 /**
