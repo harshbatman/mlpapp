@@ -5,25 +5,35 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const tintColorLight = '#000000'; // Uber Black
+const tintColorDark = '#FFFFFF'; // Uber White
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: '#000000',
+    background: '#FFFFFF',
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    icon: '#000000',
+    tabIconDefault: '#6B6B6B',
     tabIconSelected: tintColorLight,
+    border: '#EEEEEE',
+    card: '#F6F6F6',
+    primary: '#000000',
+    secondary: '#EEEEEE',
+    accent: '#276EF1', // Uber Blue for links/actions
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    text: '#FFFFFF',
+    background: '#000000',
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: '#FFFFFF',
+    tabIconDefault: '#AFAFAF',
     tabIconSelected: tintColorDark,
+    border: '#222222',
+    card: '#111111',
+    primary: '#FFFFFF',
+    secondary: '#111111',
+    accent: '#276EF1',
   },
 };
 
