@@ -71,7 +71,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
-          <IconSymbol name="chevron.right" size={20} color={colors.icon} />
+          <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
           <TextInput
             placeholder="Search properties, land..."
             placeholderTextColor={colors.icon}
