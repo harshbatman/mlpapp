@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "polar-spirit",
-    "slug": "polar-spirit",
+    "name": "mlpapp",
+    "slug": "mlpapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "polarspirit",
+    "scheme": "mlpapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
