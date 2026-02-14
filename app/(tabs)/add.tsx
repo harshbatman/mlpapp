@@ -1,11 +1,13 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { ListingType, PropertyType } from '@/constants/types';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function AddPropertyScreen() {
   const router = useRouter();
@@ -19,6 +21,43 @@ export default function AddPropertyScreen() {
   const [area, setArea] = useState('');
   const [type, setType] = useState<PropertyType>('Home');
   const [listingType, setListingType] = useState<ListingType>('Sell');
+  const [isLocating, setIsLocating] = useState(false);
+
+  const handleGetCurrentLocation = async () => {
+    setIsLocating(true);
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Allow location access to fetch the property address.');
+        setIsLocating(false);
+        return;
+      }
+
+      let pos = await Location.getCurrentPositionAsync({});
+      let reverseGeocode = await Location.reverseGeocodeAsync({
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+      });
+
+      if (reverseGeocode.length > 0) {
+        const item = reverseGeocode[0];
+        const parts = [
+          item.name,
+          item.street,
+          item.city,
+          item.region,
+          item.postalCode,
+          item.country
+        ].filter(Boolean);
+
+        setLocation(parts.join(', '));
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Could not fetch location. Please try manually.');
+    } finally {
+      setIsLocating(false);
+    }
+  };
 
   const handleSubmit = () => {
     // Logic to save property
@@ -32,7 +71,7 @@ export default function AddPropertyScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <ThemedText type="subtitle">Post New Listing</ThemedText>
+        <ThemedText type="subtitle" style={{ color: '#fff' }}>Post New Listing</ThemedText>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -104,7 +143,23 @@ export default function AddPropertyScreen() {
           keyboardType="numeric"
         />
 
-        <ThemedText style={styles.label}>Location</ThemedText>
+        <View style={styles.labelRow}>
+          <ThemedText style={styles.label}>Location</ThemedText>
+          <Pressable
+            style={styles.locationButton}
+            onPress={handleGetCurrentLocation}
+            disabled={isLocating}
+          >
+            {isLocating ? (
+              <ActivityIndicator size="small" color={colors.tint} />
+            ) : (
+              <>
+                <IconSymbol name="mappin.and.ellipse" size={14} color={colors.tint} />
+                <ThemedText style={[styles.locationButtonText, { color: colors.tint }]}>Current Location</ThemedText>
+              </>
+            )}
+          </Pressable>
+        </View>
         <TextInput
           style={[styles.input, { borderColor: colors.border, color: colors.text }]}
           placeholder="e.g. Ranchi, Jharkhand"
@@ -164,6 +219,22 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginTop: 24,
     letterSpacing: -0.5,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+    marginTop: 24,
+  },
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  locationButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
   },
   input: {
     height: 56,
