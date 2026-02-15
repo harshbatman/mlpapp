@@ -52,6 +52,9 @@ const MAPPING: IconMapping = {
   'eye.fill': 'visibility',
   'eye.slash.fill': 'visibility-off',
   'checkmark.circle.fill': 'check-circle',
+  'cart.fill': 'shopping-cart',
+  'hammer.fill': 'construction',
+  'banknote.fill': 'payments',
 };
 
 /**
