@@ -16,6 +16,24 @@ export default function HomeScreen() {
   const colors = Colors[colorScheme as 'light' | 'dark'];
   const [city, setCity] = useState('Select Location');
   const [loadingLocation, setLoadingLocation] = useState(false);
+  const [locationModalVisible, setLocationModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const indianStates = [
+    { name: 'Delhi NCR', districts: ['Central Delhi', 'East Delhi', 'New Delhi', 'North Delhi', 'South Delhi', 'Gurugram', 'Noida', 'Faridabad', 'Ghaziabad'] },
+    { name: 'Maharashtra', districts: ['Mumbai', 'Navi Mumbai', 'Pune', 'Nagpur', 'Thane', 'Nashik', 'Aurangabad'] },
+    { name: 'Karnataka', districts: ['Bengaluru', 'Mysuru', 'Hubballi', 'Mangaluru', 'Belagavi'] },
+    { name: 'Uttar Pradesh', districts: ['Lucknow', 'Kanpur', 'Agra', 'Varanasi', 'Prayagraj', 'Meerut'] },
+    { name: 'Gujarat', districts: ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar'] },
+    { name: 'Tamil Nadu', districts: ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem'] },
+    { name: 'Bihar', districts: ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Purnia'] },
+    { name: 'West Bengal', districts: ['Kolkata', 'Howrah', 'Durgapur', 'Asansol', 'Siliguri'] },
+    { name: 'Rajasthan', districts: ['Jaipur', 'Jodhpur', 'Kota', 'Ajmer', 'Bikaner'] },
+    { name: 'Haryana', districts: ['Gurugram', 'Faridabad', 'Panipat', 'Ambala', 'Karnal'] },
+    { name: 'Punjab', districts: ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda'] },
+    { name: 'Telangana', districts: ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar'] },
+    { name: 'Madhya Pradesh', districts: ['Indore', 'Bhopal', 'Jabalpur', 'Gwalior', 'Ujjain'] },
+  ];
 
   const popularCities = [
     { name: 'Delhi NCR', icon: 'mappin.circle.fill', color: 'special' },
@@ -67,178 +85,242 @@ export default function HomeScreen() {
     { name: 'Rentals', icon: 'apartment' },
   ];
 
+  const filteredStates = indianStates.filter(state =>
+    state.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    state.districts.some(d => d.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={[styles.header, { backgroundColor: colors.tint }]}>
-          <View style={styles.headerTop}>
-            <Pressable
-              style={styles.locationInfo}
-              onPress={handleLocationRequest}
-            >
-              <ThemedText style={styles.locationLabel}>Current Location</ThemedText>
-              <View style={styles.cityRow}>
-                <ThemedText style={styles.cityText}>{city}</ThemedText>
-                <IconSymbol name="chevron.right" size={16} color="rgba(255,255,255,0.6)" />
+      {/* Location Selector Modal */}
+      <View style={{ flex: 1 }}>
+        {locationModalVisible && (
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000 }]}>
+            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+              <View style={styles.modalHeader}>
+                <ThemedText style={styles.modalTitle}>Select Location</ThemedText>
+                <Pressable onPress={() => setLocationModalVisible(false)} style={styles.closeButton}>
+                  <IconSymbol name="plus.circle.fill" size={24} color={colors.text} style={{ transform: [{ rotate: '45deg' }] }} />
+                </Pressable>
               </View>
-            </Pressable>
-            <Pressable
-              style={styles.notificationBell}
-              onPress={handleLocationRequest}
-              disabled={loadingLocation}
-            >
-              {loadingLocation ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <IconSymbol name="location.fill" size={24} color="#fff" />
-              )}
-            </Pressable>
-          </View>
 
-          <View style={styles.greetingContainer}>
-            <ThemedText style={styles.greeting}>Find your dream</ThemedText>
-            <ThemedText style={styles.subGreeting}>Property</ThemedText>
-          </View>
-        </View>
+              <View style={[styles.modalSearch, { backgroundColor: colors.secondary }]}>
+                <IconSymbol name="magnifyingglass" size={18} color={colors.icon} />
+                <TextInput
+                  placeholder="Search state or district..."
+                  placeholderTextColor={colors.icon}
+                  style={[styles.modalSearchInput, { color: colors.text }]}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
 
-        <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
-          <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
-          <TextInput
-            placeholder="Search properties, land..."
-            placeholderTextColor={colors.icon}
-            style={[styles.searchInput, { color: colors.text }]}
-          />
-        </View>
+              <ScrollView style={styles.modalList} showsVerticalScrollIndicator={false}>
+                <Pressable
+                  style={styles.modalOption}
+                  onPress={handleLocationRequest}
+                >
+                  <IconSymbol name="location.fill" size={20} color={colors.tint} />
+                  <ThemedText style={[styles.modalOptionText, { color: colors.tint, fontWeight: '700' }]}>Detect My Location</ThemedText>
+                </Pressable>
 
-        {/* Promo Reward Card */}
-        <Pressable
-          style={styles.rewardCard}
-          onPress={() => router.push('/(tabs)/add')}
-        >
-          <View style={styles.rewardIconContainer}>
-            <RNText style={{
-              fontSize: 32,
-              lineHeight: 45,
-              includeFontPadding: false,
-              textAlign: 'center',
-              color: '#fff'
-            }}>✨</RNText>
-          </View>
-          <View style={styles.rewardTextContainer}>
-            <ThemedText style={styles.rewardTag}>LIMITED OFFER</ThemedText>
-            <ThemedText style={styles.rewardTitle}>Post Now - It's Free! 🎊</ThemedText>
-            <ThemedText style={styles.rewardSubtitle}>List your property today and reach thousands of buyers instantly.</ThemedText>
-          </View>
-          <View style={styles.rewardAction}>
-            <IconSymbol name="chevron.right" size={20} color="#FFFFFF" />
-          </View>
-        </Pressable>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <ThemedText type="subtitle" style={styles.sectionTitle} numberOfLines={1}>Categories</ThemedText>
-            <Pressable>
-              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>See All</ThemedText>
-            </Pressable>
-          </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.categoriesScroll}
-            contentContainerStyle={styles.categoriesContent}
-          >
-            {categories.map((cat, index) => (
-              <Pressable
-                key={index}
-                style={styles.categoryItem}
-                onPress={() => router.push({
-                  pathname: '/properties',
-                  params: { category: cat.name }
-                })}
-              >
-                <View style={[styles.categoryIcon, { backgroundColor: colors.secondary }]}>
-                  <IconSymbol
-                    name={
-                      cat.name === 'Lands' ? 'mountain.2.fill' :
-                        cat.name === 'Commercial' ? 'building.2.fill' :
-                          cat.name === 'Rentals' ? 'apartment.fill' :
-                            'house.fill'
-                    }
-                    size={24}
-                    color={colors.tint}
-                  />
-                </View>
-                <ThemedText style={styles.categoryName}>{cat.name}</ThemedText>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Explore Cities Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>Explore Cities</ThemedText>
-            <Pressable>
-              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>All India</ThemedText>
-            </Pressable>
-          </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.categoriesScroll}
-            contentContainerStyle={styles.categoriesContent}
-          >
-            {popularCities.map((cityItem, index) => (
-              <Pressable
-                key={index}
-                style={styles.cityCard}
-                onPress={() => {
-                  setCity(cityItem.name);
-                  router.push({
-                    pathname: '/properties',
-                    params: { city: cityItem.name }
-                  });
-                }}
-              >
-                <View style={[styles.cityIconContainer, { backgroundColor: cityItem.color === 'special' ? colors.tint : colors.secondary }]}>
-                  <IconSymbol
-                    name={cityItem.icon}
-                    size={28}
-                    color={cityItem.color === 'special' ? '#FFF' : colors.tint}
-                  />
-                </View>
-                <ThemedText style={styles.cityName}>{cityItem.name}</ThemedText>
-                {cityItem.color === 'special' && (
-                  <View style={styles.specialBadge}>
-                    <ThemedText style={styles.specialBadgeText}>HOT</ThemedText>
+                {filteredStates.map((state, sIndex) => (
+                  <View key={sIndex} style={styles.stateGroup}>
+                    <ThemedText style={styles.stateHeader}>{state.name}</ThemedText>
+                    <View style={styles.districtGrid}>
+                      {state.districts
+                        .filter(d => searchQuery === '' || d.toLowerCase().includes(searchQuery.toLowerCase()))
+                        .map((district, dIndex) => (
+                          <Pressable
+                            key={dIndex}
+                            style={[styles.districtItem, { backgroundColor: colors.secondary }]}
+                            onPress={() => {
+                              setCity(district);
+                              setLocationModalVisible(false);
+                            }}
+                          >
+                            <ThemedText style={styles.districtText}>{district}</ThemedText>
+                          </Pressable>
+                        ))}
+                    </View>
                   </View>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        )}
+
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={[styles.header, { backgroundColor: colors.tint }]}>
+            <View style={styles.headerTop}>
+              <Pressable
+                style={styles.locationInfo}
+                onPress={() => setLocationModalVisible(true)}
+              >
+                <ThemedText style={styles.locationLabel}>Current Location</ThemedText>
+                <View style={styles.cityRow}>
+                  <ThemedText style={styles.cityText}>{city}</ThemedText>
+                  <IconSymbol name="chevron.right" size={16} color="rgba(255,255,255,0.6)" />
+                </View>
+              </Pressable>
+              <Pressable
+                style={styles.notificationBell}
+                onPress={handleLocationRequest}
+                disabled={loadingLocation}
+              >
+                {loadingLocation ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <IconSymbol name="location.fill" size={24} color="#fff" />
                 )}
               </Pressable>
-            ))}
-          </ScrollView>
-        </View>
+            </View>
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>Featured Listings</ThemedText>
+            <View style={styles.greetingContainer}>
+              <ThemedText style={styles.greeting}>Find your dream</ThemedText>
+              <ThemedText style={styles.subGreeting}>Property</ThemedText>
+            </View>
           </View>
 
-          <View style={styles.emptyState}>
-            <IconSymbol name="house.fill" size={60} color={colors.icon} />
-            <ThemedText style={styles.emptyText}>No listings yet.</ThemedText>
-            <ThemedText style={styles.emptySubText}>Be the first one to post a property!</ThemedText>
+          <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
+            <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
+            <TextInput
+              placeholder="Search properties, land..."
+              placeholderTextColor={colors.icon}
+              style={[styles.searchInput, { color: colors.text }]}
+            />
+          </View>
 
-            <Pressable
-              style={[styles.postButton, { backgroundColor: colors.tint }]}
-              onPress={() => router.push('/(tabs)/add')}
+          {/* Promo Reward Card */}
+          <Pressable
+            style={styles.rewardCard}
+            onPress={() => router.push('/(tabs)/add')}
+          >
+            <View style={styles.rewardIconContainer}>
+              <RNText style={{
+                fontSize: 32,
+                lineHeight: 45,
+                includeFontPadding: false,
+                textAlign: 'center',
+                color: '#fff'
+              }}>✨</RNText>
+            </View>
+            <View style={styles.rewardTextContainer}>
+              <ThemedText style={styles.rewardTag}>LIMITED OFFER</ThemedText>
+              <ThemedText style={styles.rewardTitle}>Post Now - It's Free! 🎊</ThemedText>
+              <ThemedText style={styles.rewardSubtitle}>List your property today and reach thousands of buyers instantly.</ThemedText>
+            </View>
+            <View style={styles.rewardAction}>
+              <IconSymbol name="chevron.right" size={20} color="#FFFFFF" />
+            </View>
+          </Pressable>
+
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <ThemedText type="subtitle" style={styles.sectionTitle} numberOfLines={1}>Categories</ThemedText>
+              <Pressable>
+                <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>See All</ThemedText>
+              </Pressable>
+            </View>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.categoriesScroll}
+              contentContainerStyle={styles.categoriesContent}
             >
-              <ThemedText style={styles.postButtonText}>Post Now</ThemedText>
-            </Pressable>
+              {categories.map((cat, index) => (
+                <Pressable
+                  key={index}
+                  style={styles.categoryItem}
+                  onPress={() => router.push({
+                    pathname: '/properties',
+                    params: { category: cat.name }
+                  })}
+                >
+                  <View style={[styles.categoryIcon, { backgroundColor: colors.secondary }]}>
+                    <IconSymbol
+                      name={
+                        cat.name === 'Lands' ? 'mountain.2.fill' :
+                          cat.name === 'Commercial' ? 'building.2.fill' :
+                            cat.name === 'Rentals' ? 'apartment.fill' :
+                              'house.fill'
+                      }
+                      size={24}
+                      color={colors.tint}
+                    />
+                  </View>
+                  <ThemedText style={styles.categoryName}>{cat.name}</ThemedText>
+                </Pressable>
+              ))}
+            </ScrollView>
           </View>
-        </View>
-      </ScrollView >
+
+          {/* Explore Cities Section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <ThemedText type="subtitle" style={styles.sectionTitle}>Explore Cities</ThemedText>
+              <Pressable onPress={() => setLocationModalVisible(true)}>
+                <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>All India</ThemedText>
+              </Pressable>
+            </View>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.categoriesScroll}
+              contentContainerStyle={styles.categoriesContent}
+            >
+              {popularCities.map((cityItem, index) => (
+                <Pressable
+                  key={index}
+                  style={styles.cityCard}
+                  onPress={() => {
+                    setCity(cityItem.name);
+                    router.push({
+                      pathname: '/properties',
+                      params: { city: cityItem.name }
+                    });
+                  }}
+                >
+                  <View style={[styles.cityIconContainer, { backgroundColor: cityItem.color === 'special' ? colors.tint : colors.secondary }]}>
+                    <IconSymbol
+                      name={cityItem.icon}
+                      size={28}
+                      color={cityItem.color === 'special' ? '#FFF' : colors.tint}
+                    />
+                  </View>
+                  <ThemedText style={styles.cityName}>{cityItem.name}</ThemedText>
+                  {cityItem.color === 'special' && (
+                    <View style={styles.specialBadge}>
+                      <ThemedText style={styles.specialBadgeText}>HOT</ThemedText>
+                    </View>
+                  )}
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <ThemedText style={styles.sectionTitle}>Featured Listings</ThemedText>
+            </View>
+
+            <View style={styles.emptyState}>
+              <IconSymbol name="house.fill" size={60} color={colors.icon} />
+              <ThemedText style={styles.emptyText}>No listings yet.</ThemedText>
+              <ThemedText style={styles.emptySubText}>Be the first one to post a property!</ThemedText>
+
+              <Pressable
+                style={[styles.postButton, { backgroundColor: colors.tint }]}
+                onPress={() => router.push('/(tabs)/add')}
+              >
+                <ThemedText style={styles.postButtonText}>Post Now</ThemedText>
+              </Pressable>
+            </View>
+          </View>
+        </ScrollView >
+      </View>
     </ThemedView >
   );
 }
@@ -503,5 +585,82 @@ const styles = StyleSheet.create({
   rewardAction: {
     marginLeft: 8,
     opacity: 0.8,
+  },
+  // Modal Styles
+  modalContent: {
+    flex: 1,
+    marginTop: 60,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    padding: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalSearch: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    height: 50,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  modalSearchInput: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  modalList: {
+    flex: 1,
+  },
+  modalOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+    marginBottom: 16,
+  },
+  modalOptionText: {
+    marginLeft: 12,
+    fontSize: 16,
+  },
+  stateGroup: {
+    marginBottom: 24,
+  },
+  stateHeader: {
+    fontSize: 14,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    opacity: 0.5,
+    marginBottom: 12,
+  },
+  districtGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -4,
+  },
+  districtItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    margin: 4,
+  },
+  districtText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
