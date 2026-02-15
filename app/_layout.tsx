@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginTop: 12,
-    letterSpacing: 9,
+    letterSpacing: 7.2,
     lineHeight: 24,
     textTransform: 'uppercase',
   },
