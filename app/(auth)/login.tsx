@@ -53,7 +53,7 @@ export default function LoginScreen() {
             // The prompt asks for "all country with flag". 
             // Let's use the phone number as is for the credential.
 
-            const virtualEmail = `${phone}@mahto.app`; // Keeping simple 10-digit based for now as per previous flow
+            const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
 
             // Sign in with Firebase
             await signInWithEmailAndPassword(auth, virtualEmail, password);

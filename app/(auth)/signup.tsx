@@ -37,7 +37,7 @@ export default function SignUpScreen() {
         setLoading(true);
         try {
             // Virtual Email Logic
-            const virtualEmail = `${phone}@mahto.app`;
+            const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
 
             // Create user in Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(auth, virtualEmail, password);
