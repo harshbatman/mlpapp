@@ -113,7 +113,7 @@ export default function SignUpScreen() {
                     <ThemedText style={styles.label}>Password</ThemedText>
                     <View style={styles.passwordContainer}>
                         <TextInput
-                            style={[styles.input, { flex: 1, borderColor: colors.border, color: colors.text }]}
+                            style={[styles.input, { flex: 1, backgroundColor: 'transparent', borderColor: colors.border, color: colors.text }]}
                             placeholder="Create a password"
                             placeholderTextColor={colors.icon}
                             value={password}

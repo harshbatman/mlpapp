@@ -49,6 +49,9 @@ const MAPPING: IconMapping = {
   'slider.horizontal.3': 'tune',
   'chevron.down': 'keyboard-arrow-down',
   'xmark.circle.fill': 'cancel',
+  'eye.fill': 'visibility',
+  'eye.slash.fill': 'visibility-off',
+  'checkmark.circle.fill': 'check-circle',
 };
 
 /**
