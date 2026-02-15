@@ -6,7 +6,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -97,6 +97,30 @@ export default function HomeScreen() {
             style={[styles.searchInput, { color: colors.text }]}
           />
         </View>
+
+        {/* Promo Reward Card */}
+        <Pressable
+          style={styles.rewardCard}
+          onPress={() => router.push('/(tabs)/add')}
+        >
+          <View style={styles.rewardIconContainer}>
+            <RNText style={{
+              fontSize: 32,
+              lineHeight: 45,
+              includeFontPadding: false,
+              textAlign: 'center',
+              color: '#fff'
+            }}>✨</RNText>
+          </View>
+          <View style={styles.rewardTextContainer}>
+            <ThemedText style={styles.rewardTag}>LIMITED OFFER</ThemedText>
+            <ThemedText style={styles.rewardTitle}>Post Now - It's Free! 🎊</ThemedText>
+            <ThemedText style={styles.rewardSubtitle}>List your property today and reach thousands of buyers instantly.</ThemedText>
+          </View>
+          <View style={styles.rewardAction}>
+            <IconSymbol name="chevron.right" size={20} color="#FFFFFF" />
+          </View>
+        </Pressable>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -316,5 +340,57 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  rewardCard: {
+    backgroundColor: '#000000', // Sleek Black Premium look
+    marginHorizontal: 16,
+    padding: 20,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  rewardIconContainer: {
+    width: 60,
+    height: 60,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+    overflow: 'hidden',
+  },
+  rewardTextContainer: {
+    flex: 1,
+  },
+  rewardTag: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  rewardTitle: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  rewardSubtitle: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: '600',
+  },
+  rewardAction: {
+    marginLeft: 8,
+    opacity: 0.8,
   },
 });

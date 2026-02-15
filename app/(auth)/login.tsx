@@ -1,4 +1,5 @@
 import { ThemedText } from '@/components/themed-text';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
@@ -30,6 +31,9 @@ export default function LoginScreen() {
             style={[styles.container, { backgroundColor: colors.background }]}
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
+                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                    <IconSymbol name="chevron.left" size={28} color={colors.text} />
+                </Pressable>
                 <View style={styles.header}>
                     <ThemedText type="title" style={styles.appName}>MAHTO</ThemedText>
                     <ThemedText type="subtitle" style={styles.tagline}>Land & Properties</ThemedText>
@@ -80,7 +84,14 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         padding: 24,
-        paddingTop: Platform.OS === 'ios' ? 80 : 60,
+        paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    },
+    backButton: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        marginBottom: 20,
     },
     header: {
         alignItems: 'flex-start',
@@ -115,15 +126,15 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 56,
-        backgroundColor: '#EEEEEE',
-        borderRadius: 0, // Uber style is more square
-        paddingHorizontal: 16,
+        backgroundColor: '#F6F6F6',
+        borderRadius: 12,
+        paddingHorizontal: 20,
         fontSize: 16,
         borderWidth: 0,
     },
     loginButton: {
         height: 60,
-        borderRadius: 4,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 40,

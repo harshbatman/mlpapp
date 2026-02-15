@@ -42,6 +42,7 @@ const MAPPING = {
   'crown.fill': 'workspace-premium',
   'lightbulb.fill': 'lightbulb-outline',
   'location.fill': 'my-location',
+  'sparkles': 'auto-awesome',
 } as IconMapping;
 
 /**
