@@ -21,6 +21,7 @@ export default function LoginScreen() {
     const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES.find(c => c.name === 'India') || COUNTRY_CODES[0]);
     const [showCountryModal, setShowCountryModal] = useState(false);
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async () => {
@@ -121,14 +122,26 @@ export default function LoginScreen() {
                     </View>
 
                     <ThemedText style={styles.label}>Password</ThemedText>
-                    <TextInput
-                        style={[styles.input, { borderColor: colors.border, color: colors.text }]}
-                        placeholder="Enter your password"
-                        placeholderTextColor={colors.icon}
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                    />
+                    <View style={styles.passwordContainer}>
+                        <TextInput
+                            style={[styles.input, { flex: 1, borderColor: colors.border, color: colors.text }]}
+                            placeholder="Enter your password"
+                            placeholderTextColor={colors.icon}
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry={!showPassword}
+                        />
+                        <Pressable
+                            style={styles.eyeButton}
+                            onPress={() => setShowPassword(!showPassword)}
+                        >
+                            <IconSymbol
+                                name={showPassword ? 'eye.fill' : 'eye.slash.fill'}
+                                size={22}
+                                color={colors.icon}
+                            />
+                        </Pressable>
+                    </View>
 
                     <Pressable
                         style={[styles.loginButton, { backgroundColor: '#000000' }, loading && { opacity: 0.7 }]}
@@ -243,6 +256,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         fontSize: 16,
         borderWidth: 0,
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F6F6F6',
+        borderRadius: 12,
+    },
+    eyeButton: {
+        padding: 16,
     },
     phoneContainer: {
         flexDirection: 'row',
