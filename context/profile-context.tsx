@@ -14,6 +14,7 @@ type ProfileData = {
 
 type ProfileContextType = {
     profile: ProfileData;
+    loading: boolean;
     updateProfile: (data: Partial<ProfileData>) => void;
     logout: () => Promise<void>;
 };
@@ -80,7 +81,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <ProfileContext.Provider value={{ profile, updateProfile, logout }}>
+        <ProfileContext.Provider value={{ profile, loading, updateProfile, logout }}>
             {children}
         </ProfileContext.Provider>
     );

@@ -1,5 +1,4 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Redirect, Tabs } from 'expo-router';
 import { Image, StyleSheet, View } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
@@ -10,7 +9,11 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { profile } = useProfile();
+  const { profile, loading } = useProfile();
+
+  if (!loading && !profile.isLoggedIn) {
+    return <Redirect href="/" />;
+  }
 
   return (
     <Tabs
