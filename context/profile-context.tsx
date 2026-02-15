@@ -53,6 +53,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
                             isLoggedIn: true,
                         });
                     }
+                    setLoading(false);
                 });
 
                 return () => unsubscribeDoc();
