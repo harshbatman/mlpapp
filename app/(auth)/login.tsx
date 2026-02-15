@@ -99,6 +99,7 @@ export default function LoginScreen() {
                         >
                             <ThemedText style={{ fontSize: 24 }}>{selectedCountry.flag}</ThemedText>
                             <ThemedText style={{ fontSize: 16, fontWeight: '600', marginLeft: 4 }}>{selectedCountry.code}</ThemedText>
+                            <IconSymbol name="chevron.down" size={14} color={colors.text} style={{ marginLeft: 6, opacity: 0.6 }} />
                         </Pressable>
                         <TextInput
                             style={[styles.input, { flex: 1, borderColor: colors.border, color: colors.text }]}
