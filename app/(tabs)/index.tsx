@@ -432,6 +432,7 @@ export default function HomeScreen() {
   const indianStates = INDIAN_LOCATIONS;
 
   const popularCities = [
+    { name: 'Hyderabad', image: require('@/assets/images/cities/hyderabad.png'), color: 'standard' },
     { name: 'Delhi NCR', image: require('@/assets/images/cities/delhi.png'), color: 'special' },
     { name: 'Mumbai', image: require('@/assets/images/cities/mumbai.png'), color: 'standard' },
     { name: 'Bengaluru', image: require('@/assets/images/cities/bengaluru.png'), color: 'standard' },
