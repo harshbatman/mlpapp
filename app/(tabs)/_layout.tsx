@@ -1,4 +1,5 @@
 import { Redirect, Tabs } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, View } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
@@ -10,6 +11,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { profile, loading } = useProfile();
+  const { t } = useTranslation();
 
   if (!loading && !profile.isLoggedIn) {
     return <Redirect href="/" />;
@@ -25,21 +27,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: t('Home'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="add"
         options={{
-          title: 'Post',
+          title: t('Post'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: t('Profile'),
           tabBarIcon: ({ color }) => {
             if (profile.image) {
               return (

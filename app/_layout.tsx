@@ -2,9 +2,10 @@ import { ThemedText } from '@/components/themed-text';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
+import './config/i18n';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 

@@ -4,10 +4,12 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 export default function AboutScreen() {
     const router = useRouter();
+    const { t } = useTranslation();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
 
@@ -48,7 +50,7 @@ export default function AboutScreen() {
                 <Pressable onPress={() => router.back()} style={styles.backButton}>
                     <IconSymbol name="chevron.left" size={24} color={colors.text} />
                 </Pressable>
-                <ThemedText type="subtitle" style={styles.headerTitle}>About MAHTO</ThemedText>
+                <ThemedText type="subtitle" style={styles.headerTitle}>{t('About Us')}</ThemedText>
                 <View style={{ width: 40 }} />
             </View>
 
@@ -95,17 +97,17 @@ export default function AboutScreen() {
 
                 <View style={styles.visionMissionRow}>
                     <View style={styles.vmCard}>
-                        <ThemedText style={styles.vmLabel}>OUR MISSION</ThemedText>
-                        <ThemedText style={styles.vmTitle}>"Sabka sar apni chhaat."</ThemedText>
-                        <ThemedText style={styles.vmDesc}>A roof over every head — not a roof, but own roof.</ThemedText>
+                        <ThemedText style={styles.vmLabel}>{t('Mission')}</ThemedText>
+                        <ThemedText style={styles.vmTitle}>{t('Sabka Sar')}</ThemedText>
+                        <ThemedText style={styles.vmDesc}>{t('Sabka Sar')}</ThemedText>
                     </View>
 
                     <View style={styles.divider} />
 
                     <View style={styles.vmCard}>
-                        <ThemedText style={styles.vmLabel}>OUR VISION</ThemedText>
-                        <ThemedText style={styles.vmTitle}>Global OS</ThemedText>
-                        <ThemedText style={styles.vmDesc}>To raise living standards by becoming the global operating system for home building.</ThemedText>
+                        <ThemedText style={styles.vmLabel}>{t('Vision')}</ThemedText>
+                        <ThemedText style={styles.vmTitle}>{t('Global OS')}</ThemedText>
+                        <ThemedText style={styles.vmDesc}>{t('Global OS')}</ThemedText>
                     </View>
                 </View>
 

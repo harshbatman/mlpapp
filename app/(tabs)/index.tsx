@@ -8,6 +8,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Dimensions, Image, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -418,6 +419,7 @@ const styles = StyleSheet.create({
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme as 'light' | 'dark'];
   const [city, setCity] = useState('Select Location');
@@ -789,8 +791,8 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.greetingContainer}>
-            <ThemedText style={styles.greeting}>Find your dream</ThemedText>
-            <ThemedText style={styles.subGreeting}>Property</ThemedText>
+            <ThemedText style={styles.greeting}>{t('Find Dream')}</ThemedText>
+            <ThemedText style={styles.subGreeting}>{t('Property')}</ThemedText>
           </View>
         </View>
 
@@ -798,7 +800,7 @@ export default function HomeScreen() {
           <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
             <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
             <TextInput
-              placeholder="Search properties, land..."
+              placeholder={t('Search')}
               placeholderTextColor={colors.icon}
               style={[styles.searchInput, { color: colors.text }]}
             />

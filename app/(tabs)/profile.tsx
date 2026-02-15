@@ -7,10 +7,12 @@ import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function ProfileScreen() {
     const router = useRouter();
+    const { t } = useTranslation();
     const { showProfessionalError, showNotification } = useNotification();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
@@ -112,10 +114,13 @@ export default function ProfileScreen() {
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
-                    <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/language-selector')}
+                    >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="globe" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Language</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Language')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
@@ -160,7 +165,7 @@ export default function ProfileScreen() {
                     >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="info.circle" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>About Us</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('About Us')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
@@ -201,7 +206,7 @@ export default function ProfileScreen() {
                     <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]} onPress={handleLogoutClick}>
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="rectangle.portrait.and.arrow.right" size={22} color="#000000" />
-                            <ThemedText style={styles.menuItemText}>Logout</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Logout')}</ThemedText>
                         </View>
                     </Pressable>
                     <Pressable
