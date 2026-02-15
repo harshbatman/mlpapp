@@ -972,36 +972,21 @@ export default function HomeScreen() {
             {categories.map((cat, index) => (
               <Pressable
                 key={index}
-                style={[
-                  styles.categoryItem,
-                  selectedCategories.includes(cat.name) && { transform: [{ scale: 1.05 }] }
-                ]}
                 onPress={() => {
-                  toggleCategory(cat.name);
                   router.push({
                     pathname: '/properties',
                     params: { category: cat.name }
                   });
                 }}
               >
-                <View style={[
-                  styles.categoryIcon,
-                  {
-                    backgroundColor: selectedCategories.includes(cat.name) ? colors.tint : colors.secondary,
-                    borderWidth: 2,
-                    borderColor: selectedCategories.includes(cat.name) ? colors.tint : 'transparent'
-                  }
-                ]}>
+                <View style={[styles.categoryIcon, { backgroundColor: colors.secondary }]}>
                   <IconSymbol
                     name={cat.icon as any}
                     size={32}
-                    color={selectedCategories.includes(cat.name) ? '#FFF' : colors.tint}
+                    color={colors.tint}
                   />
                 </View>
-                <ThemedText style={[
-                  styles.categoryName,
-                  { color: selectedCategories.includes(cat.name) ? colors.tint : colors.text, fontWeight: selectedCategories.includes(cat.name) ? '800' : '600' }
-                ]}>
+                <ThemedText style={styles.categoryName}>
                   {cat.name}
                 </ThemedText>
               </Pressable>

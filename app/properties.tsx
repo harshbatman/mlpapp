@@ -18,35 +18,31 @@ export default function PropertyListScreen() {
 
     return (
         <ThemedView style={styles.container}>
-            <View style={[styles.header, { borderBottomColor: colors.border }]}>
-                <Pressable
-                    onPress={() => {
-                        if (router.canGoBack()) {
-                            router.back();
-                        } else {
-                            router.replace('/(tabs)');
-                        }
-                    }}
-                    style={styles.backButton}
-                >
-                    <IconSymbol name="chevron.left" size={28} color={colors.text} />
-                </Pressable>
-                <ThemedText style={styles.headerTitle}>{category || 'Properties'}</ThemedText>
-                <View style={{ width: 40 }} />
+            <View style={[styles.header, { backgroundColor: colors.tint }]}>
+                <View style={styles.headerTop}>
+                    <Pressable
+                        onPress={() => router.back()}
+                        style={styles.backButton}
+                    >
+                        <IconSymbol name="chevron.left" size={28} color="#FFF" />
+                    </Pressable>
+                    <ThemedText style={styles.headerTitle}>{category || 'All Properties'}</ThemedText>
+                    <View style={{ width: 40 }} />
+                </View>
             </View>
 
             <View style={styles.searchSection}>
                 <View style={styles.searchRow}>
-                    <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                    <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
                         <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
                         <TextInput
-                            placeholder={`Search ${category || 'properties'}...`}
+                            placeholder={`Search in ${category || 'all category'}...`}
                             placeholderTextColor={colors.icon}
                             style={[styles.searchInput, { color: colors.text }]}
                         />
                     </View>
-                    <Pressable style={[styles.filterButton, { backgroundColor: colors.primary }]}>
-                        <IconSymbol name="slider.horizontal.3" size={20} color="#FFF" />
+                    <Pressable style={[styles.filterButton, { backgroundColor: colors.tint }]}>
+                        <IconSymbol name="slider.horizontal.3" size={22} color="#FFF" />
                     </Pressable>
                 </View>
             </View>
@@ -55,6 +51,7 @@ export default function PropertyListScreen() {
                 data={properties}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.listContent}
+                showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => (
                     <Pressable style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
                         <View style={styles.imagePlaceholder}>
@@ -87,13 +84,14 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
+        paddingTop: 60,
+        paddingBottom: 24,
+        paddingHorizontal: 20,
+    },
+    headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: 60,
-        paddingBottom: 20,
-        paddingHorizontal: 20,
-        borderBottomWidth: 1,
     },
     backButton: {
         width: 40,
@@ -104,10 +102,17 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: '800',
         letterSpacing: -0.5,
+        color: '#FFF',
     },
     searchSection: {
-        padding: 20,
-        paddingBottom: 0,
+        paddingHorizontal: 20,
+        marginTop: -32, // Offset to pull search box into header area if desired, or just space out
+        zIndex: 10,
+    },
+    searchRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
     },
     searchContainer: {
         flex: 1,
@@ -116,18 +121,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         height: 64,
         borderRadius: 16,
-        borderWidth: 1,
+        backgroundColor: '#FFF',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 5,
     },
     searchInput: {
         flex: 1,
         marginLeft: 12,
         fontSize: 18,
         fontWeight: '500',
-    },
-    searchRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
     },
     filterButton: {
         width: 64,
