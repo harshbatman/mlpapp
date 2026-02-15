@@ -9,11 +9,10 @@ import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Dimensions, Image, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
-// Styles moved to top to avoid initialization issues
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -415,8 +414,6 @@ const styles = StyleSheet.create({
   },
 });
 
-
-
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -429,7 +426,7 @@ export default function HomeScreen() {
   const [selectedState, setSelectedState] = useState<any>(null);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [mainFilterModalVisible, setMainFilterModalVisible] = useState(false);
-  const { showNotification, showProfessionalError } = useNotification();
+  const { showNotification, showProfessionalError, showConfirm } = useNotification();
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -452,35 +449,44 @@ export default function HomeScreen() {
   ];
 
   const handleLocationRequest = async () => {
-    setLoadingLocation(true);
-    let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      setLoadingLocation(false);
-      showProfessionalError({ code: 'location-denied' });
-      return;
-    }
+    showConfirm({
+      title: 'Location Access',
+      message: 'Allow MAHTO to access your location to find the best properties and services near you.',
+      icon: 'location',
+      iconColor: colors.tint,
+      primaryActionText: 'Allow Access',
+      secondaryActionText: 'Maybe Later',
+      onPrimaryAction: async () => {
+        setLoadingLocation(true);
+        try {
+          let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            showProfessionalError({ code: 'location-denied' });
+            return;
+          }
 
-    try {
-      let location = await ExpoLocation.getCurrentPositionAsync({
-        accuracy: ExpoLocation.Accuracy.Balanced,
-      });
+          let location = await ExpoLocation.getCurrentPositionAsync({
+            accuracy: ExpoLocation.Accuracy.Balanced,
+          });
 
-      const reverseGeocode = await ExpoLocation.reverseGeocodeAsync({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
+          const reverseGeocode = await ExpoLocation.reverseGeocodeAsync({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
 
-      if (reverseGeocode.length > 0) {
-        const address = reverseGeocode[0];
-        const cityName = address.city || address.district || address.region || 'Unknown Location';
-        setCity(cityName);
-        showNotification('success', 'Location Updated', `Found you in ${cityName}`);
+          if (reverseGeocode.length > 0) {
+            const address = reverseGeocode[0];
+            const cityName = address.city || address.district || address.region || 'Unknown Location';
+            setCity(cityName);
+            showNotification('success', 'Location Updated', `Found you in ${cityName}`);
+          }
+        } catch (error: any) {
+          showProfessionalError(error, 'Location Error');
+        } finally {
+          setLoadingLocation(false);
+        }
       }
-    } catch (error) {
-      showProfessionalError(error, 'Location Error');
-    } finally {
-      setLoadingLocation(false);
-    }
+    });
   };
 
   const categories = [
@@ -490,7 +496,6 @@ export default function HomeScreen() {
     { name: 'Rentals', icon: 'apartment.fill' },
   ];
 
-  // Optimization: Memoize filtered states or districts based on selection
   const filteredList = React.useMemo(() => {
     if (selectedState) {
       const districts = selectedState.districts;
@@ -504,8 +509,6 @@ export default function HomeScreen() {
       state.districts.some((d: string) => d.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }, [searchQuery, selectedState, indianStates]);
-
-
 
   const toggleDistrict = (districtName: string) => {
     setSelectedDistricts(prev =>
@@ -542,7 +545,6 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* Optimized Location Selector Modal */}
       <Modal
         visible={locationModalVisible}
         animationType="slide"
@@ -685,9 +687,6 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
-
-
-      {/* Unified Search Filter Modal */}
       <Modal
         visible={mainFilterModalVisible}
         animationType="slide"
@@ -704,7 +703,6 @@ export default function HomeScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
-              {/* Location Section */}
               <View style={styles.filterSection}>
                 <View style={styles.filterSectionHeader}>
                   <ThemedText style={styles.filterSectionTitle}>Location</ThemedText>
@@ -731,9 +729,6 @@ export default function HomeScreen() {
                 </View>
               </View>
 
-
-
-              {/* Reset All */}
               <Pressable
                 onPress={() => {
                   setSelectedDistricts([]);
@@ -798,105 +793,68 @@ export default function HomeScreen() {
 
         <View style={styles.searchRow}>
           <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
-            <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
-            <TextInput
-              placeholder={t('Search')}
-              placeholderTextColor={colors.icon}
-              style={[styles.searchInput, { color: colors.text }]}
-            />
+            <View style={styles.searchLeft}>
+              <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
+              <TextInput
+                placeholder={t('Search properties, lands...')}
+                placeholderTextColor={colors.icon}
+                style={[styles.searchInput, { color: colors.text }]}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
           </View>
           <Pressable
-            style={({ pressed }) => [
-              styles.filterButton,
-              {
-                backgroundColor: colors.tint,
-                opacity: pressed ? 0.7 : 1,
-                transform: [{ scale: pressed ? 0.96 : 1 }]
-              }
-            ]}
+            style={[styles.filterButton, { backgroundColor: colors.tint }]}
             onPress={() => setMainFilterModalVisible(true)}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <IconSymbol name="slider.horizontal.3" size={24} color="#FFF" />
+            <IconSymbol name="slider.horizontal.3" size={24} color="#fff" />
           </Pressable>
         </View>
 
-        {/* Promo Reward Card */}
-        <Pressable
-          style={styles.rewardCard}
-          onPress={() => router.push('/(tabs)/add')}
-        >
+        <View style={styles.rewardCard}>
           <View style={styles.rewardIconContainer}>
-            <RNText style={{
-              fontSize: 32,
-              lineHeight: 45,
-              includeFontPadding: false,
-              textAlign: 'center',
-              color: '#fff'
-            }}>✨</RNText>
+            <IconSymbol name="sparkles" size={32} color="#FFD700" />
           </View>
           <View style={styles.rewardTextContainer}>
-            <ThemedText style={styles.rewardTag}>LIMITED OFFER</ThemedText>
-            <ThemedText style={styles.rewardTitle}>Post Now - It's Free! 🎊</ThemedText>
-            <ThemedText style={styles.rewardSubtitle}>List your property today and reach thousands of buyers instantly.</ThemedText>
+            <ThemedText style={styles.rewardTag}>EXCLUSIVE REWARDS</ThemedText>
+            <ThemedText style={styles.rewardTitle}>Refer & Earn ₹5000</ThemedText>
+            <ThemedText style={styles.rewardSubtitle}>Refer a property and get instant cash rewards upon successful listing.</ThemedText>
           </View>
-          <View style={styles.rewardAction}>
-            <IconSymbol name="chevron.right" size={20} color="#FFFFFF" />
-          </View>
-        </Pressable>
+          <Pressable style={styles.rewardAction}>
+            <IconSymbol name="chevron.right" size={24} color="#FFF" />
+          </Pressable>
+        </View>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText type="subtitle" style={styles.sectionTitle} numberOfLines={1}>
-              Categories
-            </ThemedText>
-            <Pressable onPress={() => router.push('/properties')}>
-              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>
-                See All
-              </ThemedText>
-            </Pressable>
+            <ThemedText style={styles.sectionTitle}>{t('Categories')}</ThemedText>
           </View>
-
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.categoriesScroll}
             contentContainerStyle={styles.categoriesContent}
           >
-            {categories.map((cat, index) => (
+            {categories.map((item, index) => (
               <Pressable
                 key={index}
                 style={styles.categoryItem}
-                onPress={() => {
-                  router.push({
-                    pathname: '/properties',
-                    params: { category: cat.name }
-                  });
-                }}
+                onPress={() => router.push({ pathname: '/properties', params: { category: item.name } })}
               >
-                <View style={[styles.categoryIcon, { backgroundColor: colors.secondary }]}>
-                  <IconSymbol
-                    name={cat.icon as any}
-                    size={32}
-                    color={colors.tint}
-                  />
+                <View style={[styles.categoryIcon, { backgroundColor: colors.tint + '15' }]}>
+                  <IconSymbol name={item.icon as any} size={32} color={colors.tint} />
                 </View>
-                <ThemedText style={styles.categoryName}>
-                  {cat.name}
-                </ThemedText>
+                <ThemedText style={styles.categoryName}>{t(item.name)}</ThemedText>
               </Pressable>
             ))}
           </ScrollView>
-        </View >
+        </View>
 
-        <View style={styles.section} >
+        <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>Explore Cities</ThemedText>
-            <Pressable onPress={() => setLocationModalVisible(true)}>
-              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>All India</ThemedText>
-            </Pressable>
+            <ThemedText style={styles.sectionTitle}>{t('Popular Cities')}</ThemedText>
           </View>
-
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -909,19 +867,11 @@ export default function HomeScreen() {
                 style={styles.cityCard}
                 onPress={() => {
                   setCity(cityItem.name);
-                  showNotification('success', 'Location Updated', `Exploring properties in ${cityItem.name}`);
-                  router.push({
-                    pathname: '/properties',
-                    params: { city: cityItem.name }
-                  });
+                  showNotification('success', 'Location Changed', `Showing properties in ${cityItem.name}`);
                 }}
               >
-                <View style={[styles.cityIconContainer, { padding: 0, overflow: 'hidden', borderWidth: 0 }]}>
-                  <Image
-                    source={cityItem.image}
-                    style={{ width: '100%', height: '100%' }}
-                    resizeMode="cover"
-                  />
+                <View style={[styles.cityIconContainer, { backgroundColor: cityItem.color === 'special' ? colors.tint + '15' : '#F5F5F5' }]}>
+                  <ThemedText style={{ fontSize: 32 }}>🏙️</ThemedText>
                 </View>
                 <ThemedText style={styles.cityName}>{cityItem.name}</ThemedText>
                 {cityItem.color === 'special' && (
@@ -932,23 +882,25 @@ export default function HomeScreen() {
               </Pressable>
             ))}
           </ScrollView>
-        </View >
+        </View>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>Featured Listings</ThemedText>
+            <ThemedText style={styles.sectionTitle}>{t('Featured')}</ThemedText>
+            <Pressable>
+              <ThemedText style={{ color: colors.tint, fontWeight: '700' }}>View All</ThemedText>
+            </Pressable>
           </View>
 
           <View style={styles.emptyState}>
-            <IconSymbol name="house.fill" size={60} color={colors.icon} />
-            <ThemedText style={styles.emptyText}>No listings yet.</ThemedText>
-            <ThemedText style={styles.emptySubText}>Be the first one to post a property!</ThemedText>
-
+            <IconSymbol name="house.fill" size={48} color={colors.icon} style={{ opacity: 0.2 }} />
+            <ThemedText style={styles.emptyText}>No featured properties yet</ThemedText>
+            <ThemedText style={styles.emptySubText}>Be the first one to post a property in your area!</ThemedText>
             <Pressable
               style={[styles.postButton, { backgroundColor: colors.tint }]}
               onPress={() => router.push('/(tabs)/add')}
             >
-              <ThemedText style={styles.postButtonText}>Post Now</ThemedText>
+              <ThemedText style={styles.postButtonText}>Post Property</ThemedText>
             </Pressable>
           </View>
         </View>
@@ -956,5 +908,3 @@ export default function HomeScreen() {
     </ThemedView>
   );
 }
-
-

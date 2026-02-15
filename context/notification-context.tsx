@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
 import { Animated, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StylishModal } from '../components/ui/stylish-modal';
 
 export type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
@@ -11,6 +12,17 @@ interface Notification {
     title: string;
     message: string;
     duration?: number;
+}
+
+interface ConfirmProps {
+    title: string;
+    message: string;
+    icon?: keyof typeof Ionicons.glyphMap;
+    iconColor?: string;
+    primaryActionText?: string;
+    onPrimaryAction?: () => void;
+    secondaryActionText?: string;
+    onSecondaryAction?: () => void;
 }
 
 const ERROR_MAPPING: Record<string, { title: string; message: string }> = {
@@ -60,23 +72,20 @@ interface NotificationContextType {
     showNotification: (type: NotificationType, title: string, message: string, duration?: number) => void;
     showProfessionalError: (error: any, fallbackTitle?: string) => void;
     hideNotification: () => void;
+    showConfirm: (props: ConfirmProps) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
-const NOTIFICATION_HEIGHT = 80;
-
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
     const [notification, setNotification] = useState<Notification | null>(null);
+    const [confirmProps, setConfirmProps] = useState<ConfirmProps | null>(null);
     const translateY = useRef(new Animated.Value(-150)).current;
     const insets = useSafeAreaInsets();
     const timerRef = useRef<NodeJS.Timeout | number | null>(null);
 
     const showNotification = useCallback((type: NotificationType, title: string, message: string, duration = 4000) => {
-        // Clear any existing timer
-        if (timerRef.current) {
-            clearTimeout(timerRef.current);
-        }
+        if (timerRef.current) clearTimeout(timerRef.current as any);
 
         const newNotification: Notification = {
             id: Date.now().toString(),
@@ -88,7 +97,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
         setNotification(newNotification);
 
-        // Animate in
         Animated.spring(translateY, {
             toValue: insets.top + 10,
             useNativeDriver: true,
@@ -96,7 +104,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             tension: 40,
         }).start();
 
-        // Set timer to auto-hide
         if (duration > 0) {
             timerRef.current = setTimeout(() => {
                 hideNotification();
@@ -107,22 +114,26 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     const showProfessionalError = useCallback((error: any, fallbackTitle = 'Something went wrong') => {
         const errorCode = error?.code || error?.message || 'unknown';
         const mapped = ERROR_MAPPING[errorCode];
-
         const title = mapped?.title || fallbackTitle;
         const message = mapped?.message || 'We encountered an unexpected issue. Our team is looking into it. Please try again.';
-
         showNotification('error', title, message);
     }, [showNotification]);
 
     const hideNotification = useCallback(() => {
         Animated.timing(translateY, {
-            toValue: -200, // Move completely off screen
+            toValue: -200,
             duration: 300,
             useNativeDriver: true,
         }).start(() => {
             setNotification(null);
         });
     }, []);
+
+    const showConfirm = useCallback((props: ConfirmProps) => {
+        setConfirmProps(props);
+    }, []);
+
+    const closeConfirm = () => setConfirmProps(null);
 
     const getIconName = (type: NotificationType): keyof typeof Ionicons.glyphMap => {
         switch (type) {
@@ -136,50 +147,58 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
     const getColors = (type: NotificationType) => {
         switch (type) {
-            case 'success': return { bg: '#10B981', border: '#059669', icon: '#FFFFFF' }; // Emerald Green
-            case 'error': return { bg: '#EF4444', border: '#DC2626', icon: '#FFFFFF' };   // Red
-            case 'warning': return { bg: '#F59E0B', border: '#D97706', icon: '#FFFFFF' }; // Amber
-            case 'info': return { bg: '#3B82F6', border: '#2563EB', icon: '#FFFFFF' };    // Blue
-            default: return { bg: '#3B82F6', border: '#2563EB', icon: '#FFFFFF' };
+            case 'success': return { bg: '#10B981', border: '#059669' };
+            case 'error': return { bg: '#EF4444', border: '#DC2626' };
+            case 'warning': return { bg: '#F59E0B', border: '#D97706' };
+            case 'info': return { bg: '#3B82F6', border: '#2563EB' };
+            default: return { bg: '#3B82F6', border: '#2563EB' };
         }
     };
 
     return (
-        <NotificationContext.Provider value={{ showNotification, showProfessionalError, hideNotification }}>
+        <NotificationContext.Provider value={{ showNotification, showProfessionalError, hideNotification, showConfirm }}>
             {children}
+
             {notification && (
-                <Animated.View
-                    style={[
-                        styles.container,
-                        {
-                            transform: [{ translateY }],
-                            top: 0, // Positioned relative to the window
-                        }
-                    ]}
-                >
+                <Animated.View style={[styles.container, { transform: [{ translateY }], top: 0 }]}>
                     <View style={[styles.card, {
                         borderColor: getColors(notification.type).border,
-                        borderLeftWidth: 4, // Accent border on the left
+                        borderLeftWidth: 4,
                         borderLeftColor: getColors(notification.type).bg
                     }]}>
-
-                        {/* Icon Container */}
                         <View style={[styles.iconContainer, { backgroundColor: getColors(notification.type).bg }]}>
                             <Ionicons name={getIconName(notification.type)} size={24} color="#FFFFFF" />
                         </View>
-
-                        {/* Content */}
                         <View style={styles.contentContainer}>
                             <Text style={styles.title}>{notification.title}</Text>
                             <Text style={styles.message} numberOfLines={2}>{notification.message}</Text>
                         </View>
-
-                        {/* Close Button */}
                         <TouchableOpacity onPress={hideNotification} style={styles.closeButton}>
                             <Ionicons name="close" size={20} color="#6B7280" />
                         </TouchableOpacity>
                     </View>
                 </Animated.View>
+            )}
+
+            {confirmProps && (
+                <StylishModal
+                    visible={!!confirmProps}
+                    onClose={closeConfirm}
+                    title={confirmProps.title}
+                    message={confirmProps.message}
+                    icon={confirmProps.icon}
+                    iconColor={confirmProps.iconColor}
+                    primaryActionText={confirmProps.primaryActionText}
+                    onPrimaryAction={() => {
+                        confirmProps.onPrimaryAction?.();
+                        closeConfirm();
+                    }}
+                    secondaryActionText={confirmProps.secondaryActionText}
+                    onSecondaryAction={() => {
+                        confirmProps.onSecondaryAction?.();
+                        closeConfirm();
+                    }}
+                />
             )}
         </NotificationContext.Provider>
     );
@@ -187,9 +206,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
 export function useNotification() {
     const context = useContext(NotificationContext);
-    if (context === undefined) {
-        throw new Error('useNotification must be used within a NotificationProvider');
-    }
+    if (context === undefined) throw new Error('useNotification must be used within a NotificationProvider');
     return context;
 }
 
@@ -198,7 +215,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 16,
         right: 16,
-        zIndex: 99999, // Ensure it's on top of everything
+        zIndex: 99999,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
@@ -213,14 +230,11 @@ const styles = StyleSheet.create({
     },
     card: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(25, 25, 25, 0.95)', // Dark, slightly transparent background
+        backgroundColor: 'rgba(25, 25, 25, 0.95)',
         borderRadius: 16,
         padding: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderTopWidth: 1,
-        borderRightWidth: 1,
-        borderBottomWidth: 1,
         minHeight: 70,
     },
     iconContainer: {
@@ -243,7 +257,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
     message: {
-        color: '#D1D5DB', // Gray-300
+        color: '#D1D5DB',
         fontSize: 14,
         fontWeight: '500',
         lineHeight: 20,

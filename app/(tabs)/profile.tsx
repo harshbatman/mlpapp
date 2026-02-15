@@ -13,27 +13,31 @@ import { Image, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, V
 export default function ProfileScreen() {
     const router = useRouter();
     const { t } = useTranslation();
-    const { showProfessionalError, showNotification } = useNotification();
+    const { showProfessionalError, showNotification, showConfirm } = useNotification();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
     const { profile, logout } = useProfile();
-    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [confirmPhone, setConfirmPhone] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleLogoutClick = () => {
-        setShowLogoutConfirm(true);
-    };
-
-    const confirmLogout = async () => {
-        try {
-            setShowLogoutConfirm(false);
-            await logout();
-            router.replace('/(auth)/login');
-        } catch (error) {
-            showProfessionalError(error, 'Logout Failed');
-        }
+        showConfirm({
+            title: 'Logout',
+            message: 'Are you sure you want to log out of your MAHTO account? You will need to sign in again to access your listings and saved properties.',
+            icon: 'log-out',
+            iconColor: '#EF4444',
+            primaryActionText: 'Logout',
+            secondaryActionText: 'Stay Logged In',
+            onPrimaryAction: async () => {
+                try {
+                    await logout();
+                    router.replace('/(auth)/login');
+                } catch (error) {
+                    showProfessionalError(error, 'Logout Failed');
+                }
+            }
+        });
     };
 
     const handleDeleteClick = () => {
@@ -220,39 +224,12 @@ export default function ProfileScreen() {
                     </Pressable>
                 </View>
 
-                <Modal
-                    visible={showLogoutConfirm}
-                    transparent={true}
-                    animationType="fade"
-                    onRequestClose={() => setShowLogoutConfirm(false)}
-                >
-                    <View style={styles.modalOverlay}>
-                        <View style={[styles.confirmCard, { backgroundColor: colors.background }]}>
-                            <ThemedText style={styles.confirmTitle}>Logout</ThemedText>
-                            <ThemedText style={styles.confirmSubTitle}>Are you sure you want to logout from MAHTO?</ThemedText>
 
-                            <View style={styles.confirmActions}>
-                                <Pressable
-                                    style={[styles.confirmButton, styles.noButton, { borderColor: colors.border }]}
-                                    onPress={() => setShowLogoutConfirm(false)}
-                                >
-                                    <ThemedText style={styles.noText}>No</ThemedText>
-                                </Pressable>
-                                <Pressable
-                                    style={[styles.confirmButton, styles.yesButton, { backgroundColor: '#EF4444', borderColor: '#EF4444' }]}
-                                    onPress={confirmLogout}
-                                >
-                                    <ThemedText style={styles.yesText}>Yes</ThemedText>
-                                </Pressable>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
 
                 <Modal
                     visible={showDeleteConfirm}
                     transparent={true}
-                    animationType="slide"
+                    animationType="fade"
                     onRequestClose={() => setShowDeleteConfirm(false)}
                 >
                     <View style={styles.modalOverlay}>
@@ -260,9 +237,9 @@ export default function ProfileScreen() {
                             <ThemedText style={[styles.confirmTitle, { color: '#EF4444' }]}>Delete Account</ThemedText>
                             <ThemedText style={styles.confirmSubTitle}>Please enter your details to confirm permanent deletion.</ThemedText>
 
-                            <View style={styles.deleteForm}>
+                            <View style={styles.inputGroup}>
                                 <TextInput
-                                    style={[styles.deleteInput, { borderColor: colors.border, color: colors.text }]}
+                                    style={[styles.confirmInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.secondary }]}
                                     placeholder="Phone Number"
                                     placeholderTextColor={colors.icon}
                                     value={confirmPhone}
@@ -270,7 +247,7 @@ export default function ProfileScreen() {
                                     keyboardType="phone-pad"
                                 />
                                 <TextInput
-                                    style={[styles.deleteInput, { borderColor: colors.border, color: colors.text }]}
+                                    style={[styles.confirmInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.secondary }]}
                                     placeholder="Password"
                                     placeholderTextColor={colors.icon}
                                     value={confirmPassword}
@@ -281,13 +258,13 @@ export default function ProfileScreen() {
 
                             <View style={styles.confirmActions}>
                                 <Pressable
-                                    style={[styles.confirmButton, styles.noButton, { borderColor: colors.border }]}
+                                    style={[styles.confirmButton, { backgroundColor: colors.secondary }]}
                                     onPress={() => setShowDeleteConfirm(false)}
                                 >
-                                    <ThemedText style={styles.noText}>Cancel</ThemedText>
+                                    <ThemedText style={[styles.noText, { color: colors.text }]}>Cancel</ThemedText>
                                 </Pressable>
                                 <Pressable
-                                    style={[styles.confirmButton, { backgroundColor: '#EF4444', borderColor: '#EF4444' }]}
+                                    style={[styles.confirmButton, { backgroundColor: '#EF4444' }]}
                                     onPress={confirmDelete}
                                 >
                                     <ThemedText style={styles.yesText}>Delete Forever</ThemedText>
@@ -392,72 +369,74 @@ const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(0,0,0,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        padding: 24,
     },
     confirmCard: {
+        borderRadius: 32,
+        padding: 32,
         width: '100%',
-        borderRadius: 20,
-        padding: 24,
+        maxWidth: 400,
         alignItems: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.2,
+                shadowRadius: 20,
+            },
+            android: {
+                elevation: 10,
+            },
+        }),
     },
     confirmTitle: {
         fontSize: 24,
-        fontWeight: '800',
-        marginBottom: 8,
+        fontWeight: '900',
+        marginBottom: 12,
+        textAlign: 'center',
+        letterSpacing: -0.5,
     },
     confirmSubTitle: {
         fontSize: 16,
-        textAlign: 'center',
-        opacity: 0.6,
+        opacity: 0.7,
         marginBottom: 24,
+        textAlign: 'center',
+        lineHeight: 22,
+    },
+    inputGroup: {
+        width: '100%',
+        marginBottom: 24,
+    },
+    confirmInput: {
+        height: 56,
+        borderRadius: 16,
+        paddingHorizontal: 16,
+        fontSize: 16,
+        marginBottom: 12,
+        borderWidth: 1,
     },
     confirmActions: {
         flexDirection: 'row',
-        width: '100%',
         gap: 12,
+        width: '100%',
     },
     confirmButton: {
         flex: 1,
-        height: 52,
-        borderRadius: 12,
+        height: 56,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
-    },
-    noButton: {
-        backgroundColor: 'transparent',
-    },
-    yesButton: {
-        // backgroundColor handled in component
     },
     noText: {
-        fontSize: 16,
         fontWeight: '700',
+        fontSize: 16,
     },
     yesText: {
         fontSize: 16,
         fontWeight: '700',
         color: '#FFFFFF',
-    },
-    deleteForm: {
-        width: '100%',
-        marginBottom: 20,
-    },
-    deleteInput: {
-        height: 52,
-        backgroundColor: '#F6F6F6',
-        borderRadius: 12,
-        paddingHorizontal: 16,
-        fontSize: 16,
-        marginBottom: 12,
-        borderWidth: 0,
     },
 });
