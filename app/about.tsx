@@ -99,7 +99,6 @@ export default function AboutScreen() {
                     <View style={styles.vmCard}>
                         <ThemedText style={styles.vmLabel}>{t('Mission')}</ThemedText>
                         <ThemedText style={styles.vmTitle}>{t('Sabka Sar')}</ThemedText>
-                        <ThemedText style={styles.vmDesc}>{t('Sabka Sar')}</ThemedText>
                     </View>
 
                     <View style={styles.divider} />
@@ -107,7 +106,6 @@ export default function AboutScreen() {
                     <View style={styles.vmCard}>
                         <ThemedText style={styles.vmLabel}>{t('Vision')}</ThemedText>
                         <ThemedText style={styles.vmTitle}>{t('Global OS')}</ThemedText>
-                        <ThemedText style={styles.vmDesc}>{t('Global OS')}</ThemedText>
                     </View>
                 </View>
 
