@@ -75,13 +75,15 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: '900',
     letterSpacing: 4,
+    lineHeight: 56, // Fixed: Added line height to prevent cropping
   },
   splashSubtitle: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: 16,
     fontWeight: '600',
-    marginTop: 8,
+    marginTop: 4,
     letterSpacing: 2,
+    lineHeight: 24, // Added line height for consistency
     textTransform: 'uppercase',
   },
 });
