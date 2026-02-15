@@ -1,0 +1,6 @@
+nohup: ignoring input
+127.0.0.1 - - [15/Feb/2026 18:17:34] "GET /icon.png HTTP/1.1" 200 -
+127.0.0.1 - - [15/Feb/2026 18:17:36] code 404, message File not found
+127.0.0.1 - - [15/Feb/2026 18:17:36] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [15/Feb/2026 18:17:47] "GET /splash-icon.png HTTP/1.1" 200 -
+127.0.0.1 - - [15/Feb/2026 18:18:01] "GET /splash-icon.png HTTP/1.1" 304 -
