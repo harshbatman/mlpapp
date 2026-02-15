@@ -3,6 +3,11 @@
     "name": "MAHTO Land & Properties",
     "slug": "mlp",
     "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "6f491b62-838e-45d4-bd82-0a4c932c9494"
+      }
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mlpapp",
