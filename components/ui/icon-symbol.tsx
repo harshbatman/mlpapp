@@ -47,6 +47,8 @@ const MAPPING: IconMapping = {
   'mappin.circle.fill': 'location-city',
   'map.fill': 'map',
   'slider.horizontal.3': 'tune',
+  'chevron.down': 'keyboard-arrow-down',
+  'xmark.circle.fill': 'cancel',
 };
 
 /**
