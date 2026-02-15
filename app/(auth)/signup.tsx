@@ -13,7 +13,7 @@ export default function SignUpScreen() {
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
 
-    const [name, setName] = useState('Harsh');
+    const [name, setName] = useState('harsh');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
