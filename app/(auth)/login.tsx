@@ -50,6 +50,8 @@ export default function LoginScreen() {
                     onPress={() => {
                         if (router.canGoBack()) {
                             router.back();
+                        } else {
+                            router.replace('/(auth)/signup');
                         }
                     }}
                     style={styles.backButton}
