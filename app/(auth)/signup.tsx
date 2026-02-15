@@ -17,7 +17,7 @@ export default function SignUpScreen() {
     const colors = Colors[colorScheme as 'light' | 'dark'];
 
     const [name, setName] = useState('harsh');
-    const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES[0]);
+    const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES.find(c => c.name === 'India') || COUNTRY_CODES[0]);
     const [showCountryModal, setShowCountryModal] = useState(false);
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');

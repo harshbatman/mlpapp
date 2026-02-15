@@ -16,7 +16,7 @@ export default function LoginScreen() {
     const colors = Colors[colorScheme as 'light' | 'dark'];
 
     const [phone, setPhone] = useState('');
-    const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES[0]); // Default to India
+    const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES.find(c => c.name === 'India') || COUNTRY_CODES[0]);
     const [showCountryModal, setShowCountryModal] = useState(false);
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
