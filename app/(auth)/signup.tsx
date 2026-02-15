@@ -1,12 +1,15 @@
 import { ThemedText } from '@/components/themed-text';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { auth, db } from '../../config/firebase';
+
+import { COUNTRY_CODES } from '../../constants/country-codes';
 
 export default function SignUpScreen() {
     const router = useRouter();
@@ -14,6 +17,8 @@ export default function SignUpScreen() {
     const colors = Colors[colorScheme as 'light' | 'dark'];
 
     const [name, setName] = useState('harsh');
+    const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES[0]);
+    const [showCountryModal, setShowCountryModal] = useState(false);
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -77,14 +82,29 @@ export default function SignUpScreen() {
                     />
 
                     <ThemedText style={styles.label}>Phone Number</ThemedText>
-                    <TextInput
-                        style={[styles.input, { borderColor: colors.border, color: colors.text }]}
-                        placeholder="Enter your phone number"
-                        placeholderTextColor={colors.icon}
-                        value={phone}
-                        onChangeText={setPhone}
-                        keyboardType="phone-pad"
-                    />
+                    <View style={styles.phoneContainer}>
+                        <Pressable
+                            style={[styles.countryCodeButton, { borderColor: colors.border, backgroundColor: '#F6F6F6' }]}
+                            onPress={() => setShowCountryModal(true)}
+                        >
+                            <ThemedText style={{ fontSize: 24 }}>{selectedCountry.flag}</ThemedText>
+                            <ThemedText style={{ fontSize: 16, fontWeight: '600', marginLeft: 4 }}>{selectedCountry.code}</ThemedText>
+                        </Pressable>
+                        <TextInput
+                            style={[styles.input, { flex: 1, borderColor: colors.border, color: colors.text }]}
+                            placeholder="Enter 10-digit number"
+                            placeholderTextColor={colors.icon}
+                            value={phone}
+                            onChangeText={(text) => {
+                                const numericText = text.replace(/[^0-9]/g, '');
+                                if (numericText.length <= 10) {
+                                    setPhone(numericText);
+                                }
+                            }}
+                            keyboardType="phone-pad"
+                            maxLength={10}
+                        />
+                    </View>
 
                     <ThemedText style={styles.label}>Password</ThemedText>
                     <TextInput
@@ -115,7 +135,7 @@ export default function SignUpScreen() {
                     </View>
 
                     <View style={styles.footer}>
-                        <ThemedText>Already have an account?</ThemedText>
+                        <ThemedText>Already have an account? </ThemedText>
                     </View>
 
                     <Pressable
@@ -125,6 +145,41 @@ export default function SignUpScreen() {
                         <ThemedText style={[styles.mahtoIdButtonText, { color: '#FFFFFF' }]}>Continue with MAHTO ID</ThemedText>
                     </Pressable>
                 </View>
+
+                {/* Country Selection Modal */}
+                <Modal
+                    visible={showCountryModal}
+                    animationType="slide"
+                    transparent={true}
+                    onRequestClose={() => setShowCountryModal(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+                            <View style={styles.modalHeader}>
+                                <ThemedText style={styles.modalTitle}>Select Country</ThemedText>
+                                <Pressable onPress={() => setShowCountryModal(false)}>
+                                    <IconSymbol name="xmark.circle.fill" size={30} color={colors.text} />
+                                </Pressable>
+                            </View>
+                            <ScrollView showsVerticalScrollIndicator={false}>
+                                {COUNTRY_CODES.map((country, index) => (
+                                    <Pressable
+                                        key={index}
+                                        style={styles.countryItem}
+                                        onPress={() => {
+                                            setSelectedCountry(country);
+                                            setShowCountryModal(false);
+                                        }}
+                                    >
+                                        <ThemedText style={{ fontSize: 32, marginRight: 16 }}>{country.flag}</ThemedText>
+                                        <ThemedText style={{ fontSize: 18, flex: 1 }}>{country.name}</ThemedText>
+                                        <ThemedText style={{ fontSize: 18, fontWeight: '700', color: colors.tint }}>{country.code}</ThemedText>
+                                    </Pressable>
+                                ))}
+                            </ScrollView>
+                        </View>
+                    </View>
+                </Modal>
             </ScrollView>
         </KeyboardAvoidingView>
     );
@@ -171,6 +226,46 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         fontSize: 16,
         borderWidth: 0,
+    },
+    phoneContainer: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    countryCodeButton: {
+        height: 56,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        borderRadius: 12,
+        backgroundColor: '#F6F6F6',
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        height: '70%',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        padding: 24,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: '700',
+    },
+    countryItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
     },
     signupButton: {
         height: 60,
