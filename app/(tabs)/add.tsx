@@ -18,7 +18,7 @@ export default function AddPropertyScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState('Begusarai, Bihar');
   const [area, setArea] = useState('');
   const [type, setType] = useState<PropertyType>('Home');
   const [listingType, setListingType] = useState<ListingType>('Sell');
