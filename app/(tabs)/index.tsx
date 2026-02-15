@@ -387,6 +387,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
   },
+  filterSection: {
+    marginBottom: 32,
+  },
+  filterSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  filterSectionTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    marginBottom: 12,
+  },
 });
 
 
@@ -403,6 +417,7 @@ export default function HomeScreen() {
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [mainFilterModalVisible, setMainFilterModalVisible] = useState(false);
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -450,10 +465,10 @@ export default function HomeScreen() {
   };
 
   const categories = [
-    { name: 'Homes', icon: 'home' },
-    { name: 'Lands', icon: 'landscape' },
-    { name: 'Commercial', icon: 'business' },
-    { name: 'Rentals', icon: 'apartment' },
+    { name: 'Homes', icon: 'house.fill' },
+    { name: 'Lands', icon: 'mountain.2.fill' },
+    { name: 'Commercial', icon: 'building.2.fill' },
+    { name: 'Rentals', icon: 'apartment.fill' },
   ];
 
   // Optimization: Memoize filtered states or districts based on selection
@@ -740,6 +755,100 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
+      {/* Unified Search Filter Modal */}
+      <Modal
+        visible={mainFilterModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setMainFilterModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background, height: height * 0.9 }]}>
+            <View style={styles.modalHeader}>
+              <ThemedText style={styles.modalTitle}>Search Filters</ThemedText>
+              <Pressable onPress={() => setMainFilterModalVisible(false)} style={styles.closeButton}>
+                <IconSymbol name="plus.circle.fill" size={24} color={colors.text} style={{ transform: [{ rotate: '45deg' }] }} />
+              </Pressable>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+              {/* Location Section */}
+              <View style={styles.filterSection}>
+                <View style={styles.filterSectionHeader}>
+                  <ThemedText style={styles.filterSectionTitle}>Location</ThemedText>
+                  <Pressable onPress={() => {
+                    setMainFilterModalVisible(false);
+                    setLocationModalVisible(true);
+                  }}>
+                    <ThemedText style={{ color: colors.tint, fontWeight: '700' }}>Change</ThemedText>
+                  </Pressable>
+                </View>
+                <View style={styles.districtGrid}>
+                  {selectedDistricts.length > 0 ? (
+                    selectedDistricts.map((d, i) => (
+                      <View key={i} style={[styles.districtItem, { backgroundColor: colors.tint }]}>
+                        <ThemedText style={[styles.districtText, { color: '#FFF' }]}>{d}</ThemedText>
+                        <Pressable onPress={() => toggleDistrict(d)} style={{ marginLeft: 6 }}>
+                          <IconSymbol name="xmark.circle.fill" size={14} color="#FFF" />
+                        </Pressable>
+                      </View>
+                    ))
+                  ) : (
+                    <ThemedText style={{ opacity: 0.5, marginLeft: 4 }}>No location selected</ThemedText>
+                  )}
+                </View>
+              </View>
+
+              {/* Category Section */}
+              <View style={styles.filterSection}>
+                <ThemedText style={styles.filterSectionTitle}>Categories</ThemedText>
+                <View style={styles.districtGrid}>
+                  {categories.map((cat, i) => (
+                    <Pressable
+                      key={i}
+                      style={[
+                        styles.districtItem,
+                        { backgroundColor: selectedCategories.includes(cat.name) ? colors.tint : colors.secondary }
+                      ]}
+                      onPress={() => toggleCategory(cat.name)}
+                    >
+                      <ThemedText style={[
+                        styles.districtText,
+                        { color: selectedCategories.includes(cat.name) ? '#FFF' : colors.text }
+                      ]}>{cat.name}</ThemedText>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+
+              {/* Reset All */}
+              <Pressable
+                onPress={() => {
+                  setSelectedDistricts([]);
+                  setSelectedCategories([]);
+                  setCity('Select Location');
+                }}
+                style={{ marginTop: 20, alignItems: 'center' }}
+              >
+                <ThemedText style={{ color: '#FF3B30', fontWeight: '700' }}>Reset All Filters</ThemedText>
+              </Pressable>
+            </ScrollView>
+
+            <View style={styles.modalFooter}>
+              <Pressable
+                style={[styles.applyButton, { backgroundColor: colors.tint }]}
+                onPress={() => {
+                  handleApplySelection();
+                  setMainFilterModalVisible(false);
+                }}
+              >
+                <ThemedText style={styles.applyButtonText}>Apply Filters</ThemedText>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -794,7 +903,7 @@ export default function HomeScreen() {
                 transform: [{ scale: pressed ? 0.96 : 1 }]
               }
             ]}
-            onPress={() => setLocationModalVisible(true)}
+            onPress={() => setMainFilterModalVisible(true)}
             hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
           >
             <IconSymbol name="slider.horizontal.3" size={20} color="#FFF" />
