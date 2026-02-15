@@ -401,6 +401,8 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedState, setSelectedState] = useState<any>(null);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -468,6 +470,26 @@ export default function HomeScreen() {
       state.districts.some((d: string) => d.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }, [searchQuery, selectedState, indianStates]);
+
+  // Optimization: Memoize filtered categories (if needed for search)
+  const filteredCategories = React.useMemo(() => {
+    return categories.filter(cat =>
+      searchQuery === '' || cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, categories]);
+
+  const toggleCategory = (catName: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(catName)
+        ? prev.filter(c => c !== catName)
+        : [...prev, catName]
+    );
+  };
+
+  const handleApplyCategories = () => {
+    setCategoryModalVisible(false);
+    setSearchQuery('');
+  };
 
   const toggleDistrict = (districtName: string) => {
     setSelectedDistricts(prev =>
@@ -640,6 +662,84 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
+      {/* Optimized Category Selector Modal */}
+      <Modal
+        visible={categoryModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setCategoryModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.modalHeader}>
+              <ThemedText style={styles.modalTitle}>Select Categories</ThemedText>
+              <Pressable onPress={() => {
+                setCategoryModalVisible(false);
+                setSearchQuery('');
+              }} style={styles.closeButton}>
+                <IconSymbol name="plus.circle.fill" size={24} color={colors.text} style={{ transform: [{ rotate: '45deg' }] }} />
+              </Pressable>
+            </View>
+
+            <View style={[styles.modalSearch, { backgroundColor: colors.secondary }]}>
+              <IconSymbol name="magnifyingglass" size={18} color={colors.icon} />
+              <TextInput
+                placeholder="Search categories..."
+                placeholderTextColor={colors.icon}
+                style={[styles.modalSearchInput, { color: colors.text }]}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
+
+            <ScrollView
+              style={styles.modalList}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="always"
+            >
+              <View style={styles.districtGrid}>
+                {filteredCategories.map((cat, index) => (
+                  <Pressable
+                    key={index}
+                    style={[
+                      styles.districtItem,
+                      {
+                        backgroundColor: selectedCategories.includes(cat.name) ? colors.tint : colors.secondary,
+                        width: '48%',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        height: 60,
+                        paddingHorizontal: 16
+                      }
+                    ]}
+                    onPress={() => toggleCategory(cat.name)}
+                  >
+                    <ThemedText style={[styles.districtText, { color: selectedCategories.includes(cat.name) ? '#FFF' : colors.text }]}>
+                      {cat.name}
+                    </ThemedText>
+                    {selectedCategories.includes(cat.name) && (
+                      <IconSymbol name="checkmark.circle.fill" size={18} color="#FFF" />
+                    )}
+                  </Pressable>
+                ))}
+              </View>
+            </ScrollView>
+
+            <View style={styles.modalFooter}>
+              <Pressable
+                style={[styles.applyButton, { backgroundColor: colors.tint }]}
+                onPress={handleApplyCategories}
+              >
+                <ThemedText style={styles.applyButtonText}>
+                  Apply {selectedCategories.length > 0 ? `(${selectedCategories.length})` : ''}
+                </ThemedText>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -727,9 +827,13 @@ export default function HomeScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText type="subtitle" style={styles.sectionTitle} numberOfLines={1}>Categories</ThemedText>
-            <Pressable>
-              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>See All</ThemedText>
+            <ThemedText type="subtitle" style={styles.sectionTitle} numberOfLines={1}>
+              Categories {selectedCategories.length > 0 ? `(${selectedCategories.length})` : ''}
+            </ThemedText>
+            <Pressable onPress={() => setCategoryModalVisible(true)}>
+              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>
+                {selectedCategories.length > 0 ? 'Edit Filter' : 'Filter All'}
+              </ThemedText>
             </Pressable>
           </View>
 
@@ -742,32 +846,38 @@ export default function HomeScreen() {
             {categories.map((cat, index) => (
               <Pressable
                 key={index}
-                style={styles.categoryItem}
-                onPress={() => router.push({
-                  pathname: '/properties',
-                  params: { category: cat.name }
-                })}
+                style={[
+                  styles.categoryItem,
+                  selectedCategories.includes(cat.name) && { transform: [{ scale: 1.05 }] }
+                ]}
+                onPress={() => toggleCategory(cat.name)}
               >
-                <View style={[styles.categoryIcon, { backgroundColor: colors.secondary }]}>
+                <View style={[
+                  styles.categoryIcon,
+                  {
+                    backgroundColor: selectedCategories.includes(cat.name) ? colors.tint : colors.secondary,
+                    borderWidth: 2,
+                    borderColor: selectedCategories.includes(cat.name) ? colors.tint : 'transparent'
+                  }
+                ]}>
                   <IconSymbol
-                    name={
-                      cat.name === 'Lands' ? 'mountain.2.fill' :
-                        cat.name === 'Commercial' ? 'building.2.fill' :
-                          cat.name === 'Rentals' ? 'apartment.fill' :
-                            'house.fill'
-                    }
-                    size={24}
-                    color={colors.tint}
+                    name={cat.icon as any}
+                    size={32}
+                    color={selectedCategories.includes(cat.name) ? '#FFF' : colors.tint}
                   />
                 </View>
-                <ThemedText style={styles.categoryName}>{cat.name}</ThemedText>
+                <ThemedText style={[
+                  styles.categoryName,
+                  { color: selectedCategories.includes(cat.name) ? colors.tint : colors.text, fontWeight: selectedCategories.includes(cat.name) ? '800' : '600' }
+                ]}>
+                  {cat.name}
+                </ThemedText>
               </Pressable>
             ))}
           </ScrollView>
-        </View>
+        </View >
 
-        {/* Explore Cities Section */}
-        <View style={styles.section}>
+        <View style={styles.section} >
           <View style={styles.sectionHeader}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>Explore Cities</ThemedText>
             <Pressable onPress={() => setLocationModalVisible(true)}>
@@ -809,7 +919,7 @@ export default function HomeScreen() {
               </Pressable>
             ))}
           </ScrollView>
-        </View>
+        </View >
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -830,7 +940,7 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
-    </ThemedView >
+    </ThemedView>
   );
 }
 
