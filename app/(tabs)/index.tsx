@@ -17,6 +17,18 @@ export default function HomeScreen() {
   const [city, setCity] = useState('Select Location');
   const [loadingLocation, setLoadingLocation] = useState(false);
 
+  const popularCities = [
+    { name: 'Delhi NCR', icon: 'mappin.circle.fill', color: 'special' },
+    { name: 'Mumbai', icon: 'building.2.fill', color: 'standard' },
+    { name: 'Bengaluru', icon: 'sparkles', color: 'standard' },
+    { name: 'Pune', icon: 'house.fill', color: 'standard' },
+    { name: 'Gurugram', icon: 'building.2.fill', color: 'standard' },
+    { name: 'Navi Mumbai', icon: 'apartment.fill', color: 'standard' },
+    { name: 'Ahmedabad', icon: 'map.fill', color: 'standard' },
+    { name: 'Chennai', icon: 'house.fill', color: 'standard' },
+    { name: 'Patna', icon: 'mappin.circle.fill', color: 'standard' },
+  ];
+
   const handleLocationRequest = async () => {
     setLoadingLocation(true);
     let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
@@ -163,6 +175,51 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
+        {/* Explore Cities Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>Explore Cities</ThemedText>
+            <Pressable>
+              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>All India</ThemedText>
+            </Pressable>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoriesScroll}
+            contentContainerStyle={styles.categoriesContent}
+          >
+            {popularCities.map((cityItem, index) => (
+              <Pressable
+                key={index}
+                style={styles.cityCard}
+                onPress={() => {
+                  setCity(cityItem.name);
+                  router.push({
+                    pathname: '/properties',
+                    params: { city: cityItem.name }
+                  });
+                }}
+              >
+                <View style={[styles.cityIconContainer, { backgroundColor: cityItem.color === 'special' ? colors.tint : colors.secondary }]}>
+                  <IconSymbol
+                    name={cityItem.icon}
+                    size={28}
+                    color={cityItem.color === 'special' ? '#FFF' : colors.tint}
+                  />
+                </View>
+                <ThemedText style={styles.cityName}>{cityItem.name}</ThemedText>
+                {cityItem.color === 'special' && (
+                  <View style={styles.specialBadge}>
+                    <ThemedText style={styles.specialBadgeText}>HOT</ThemedText>
+                  </View>
+                )}
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <ThemedText style={styles.sectionTitle}>Featured Listings</ThemedText>
@@ -181,8 +238,8 @@ export default function HomeScreen() {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
-    </ThemedView>
+      </ScrollView >
+    </ThemedView >
   );
 }
 
@@ -322,6 +379,48 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  cityCard: {
+    width: 110,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 12,
+    marginRight: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  cityIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  cityName: {
+    fontSize: 14,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  specialBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#FF3B30',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  specialBadgeText: {
+    color: '#FFF',
+    fontSize: 8,
+    fontWeight: '900',
   },
   emptyState: {
     alignItems: 'center',
