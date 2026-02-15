@@ -183,11 +183,18 @@ export default function HomeScreen() {
               />
             </View>
             <Pressable
-              style={[styles.filterButton, { backgroundColor: colors.tint }]}
+              style={({ pressed }) => [
+                styles.filterButton,
+                {
+                  backgroundColor: colors.tint,
+                  opacity: pressed ? 0.7 : 1,
+                  transform: [{ scale: pressed ? 0.96 : 1 }]
+                }
+              ]}
               onPress={() => setLocationModalVisible(true)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
             >
-              <IconSymbol name="slider.horizontal.3" size={18} color="#FFF" />
+              <IconSymbol name="slider.horizontal.3" size={20} color="#FFF" />
             </Pressable>
           </View>
 
@@ -423,12 +430,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
+    marginLeft: 12,
   },
   scrollContent: {
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
