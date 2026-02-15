@@ -1,11 +1,12 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { INDIAN_LOCATIONS } from '@/constants/locations';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
-import { Dimensions, FlatList, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Dimensions, FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { height } = Dimensions.get('window');
 
@@ -14,8 +15,41 @@ export default function PropertyListScreen() {
     const router = useRouter();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
-    const [filterModalVisible, setFilterModalVisible] = React.useState(false);
-    const [searchQuery, setSearchQuery] = React.useState('');
+    const [filterModalVisible, setFilterModalVisible] = useState(false);
+    const [locationModalVisible, setLocationModalVisible] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [modalSearchQuery, setModalSearchQuery] = useState('');
+    const [selectedState, setSelectedState] = useState<any>(null);
+    const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
+
+    const indianStates = INDIAN_LOCATIONS;
+
+    const filteredList = useMemo(() => {
+        if (selectedState) {
+            const districts = selectedState.districts;
+            return districts.filter((d: string) =>
+                modalSearchQuery === '' || d.toLowerCase().includes(modalSearchQuery.toLowerCase())
+            );
+        }
+        return indianStates.filter(state =>
+            modalSearchQuery === '' ||
+            state.name.toLowerCase().includes(modalSearchQuery.toLowerCase()) ||
+            state.districts.some((d: string) => d.toLowerCase().includes(modalSearchQuery.toLowerCase()))
+        );
+    }, [modalSearchQuery, selectedState, indianStates]);
+
+    const toggleDistrict = (districtName: string) => {
+        setSelectedDistricts(prev =>
+            prev.includes(districtName)
+                ? prev.filter(d => d !== districtName)
+                : [...prev, districtName]
+        );
+    };
+
+    const handleBackToStates = () => {
+        setSelectedState(null);
+        setModalSearchQuery('');
+    };
 
     // Empty array to be populated by users
     const properties: any[] = [];
@@ -83,7 +117,7 @@ export default function PropertyListScreen() {
                 }
             />
 
-            {/* Simple Filter Modal for Properties Page */}
+            {/* Unified Search Filter Modal */}
             <Modal
                 visible={filterModalVisible}
                 animationType="slide"
@@ -91,31 +125,200 @@ export default function PropertyListScreen() {
                 onRequestClose={() => setFilterModalVisible(false)}
             >
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.background, height: height * 0.9 }]}>
                         <View style={styles.modalHeader}>
-                            <ThemedText style={styles.modalTitle}>Sort & Filter</ThemedText>
+                            <ThemedText style={styles.modalTitle}>Search Filters</ThemedText>
                             <Pressable onPress={() => setFilterModalVisible(false)} style={styles.closeButton}>
                                 <IconSymbol name="plus.circle.fill" size={24} color={colors.text} style={{ transform: [{ rotate: '45deg' }] }} />
                             </Pressable>
                         </View>
 
-                        <View style={styles.filterSection}>
-                            <ThemedText style={styles.filterSectionTitle}>Current Category: {category || 'All'}</ThemedText>
-                            <ThemedText style={{ opacity: 0.6, marginTop: 4 }}>
-                                You are currently viewing {category || 'all properties'}.
-                            </ThemedText>
-                        </View>
+                        <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+                            {/* Location Section */}
+                            <View style={styles.filterSection}>
+                                <View style={styles.filterSectionHeader}>
+                                    <ThemedText style={styles.filterSectionTitle}>Location</ThemedText>
+                                    <Pressable onPress={() => {
+                                        setFilterModalVisible(false);
+                                        setLocationModalVisible(true);
+                                    }}>
+                                        <ThemedText style={{ color: colors.tint, fontWeight: '700' }}>Change</ThemedText>
+                                    </Pressable>
+                                </View>
+                                <View style={styles.districtGrid}>
+                                    {selectedDistricts.length > 0 ? (
+                                        selectedDistricts.map((d, i) => (
+                                            <View key={i} style={[styles.districtItem, { backgroundColor: colors.tint }]}>
+                                                <ThemedText style={[styles.districtText, { color: '#FFF' }]}>{d}</ThemedText>
+                                                <Pressable onPress={() => toggleDistrict(d)} style={{ marginLeft: 6 }}>
+                                                    <IconSymbol name="xmark.circle.fill" size={14} color="#FFF" />
+                                                </Pressable>
+                                            </View>
+                                        ))
+                                    ) : (
+                                        <ThemedText style={{ opacity: 0.5, marginLeft: 4 }}>No location selected</ThemedText>
+                                    )}
+                                </View>
+                            </View>
 
-                        <ThemedText style={{ padding: 20, textAlign: 'center', opacity: 0.5 }}>
-                            Advanced filtering (Price Range, BHK, Area) will be available in the next update.
-                        </ThemedText>
+                            {/* Category Section (Read only here) */}
+                            <View style={styles.filterSection}>
+                                <ThemedText style={styles.filterSectionTitle}>Category</ThemedText>
+                                <View style={[styles.districtItem, { backgroundColor: colors.secondary, width: '100%' }]}>
+                                    <ThemedText style={styles.districtText}>{category || 'All Properties'}</ThemedText>
+                                </View>
+                            </View>
+
+                            {/* Reset All */}
+                            <Pressable
+                                onPress={() => {
+                                    setSelectedDistricts([]);
+                                }}
+                                style={{ marginTop: 20, alignItems: 'center' }}
+                            >
+                                <ThemedText style={{ color: '#FF3B30', fontWeight: '700' }}>Reset All Filters</ThemedText>
+                            </Pressable>
+                        </ScrollView>
 
                         <View style={styles.modalFooter}>
                             <Pressable
                                 style={[styles.applyButton, { backgroundColor: colors.tint }]}
                                 onPress={() => setFilterModalVisible(false)}
                             >
-                                <ThemedText style={styles.applyButtonText}>Close</ThemedText>
+                                <ThemedText style={styles.applyButtonText}>Apply Filters</ThemedText>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Simplified Location Selector Modal */}
+            <Modal
+                visible={locationModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setLocationModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.background, height: height * 0.85 }]}>
+                        <View style={styles.modalHeader}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                {selectedState && (
+                                    <Pressable onPress={handleBackToStates} style={{ marginRight: 12 }}>
+                                        <IconSymbol name="chevron.left" size={24} color={colors.text} />
+                                    </Pressable>
+                                )}
+                                <ThemedText style={styles.modalTitle}>
+                                    {selectedState ? selectedState.name : 'Select State'}
+                                </ThemedText>
+                            </View>
+                            <Pressable onPress={() => {
+                                setLocationModalVisible(false);
+                                setSelectedState(null);
+                                setModalSearchQuery('');
+                            }} style={styles.closeButton}>
+                                <IconSymbol name="plus.circle.fill" size={24} color={colors.text} style={{ transform: [{ rotate: '45deg' }] }} />
+                            </Pressable>
+                        </View>
+
+                        <View style={[styles.modalSearch, { backgroundColor: colors.secondary }]}>
+                            <IconSymbol name="magnifyingglass" size={18} color={colors.icon} />
+                            <TextInput
+                                placeholder={selectedState ? "Search district..." : "Search state..."}
+                                placeholderTextColor={colors.icon}
+                                style={[styles.modalSearchInput, { color: colors.text }]}
+                                value={modalSearchQuery}
+                                onChangeText={setModalSearchQuery}
+                            />
+                        </View>
+
+                        <ScrollView
+                            style={{ flex: 1 }}
+                            showsVerticalScrollIndicator={false}
+                            keyboardShouldPersistTaps="always"
+                        >
+                            {selectedState ? (
+                                <View style={styles.districtGrid}>
+                                    <Pressable
+                                        style={[
+                                            styles.districtItem,
+                                            {
+                                                backgroundColor: selectedDistricts.includes(selectedState.name) ? colors.tint : colors.secondary,
+                                                width: '98%',
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center'
+                                            }
+                                        ]}
+                                        onPress={() => toggleDistrict(selectedState.name)}
+                                    >
+                                        <ThemedText style={[styles.districtText, { color: selectedDistricts.includes(selectedState.name) ? '#FFF' : colors.text }]}>
+                                            All {selectedState.name}
+                                        </ThemedText>
+                                        {selectedDistricts.includes(selectedState.name) && (
+                                            <IconSymbol name="checkmark.circle.fill" size={18} color="#FFF" />
+                                        )}
+                                    </Pressable>
+                                    {filteredList.map((district: any, dIndex: number) => (
+                                        <Pressable
+                                            key={dIndex}
+                                            style={[
+                                                styles.districtItem,
+                                                {
+                                                    backgroundColor: selectedDistricts.includes(district) ? colors.tint : colors.secondary,
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    paddingRight: selectedDistricts.includes(district) ? 12 : 16
+                                                }
+                                            ]}
+                                            onPress={() => toggleDistrict(district)}
+                                        >
+                                            <ThemedText style={[styles.districtText, { color: selectedDistricts.includes(district) ? '#FFF' : colors.text }]}>
+                                                {district}
+                                            </ThemedText>
+                                            {selectedDistricts.includes(district) && (
+                                                <IconSymbol name="checkmark.circle.fill" size={16} color="#FFF" />
+                                            )}
+                                        </Pressable>
+                                    ))}
+                                </View>
+                            ) : (
+                                filteredList.map((state: any, sIndex: number) => (
+                                    <Pressable
+                                        key={sIndex}
+                                        style={styles.modalOption}
+                                        onPress={() => {
+                                            setSelectedState(state);
+                                            setModalSearchQuery('');
+                                        }}
+                                    >
+                                        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <ThemedText style={styles.modalOptionText}>{state.name}</ThemedText>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                {selectedDistricts.filter(d => state.districts.includes(d) || d === state.name).length > 0 && (
+                                                    <View style={{ backgroundColor: colors.tint, borderRadius: 10, paddingHorizontal: 6, paddingVertical: 2, marginRight: 8 }}>
+                                                        <ThemedText style={{ color: '#FFF', fontSize: 10, fontWeight: '700' }}>
+                                                            {selectedDistricts.filter(d => state.districts.includes(d) || d === state.name).length}
+                                                        </ThemedText>
+                                                    </View>
+                                                )}
+                                                <IconSymbol name="chevron.right" size={16} color={colors.icon} />
+                                            </View>
+                                        </View>
+                                    </Pressable>
+                                ))
+                            )}
+                        </ScrollView>
+
+                        <View style={styles.modalFooter}>
+                            <Pressable
+                                style={[styles.applyButton, { backgroundColor: colors.tint }]}
+                                onPress={() => setLocationModalVisible(false)}
+                            >
+                                <ThemedText style={styles.applyButtonText}>
+                                    Done {selectedDistricts.length > 0 ? `(${selectedDistricts.length})` : ''}
+                                </ThemedText>
                             </Pressable>
                         </View>
                     </View>
@@ -285,5 +488,50 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 18,
         fontWeight: '700',
+    },
+    filterSectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    districtGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    districtItem: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 12,
+        marginBottom: 8,
+        minWidth: '48%',
+        justifyContent: 'center',
+    },
+    districtText: {
+        fontSize: 14,
+        fontWeight: '700',
+    },
+    modalSearch: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        height: 50,
+        borderRadius: 12,
+        marginBottom: 20,
+    },
+    modalSearchInput: {
+        flex: 1,
+        marginLeft: 10,
+        fontSize: 16,
+    },
+    modalOption: {
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
+    },
+    modalOptionText: {
+        fontSize: 16,
+        fontWeight: '500',
     },
 });
