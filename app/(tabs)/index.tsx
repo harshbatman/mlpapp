@@ -442,6 +442,11 @@ export default function HomeScreen() {
     { name: 'Ahmedabad', image: require('@/assets/images/cities/ahmedabad.png'), color: 'standard' },
     { name: 'Chennai', image: require('@/assets/images/cities/chennai.png'), color: 'standard' },
     { name: 'Patna', image: require('@/assets/images/cities/patna.png'), color: 'standard' },
+    { name: 'Indore', image: require('@/assets/images/cities/indore.png'), color: 'standard' },
+    { name: 'Lucknow', image: require('@/assets/images/cities/lucknow.png'), color: 'standard' },
+    { name: 'Begusarai', image: require('@/assets/images/cities/begusarai.png'), color: 'standard' },
+    { name: 'Rohtak', image: require('@/assets/images/cities/rohtak.png'), color: 'standard' },
+    { name: 'Bhubaneswar', image: require('@/assets/images/cities/bhubaneswar.png'), color: 'standard' },
   ];
 
   const handleLocationRequest = async () => {
