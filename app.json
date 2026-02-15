@@ -2,6 +2,7 @@
   "expo": {
     "name": "MAHTO Land & Properties",
     "slug": "mlp",
+    "owner": "mahtobuild",
     "version": "1.0.0",
     "runtimeVersion": {
       "policy": "appVersion"
