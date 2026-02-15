@@ -8,10 +8,12 @@ import React, { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { auth } from '../../config/firebase';
 
+import { useNotification } from '@/context/notification-context';
 import { COUNTRY_CODES } from '../../constants/country-codes';
 
 export default function LoginScreen() {
     const router = useRouter();
+    const { showProfessionalError, showNotification } = useNotification();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
 
@@ -23,12 +25,12 @@ export default function LoginScreen() {
 
     const handleLogin = async () => {
         if (!phone || !password) {
-            alert('Please enter your credentials');
+            showNotification('warning', 'Missing Details', 'Please enter your phone number and password');
             return;
         }
 
         if (phone.length !== 10) {
-            alert('Please enter a valid 10-digit phone number');
+            showNotification('warning', 'Invalid Number', 'Please enter a valid 10-digit phone number');
             return;
         }
 
@@ -60,8 +62,7 @@ export default function LoginScreen() {
 
             router.replace('/(tabs)');
         } catch (error: any) {
-            console.error(error);
-            alert('Login failed: ' + (error.message || 'Check your credentials'));
+            showProfessionalError(error, 'Login Failed');
         } finally {
             setLoading(false);
         }

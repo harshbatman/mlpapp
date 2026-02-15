@@ -9,10 +9,12 @@ import React, { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { auth, db } from '../../config/firebase';
 
+import { useNotification } from '@/context/notification-context';
 import { COUNTRY_CODES } from '../../constants/country-codes';
 
 export default function SignUpScreen() {
     const router = useRouter();
+    const { showProfessionalError, showNotification } = useNotification();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
 
@@ -25,12 +27,12 @@ export default function SignUpScreen() {
 
     const handleSignUp = async () => {
         if (!name || !phone || !password) {
-            alert('Please fill all fields');
+            showNotification('warning', 'Missing Information', 'Please fill in all the details to join MAHTO.');
             return;
         }
 
         if (phone.length < 10) {
-            alert('Please enter a valid phone number');
+            showNotification('warning', 'Invalid Number', 'Please enter a valid 10-digit phone number.');
             return;
         }
 
@@ -53,8 +55,7 @@ export default function SignUpScreen() {
 
             router.replace('/(tabs)');
         } catch (error: any) {
-            console.error(error);
-            alert(error.message || 'Signup failed');
+            showProfessionalError(error, 'Sign Up Failed');
         } finally {
             setLoading(false);
         }

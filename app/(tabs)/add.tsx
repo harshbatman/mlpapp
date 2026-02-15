@@ -3,15 +3,17 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { ListingType, PropertyType } from '@/constants/types';
+import { useNotification } from '@/context/notification-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Image, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function AddPropertyScreen() {
   const router = useRouter();
+  const { showProfessionalError, showNotification } = useNotification();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme as 'light' | 'dark'];
 
@@ -27,7 +29,7 @@ export default function AddPropertyScreen() {
 
   const pickImages = async () => {
     if (images.length >= 5) {
-      Alert.alert('Limit Reached', 'You can only add up to 5 images.');
+      showNotification('warning', 'Limit Reached', 'You can only add up to 5 images per listing.');
       return;
     }
 
@@ -53,7 +55,7 @@ export default function AddPropertyScreen() {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Allow location access to fetch the property address.');
+        showProfessionalError({ code: 'location-denied' });
         setIsLocating(false);
         return;
       }
@@ -78,7 +80,7 @@ export default function AddPropertyScreen() {
         setLocation(parts.join(', '));
       }
     } catch (error) {
-      Alert.alert('Error', 'Could not fetch location. Please try manually.');
+      showProfessionalError(error, 'Location Error');
     } finally {
       setIsLocating(false);
     }
@@ -86,8 +88,7 @@ export default function AddPropertyScreen() {
 
   const handleSubmit = () => {
     // Logic to save property
-    console.log({ title, description, price, location, area, type, listingType });
-    alert('Listing Posted Successfully!');
+    showNotification('success', 'Listing Posted', 'Your property has been successfully listed on MAHTO.');
     router.replace('/(tabs)');
   };
 

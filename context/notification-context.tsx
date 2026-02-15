@@ -13,8 +13,52 @@ interface Notification {
     duration?: number;
 }
 
+const ERROR_MAPPING: Record<string, { title: string; message: string }> = {
+    'auth/user-not-found': {
+        title: 'Account Not Found',
+        message: "We couldn't find a MAHTO ID with this number. Please check the number or create a new account."
+    },
+    'auth/wrong-password': {
+        title: 'Incorrect Password',
+        message: 'The password you entered is incorrect. Please try again.'
+    },
+    'auth/invalid-email': {
+        title: 'ID Format Issue',
+        message: 'There was an issue with your MAHTO ID format. Please verify your number.'
+    },
+    'auth/user-disabled': {
+        title: 'Account Disabled',
+        message: 'This MAHTO ID has been temporarily disabled for security. Please contact support.'
+    },
+    'auth/network-request-failed': {
+        title: 'Connection Issue',
+        message: "We're having trouble connecting to our servers. Please check your internet connection."
+    },
+    'auth/email-already-in-use': {
+        title: 'Already Registered',
+        message: 'This phone number is already linked to a MAHTO ID. Please log in instead.'
+    },
+    'auth/too-many-requests': {
+        title: 'Security Notice',
+        message: 'Too many attempts. For your security, please wait a moment before trying again.'
+    },
+    'auth/internal-error': {
+        title: 'Service Interruption',
+        message: 'We encountered a momentary issue. Please try again in a few seconds.'
+    },
+    'location-denied': {
+        title: 'Permission Required',
+        message: 'To show properties near you, we need location access. Please enable it in settings.'
+    },
+    'location-error': {
+        title: 'Location Unavailable',
+        message: 'We could not determine your current location. Please select your city manually.'
+    }
+};
+
 interface NotificationContextType {
     showNotification: (type: NotificationType, title: string, message: string, duration?: number) => void;
+    showProfessionalError: (error: any, fallbackTitle?: string) => void;
     hideNotification: () => void;
 }
 
@@ -60,6 +104,16 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         }
     }, [insets.top]);
 
+    const showProfessionalError = useCallback((error: any, fallbackTitle = 'Something went wrong') => {
+        const errorCode = error?.code || error?.message || 'unknown';
+        const mapped = ERROR_MAPPING[errorCode];
+
+        const title = mapped?.title || fallbackTitle;
+        const message = mapped?.message || 'We encountered an unexpected issue. Our team is looking into it. Please try again.';
+
+        showNotification('error', title, message);
+    }, [showNotification]);
+
     const hideNotification = useCallback(() => {
         Animated.timing(translateY, {
             toValue: -200, // Move completely off screen
@@ -91,7 +145,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     };
 
     return (
-        <NotificationContext.Provider value={{ showNotification, hideNotification }}>
+        <NotificationContext.Provider value={{ showNotification, showProfessionalError, hideNotification }}>
             {children}
             {notification && (
                 <Animated.View

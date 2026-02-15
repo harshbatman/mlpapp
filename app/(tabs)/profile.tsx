@@ -2,14 +2,16 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
+import { useNotification } from '@/context/notification-context';
 import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Image, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function ProfileScreen() {
     const router = useRouter();
+    const { showProfessionalError, showNotification } = useNotification();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
     const { profile, logout } = useProfile();
@@ -28,8 +30,7 @@ export default function ProfileScreen() {
             await logout();
             router.replace('/(auth)/login');
         } catch (error) {
-            console.error('Logout failed:', error);
-            Alert.alert('Error', 'Failed to log out. Please try again.');
+            showProfessionalError(error, 'Logout Failed');
         }
     };
 
@@ -40,10 +41,10 @@ export default function ProfileScreen() {
     const confirmDelete = () => {
         if (confirmPhone === '1234567890' && confirmPassword === '123456') {
             setShowDeleteConfirm(false);
-            Alert.alert('Account Deleted', 'Your account has been permanently removed.');
+            showNotification('success', 'Account Deleted', 'Your account has been permanently removed from the MAHTO ecosystem.');
             router.replace('/(auth)/login');
         } else {
-            Alert.alert('Invalid Credentials', 'The phone number or password you entered is incorrect.');
+            showNotification('error', 'Authentication Failed', 'The phone number or password you entered is incorrect.');
         }
     };
 

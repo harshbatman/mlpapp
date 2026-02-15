@@ -427,7 +427,7 @@ export default function HomeScreen() {
   const [selectedState, setSelectedState] = useState<any>(null);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [mainFilterModalVisible, setMainFilterModalVisible] = useState(false);
-  const { showNotification } = useNotification();
+  const { showNotification, showProfessionalError } = useNotification();
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -454,8 +454,7 @@ export default function HomeScreen() {
     let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       setLoadingLocation(false);
-      setLoadingLocation(false);
-      showNotification('error', 'Permission Denied', 'Please allow location access to find properties near you.');
+      showProfessionalError({ code: 'location-denied' });
       return;
     }
 
@@ -476,7 +475,7 @@ export default function HomeScreen() {
         showNotification('success', 'Location Updated', `Found you in ${cityName}`);
       }
     } catch (error) {
-      showNotification('error', 'Location Error', 'Could not fetch your location. Please try manually.');
+      showProfessionalError(error, 'Location Error');
     } finally {
       setLoadingLocation(false);
     }
