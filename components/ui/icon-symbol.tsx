@@ -44,6 +44,9 @@ const MAPPING: IconMapping = {
   'location.fill': 'my-location',
   'sparkles': 'auto-awesome',
   'apartment.fill': 'apartment',
+  'mappin.circle.fill': 'location-city',
+  'map.fill': 'map',
+  'slider.horizontal.3': 'tune',
 };
 
 /**

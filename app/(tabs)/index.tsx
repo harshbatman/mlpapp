@@ -183,12 +183,20 @@ export default function HomeScreen() {
           </View>
 
           <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
-            <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
-            <TextInput
-              placeholder="Search properties, land..."
-              placeholderTextColor={colors.icon}
-              style={[styles.searchInput, { color: colors.text }]}
-            />
+            <View style={styles.searchLeft}>
+              <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
+              <TextInput
+                placeholder="Search properties, land..."
+                placeholderTextColor={colors.icon}
+                style={[styles.searchInput, { color: colors.text }]}
+              />
+            </View>
+            <Pressable
+              style={[styles.filterButton, { backgroundColor: colors.tint }]}
+              onPress={() => setLocationModalVisible(true)}
+            >
+              <IconSymbol name="slider.horizontal.3" size={18} color="#FFF" />
+            </Pressable>
           </View>
 
           {/* Promo Reward Card */}
@@ -416,6 +424,19 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 18,
     fontWeight: '500',
+  },
+  searchLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filterButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
   },
   scrollContent: {
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
