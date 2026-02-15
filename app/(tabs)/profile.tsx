@@ -12,7 +12,7 @@ export default function ProfileScreen() {
     const router = useRouter();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
-    const { profile } = useProfile();
+    const { profile, logout } = useProfile();
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [confirmPhone, setConfirmPhone] = useState('');
@@ -22,9 +22,15 @@ export default function ProfileScreen() {
         setShowLogoutConfirm(true);
     };
 
-    const confirmLogout = () => {
-        setShowLogoutConfirm(false);
-        router.replace('/(auth)/login');
+    const confirmLogout = async () => {
+        try {
+            setShowLogoutConfirm(false);
+            await logout();
+            router.replace('/(auth)/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            Alert.alert('Error', 'Failed to log out. Please try again.');
+        }
     };
 
     const handleDeleteClick = () => {

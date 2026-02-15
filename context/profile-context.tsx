@@ -1,5 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { auth, db } from '../config/firebase';
 
 type ProfileData = {
     name: string;
@@ -7,53 +9,78 @@ type ProfileData = {
     email: string;
     address: string;
     image: string | null;
+    isLoggedIn: boolean;
 };
 
 type ProfileContextType = {
     profile: ProfileData;
     updateProfile: (data: Partial<ProfileData>) => void;
+    logout: () => Promise<void>;
 };
 
 const defaultProfile: ProfileData = {
-    name: 'Harsh Batman',
-    phone: '1234567890',
-    email: 'harsh@example.com',
+    name: 'Guest User',
+    phone: '',
+    email: '',
     address: '',
     image: null,
+    isLoggedIn: false,
 };
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
     const [profile, setProfile] = useState<ProfileData>(defaultProfile);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadProfile();
+        const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in, fetch from Firestore
+                const userDoc = doc(db, 'users', user.uid);
+
+                // Set up a listener for the user document
+                const unsubscribeDoc = onSnapshot(userDoc, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        setProfile({
+                            name: userData.name || 'User',
+                            phone: userData.phone || '',
+                            email: user.email || '',
+                            address: userData.address || '',
+                            image: userData.image || null,
+                            isLoggedIn: true,
+                        });
+                    }
+                });
+
+                return () => unsubscribeDoc();
+            } else {
+                // User is signed out
+                setProfile(defaultProfile);
+                setLoading(false);
+            }
+        });
+
+        return () => unsubscribeAuth();
     }, []);
 
-    const loadProfile = async () => {
-        try {
-            const saved = await AsyncStorage.getItem('mahto_profile');
-            if (saved) {
-                setProfile(JSON.parse(saved));
-            }
-        } catch (e) {
-            console.error('Failed to load profile', e);
-        }
+    const updateProfile = async (data: Partial<ProfileData>) => {
+        setProfile(prev => ({ ...prev, ...data }));
+        // In a real app, we would also update Firestore here if user is logged in
     };
 
-    const updateProfile = async (data: Partial<ProfileData>) => {
-        const newProfile = { ...profile, ...data };
-        setProfile(newProfile);
+    const logout = async () => {
         try {
-            await AsyncStorage.setItem('mahto_profile', JSON.stringify(newProfile));
-        } catch (e) {
-            console.error('Failed to save profile', e);
+            await signOut(auth);
+            setProfile(defaultProfile);
+        } catch (error) {
+            console.error('Logout error:', error);
         }
     };
 
     return (
-        <ProfileContext.Provider value={{ profile, updateProfile }}>
+        <ProfileContext.Provider value={{ profile, updateProfile, logout }}>
             {children}
         </ProfileContext.Provider>
     );

@@ -3,8 +3,10 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { auth } from '../../config/firebase';
 
 export default function LoginScreen() {
     const router = useRouter();
@@ -13,15 +15,28 @@ export default function LoginScreen() {
 
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
-        // Demo account logic
-        if (phone === '1234567890' && password === '123456') {
-            router.replace('/(tabs)');
-        } else if (phone && password) {
-            router.replace('/(tabs)');
-        } else {
+    const handleLogin = async () => {
+        if (!phone || !password) {
             alert('Please enter your credentials');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // Virtual Email Logic
+            const virtualEmail = `${phone}@mahto.app`;
+
+            // Sign in with Firebase
+            await signInWithEmailAndPassword(auth, virtualEmail, password);
+
+            router.replace('/(tabs)');
+        } catch (error: any) {
+            console.error(error);
+            alert('Login failed: ' + (error.message || 'Check your credentials'));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -37,7 +52,6 @@ export default function LoginScreen() {
                 <View style={styles.header}>
                     <ThemedText type="title" style={styles.appName}>MAHTO</ThemedText>
                     <ThemedText type="subtitle" style={styles.tagline}>Land & Properties</ThemedText>
-                    <ThemedText style={styles.demoHint}>Demo: 1234567890 / 123456</ThemedText>
                 </View>
 
                 <View style={styles.form}>
@@ -61,8 +75,16 @@ export default function LoginScreen() {
                         secureTextEntry
                     />
 
-                    <Pressable style={[styles.loginButton, { backgroundColor: '#000000' }]} onPress={handleLogin}>
-                        <ThemedText style={styles.loginButtonText}>Continue with MAHTO ID</ThemedText>
+                    <Pressable
+                        style={[styles.loginButton, { backgroundColor: '#000000' }, loading && { opacity: 0.7 }]}
+                        onPress={handleLogin}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <ThemedText style={styles.loginButtonText}>Continue with MAHTO ID</ThemedText>
+                        )}
                     </Pressable>
 
                     <View style={styles.footer}>

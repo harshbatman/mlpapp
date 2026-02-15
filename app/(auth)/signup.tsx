@@ -2,8 +2,11 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { auth, db } from '../../config/firebase';
 
 export default function SignUpScreen() {
     const router = useRouter();
@@ -13,10 +16,42 @@ export default function SignUpScreen() {
     const [name, setName] = useState('Harsh Mahto');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSignUp = () => {
-        if (name && phone && password) {
+    const handleSignUp = async () => {
+        if (!name || !phone || !password) {
+            alert('Please fill all fields');
+            return;
+        }
+
+        if (phone.length < 10) {
+            alert('Please enter a valid phone number');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // Virtual Email Logic
+            const virtualEmail = `${phone}@mahto.app`;
+
+            // Create user in Firebase Auth
+            const userCredential = await createUserWithEmailAndPassword(auth, virtualEmail, password);
+            const user = userCredential.user;
+
+            // Store extra info in Firestore
+            await setDoc(doc(db, 'users', user.uid), {
+                name,
+                phone,
+                email: virtualEmail,
+                createdAt: Date.now(),
+            });
+
             router.replace('/(tabs)');
+        } catch (error: any) {
+            console.error(error);
+            alert(error.message || 'Signup failed');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -61,8 +96,16 @@ export default function SignUpScreen() {
                         secureTextEntry
                     />
 
-                    <Pressable style={[styles.signupButton, { backgroundColor: colors.tint }]} onPress={handleSignUp}>
-                        <ThemedText style={styles.signupButtonText}>Create Account</ThemedText>
+                    <Pressable
+                        style={[styles.signupButton, { backgroundColor: colors.tint }, loading && { opacity: 0.7 }]}
+                        onPress={handleSignUp}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <ThemedText style={styles.signupButtonText}>Create Account</ThemedText>
+                        )}
                     </Pressable>
 
                     <View style={styles.divider}>
