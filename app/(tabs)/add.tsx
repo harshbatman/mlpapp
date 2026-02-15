@@ -4,10 +4,11 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { ListingType, PropertyType } from '@/constants/types';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function AddPropertyScreen() {
   const router = useRouter();
@@ -22,6 +23,30 @@ export default function AddPropertyScreen() {
   const [type, setType] = useState<PropertyType>('Home');
   const [listingType, setListingType] = useState<ListingType>('Sell');
   const [isLocating, setIsLocating] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
+
+  const pickImages = async () => {
+    if (images.length >= 5) {
+      Alert.alert('Limit Reached', 'You can only add up to 5 images.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsMultipleSelection: true,
+      selectionLimit: 5 - images.length,
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      const selectedUris = result.assets.map(asset => asset.uri);
+      setImages(prev => [...prev, ...selectedUris].slice(0, 5));
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleGetCurrentLocation = async () => {
     setIsLocating(true);
@@ -75,6 +100,26 @@ export default function AddPropertyScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ThemedText style={styles.label}>Property Images ({images.length}/5)</ThemedText>
+        <View style={styles.imageSection}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.imageScroll}>
+            {images.map((uri, index) => (
+              <View key={index} style={styles.imageWrapper}>
+                <Image source={{ uri }} style={styles.imagePreview} />
+                <Pressable style={styles.removeImageBtn} onPress={() => removeImage(index)}>
+                  <IconSymbol name="trash.fill" size={14} color="#fff" />
+                </Pressable>
+              </View>
+            ))}
+            {images.length < 5 && (
+              <Pressable style={[styles.imagePicker, { borderColor: colors.border }]} onPress={pickImages}>
+                <IconSymbol name="camera.fill" size={24} color={colors.icon} />
+                <ThemedText style={styles.imagePickerText}>Add Photo</ThemedText>
+              </Pressable>
+            )}
+          </ScrollView>
+        </View>
+
         <ThemedText style={styles.label}>Listing Title</ThemedText>
         <TextInput
           style={[styles.input, { borderColor: colors.border, color: colors.text }]}
@@ -298,5 +343,51 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
+  },
+  imageSection: {
+    marginTop: 4,
+  },
+  imageScroll: {
+    gap: 12,
+  },
+  imageWrapper: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    position: 'relative',
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+  },
+  removeImageBtn: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: '#EF4444',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  imagePicker: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F6F6F6',
+  },
+  imagePickerText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#666',
+    marginTop: 4,
   },
 });

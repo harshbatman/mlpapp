@@ -37,6 +37,11 @@ const MAPPING = {
   'chevron.left': 'chevron-left',
   'rectangle.portrait.and.arrow.right': 'logout',
   'camera.fill': 'photo-camera',
+  'envelope.fill': 'email',
+  'person.crop.circle.fill': 'account-circle',
+  'crown.fill': 'workspace-premium',
+  'lightbulb.fill': 'lightbulb-outline',
+  'location.fill': 'my-location',
 } as IconMapping;
 
 /**

@@ -6,7 +6,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Dimensions, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -15,22 +15,36 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme as 'light' | 'dark'];
   const [city, setCity] = useState('Select Location');
+  const [loadingLocation, setLoadingLocation] = useState(false);
 
   const handleLocationRequest = async () => {
+    setLoadingLocation(true);
     let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
+      setLoadingLocation(false);
       Alert.alert('Permission Denied', 'Allow location access to find properties near you.');
       return;
     }
 
     try {
-      let location = await ExpoLocation.getCurrentPositionAsync({});
-      console.log('Location:', location);
-      Alert.alert('Location Accessed', `Coordinates: ${location.coords.latitude}, ${location.coords.longitude}`);
-      // In a real app, you'd use reverse geocoding here to get the city name
-      // setCity('New Location...'); 
+      let location = await ExpoLocation.getCurrentPositionAsync({
+        accuracy: ExpoLocation.Accuracy.Balanced,
+      });
+
+      const reverseGeocode = await ExpoLocation.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+
+      if (reverseGeocode.length > 0) {
+        const address = reverseGeocode[0];
+        const cityName = address.city || address.district || address.region || 'Unknown Location';
+        setCity(cityName);
+      }
     } catch (error) {
       Alert.alert('Error', 'Could not fetch your location. Please try manually.');
+    } finally {
+      setLoadingLocation(false);
     }
   };
 
@@ -59,8 +73,13 @@ export default function HomeScreen() {
             <Pressable
               style={styles.notificationBell}
               onPress={handleLocationRequest}
+              disabled={loadingLocation}
             >
-              <IconSymbol name="mappin.and.ellipse" size={24} color="#fff" />
+              {loadingLocation ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <IconSymbol name="location.fill" size={24} color="#fff" />
+              )}
             </Pressable>
           </View>
 
@@ -81,9 +100,9 @@ export default function HomeScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>Categories</ThemedText>
+            <ThemedText type="subtitle" style={styles.sectionTitle} numberOfLines={1}>Categories</ThemedText>
             <Pressable>
-              <ThemedText style={{ color: colors.tint, fontWeight: '600' }}>See All</ThemedText>
+              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>See All</ThemedText>
             </Pressable>
           </View>
 
@@ -238,12 +257,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: '800',
     letterSpacing: -0.5,
+    flex: 1,
   },
   categoriesScroll: {
     marginHorizontal: -20,
@@ -251,8 +271,8 @@ const styles = StyleSheet.create({
   },
   categoryItem: {
     alignItems: 'center',
-    marginRight: 20,
-    width: 80,
+    marginRight: 16,
+    width: 90,
   },
   categoryIcon: {
     width: 72,

@@ -66,14 +66,17 @@ export default function ProfileScreen() {
                 </View>
 
                 <View style={styles.statsRow}>
-                    <View style={styles.statBox}>
+                    <Pressable style={styles.statBox} onPress={() => router.push('/my-listings')}>
                         <ThemedText type="subtitle">0</ThemedText>
                         <ThemedText style={styles.statLabel}>My Listings</ThemedText>
-                    </View>
-                    <View style={[styles.statBox, { borderLeftWidth: 1, borderRightWidth: 1, borderColor: colors.border }]}>
+                    </Pressable>
+                    <Pressable
+                        style={[styles.statBox, { borderLeftWidth: 1, borderRightWidth: 1, borderColor: colors.border }]}
+                        onPress={() => router.push('/saved-properties')}
+                    >
                         <ThemedText type="subtitle">0</ThemedText>
                         <ThemedText style={styles.statLabel}>Saved</ThemedText>
-                    </View>
+                    </Pressable>
                     <View style={styles.statBox}>
                         <ThemedText type="subtitle">0</ThemedText>
                         <ThemedText style={styles.statLabel}>Views</ThemedText>
@@ -82,10 +85,23 @@ export default function ProfileScreen() {
 
                 <View style={styles.section}>
                     <ThemedText style={styles.sectionTitle}>Account & Preferences</ThemedText>
-                    <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/notifications')}
+                    >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="bell.fill" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Notifications</ThemedText>
+                            <ThemedText style={styles.menuItemText}>Notifications Inbox</ThemedText>
+                        </View>
+                        <IconSymbol name="chevron.right" size={20} color={colors.icon} />
+                    </Pressable>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/notification-settings')}
+                    >
+                        <View style={styles.menuItemLeft}>
+                            <IconSymbol name="bell.fill" size={22} color={colors.icon} />
+                            <ThemedText style={styles.menuItemText}>Notification Settings</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
@@ -100,14 +116,20 @@ export default function ProfileScreen() {
 
                 <View style={styles.section}>
                     <ThemedText style={styles.sectionTitle}>Support & Feedback</ThemedText>
-                    <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/help-center')}
+                    >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="questionmark.circle" size={22} color={colors.icon} />
                             <ThemedText style={styles.menuItemText}>Help Center / FAQ</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
-                    <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/contact-us')}
+                    >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="envelope" size={22} color={colors.icon} />
                             <ThemedText style={styles.menuItemText}>Contact Us</ThemedText>
@@ -132,21 +154,30 @@ export default function ProfileScreen() {
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
-                    <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/terms-and-conditions')}
+                    >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="doc.text" size={22} color={colors.icon} />
                             <ThemedText style={styles.menuItemText}>Terms & Conditions</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
-                    <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/privacy-policy')}
+                    >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="lock" size={22} color={colors.icon} />
                             <ThemedText style={styles.menuItemText}>Privacy Policy</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
-                    <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/refund-policy')}
+                    >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="banknote" size={22} color={colors.icon} />
                             <ThemedText style={styles.menuItemText}>Refund Policy</ThemedText>
@@ -193,7 +224,7 @@ export default function ProfileScreen() {
                                     <ThemedText style={styles.noText}>No</ThemedText>
                                 </Pressable>
                                 <Pressable
-                                    style={[styles.confirmButton, styles.yesButton, { backgroundColor: '#000000' }]}
+                                    style={[styles.confirmButton, styles.yesButton, { backgroundColor: '#EF4444', borderColor: '#EF4444' }]}
                                     onPress={confirmLogout}
                                 >
                                     <ThemedText style={styles.yesText}>Yes</ThemedText>
