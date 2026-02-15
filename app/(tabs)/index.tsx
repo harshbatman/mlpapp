@@ -514,13 +514,20 @@ export default function HomeScreen() {
   };
 
   const handleApplySelection = () => {
+    let newCity = 'Select Location';
     if (selectedDistricts.length === 0) {
-      setCity('Select Location');
+      newCity = 'Select Location';
     } else if (selectedDistricts.length === 1) {
-      setCity(selectedDistricts[0]);
+      newCity = selectedDistricts[0];
     } else {
-      setCity(`${selectedDistricts.length} locations`);
+      newCity = `${selectedDistricts.length} locations`;
     }
+
+    setCity(newCity);
+    if (newCity !== 'Select Location') {
+      showNotification('success', 'Location Updated', `Now showing properties in ${newCity}`);
+    }
+
     setLocationModalVisible(false);
     setSelectedState(null);
     setSearchQuery('');
@@ -900,6 +907,7 @@ export default function HomeScreen() {
                 style={styles.cityCard}
                 onPress={() => {
                   setCity(cityItem.name);
+                  showNotification('success', 'Location Updated', `Exploring properties in ${cityItem.name}`);
                   router.push({
                     pathname: '/properties',
                     params: { city: cityItem.name }
