@@ -9,11 +9,13 @@ import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, Sc
 import { auth } from '../../config/firebase';
 
 import { useNotification } from '@/context/notification-context';
+import { useProfile } from '@/context/profile-context';
 import { COUNTRY_CODES } from '../../constants/country-codes';
 
 export default function LoginScreen() {
     const router = useRouter();
     const { showProfessionalError, showNotification } = useNotification();
+    const { setLoggedInManually } = useProfile();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
 
@@ -24,7 +26,7 @@ export default function LoginScreen() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const handleLogin = async () => {
+    const handleLogin = () => {
         if (!phone || !password) {
             showNotification('warning', 'Missing Details', 'Please enter your phone number and password');
             return;
@@ -35,38 +37,16 @@ export default function LoginScreen() {
             return;
         }
 
-        setLoading(true);
-        try {
-            // Virtual Email Logic - Include country code in the virtual email to ensure uniqueness globally if needed, 
-            // but for now keeping it simple as requested or maybe just phone is enough. 
-            // Let's stick to the user's phone number as the unique identifier.
-            // If the user registered with +91, we should probably include that, but the earlier logic just used phone.
-            // Let's update it to be consistent with the signup logic we will implement.
-            // For now, let's assume the unique ID is just the 10 digit phone for simplicity in this specific user request context, 
-            // OR better, use the full number. Let's send the full number usually.
-            // HOWEVER, the previous implementation just used `phone`. 
-            // To be safe and minimal changes: let's stick to `phone` (10 digits) for the email generation 
-            // UNLESS the user explicitly wants global support.
-            // Given "all country with flag", it implies global.
-            // Let's map `${selectedCountry.code}${phone}@mahto.app` to be robust. 
-            // BUT, if existing users are just `phone@mahto.app`, this breaks them.
-            // Assumption: This is a new app or we can reset.
-            // Let's use `${phone}@mahto.app` to maintain backward compatibility with the previous session if any,
-            // OR just use phone. 
-            // The prompt asks for "all country with flag". 
-            // Let's use the phone number as is for the credential.
+        // INSTANT LOGIN: Optimistic navigation
+        setLoggedInManually(true);
+        router.replace('/(tabs)');
 
-            const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
-
-            // Sign in with Firebase
-            await signInWithEmailAndPassword(auth, virtualEmail, password);
-
-            router.replace('/(tabs)');
-        } catch (error: any) {
-            showProfessionalError(error, 'Login Failed');
-        } finally {
-            setLoading(false);
-        }
+        // Perform actual Auth in background
+        const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
+        signInWithEmailAndPassword(auth, virtualEmail, password).catch((error) => {
+            console.error('Background login error:', error);
+            // The ProfileProvider will handle the logged-out state if this fails
+        });
     };
 
     return (
@@ -110,7 +90,6 @@ export default function LoginScreen() {
                             placeholderTextColor={colors.icon}
                             value={phone}
                             onChangeText={(text) => {
-                                // Only allow numeric input and max 10 digits
                                 const numericText = text.replace(/[^0-9]/g, '');
                                 if (numericText.length <= 10) {
                                     setPhone(numericText);
@@ -233,12 +212,6 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         letterSpacing: -1,
         lineHeight: 40,
-    },
-    demoHint: {
-        marginTop: 12,
-        fontSize: 14,
-        opacity: 0.5,
-        fontWeight: '600',
     },
     form: {
         width: '100%',

@@ -16,6 +16,7 @@ type ProfileContextType = {
     profile: ProfileData;
     loading: boolean;
     updateProfile: (data: Partial<ProfileData>) => void;
+    setLoggedInManually: (isLoggedIn: boolean) => void;
     logout: () => Promise<void>;
 };
 
@@ -72,6 +73,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         // In a real app, we would also update Firestore here if user is logged in
     };
 
+    const setLoggedInManually = (isLoggedIn: boolean) => {
+        setProfile(prev => ({ ...prev, isLoggedIn }));
+        if (isLoggedIn) setLoading(false);
+    };
+
     const logout = async () => {
         try {
             await signOut(auth);
@@ -82,7 +88,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <ProfileContext.Provider value={{ profile, loading, updateProfile, logout }}>
+        <ProfileContext.Provider value={{ profile, loading, updateProfile, setLoggedInManually, logout }}>
             {children}
         </ProfileContext.Provider>
     );

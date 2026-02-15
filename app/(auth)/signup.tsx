@@ -10,15 +10,17 @@ import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, Sc
 import { auth, db } from '../../config/firebase';
 
 import { useNotification } from '@/context/notification-context';
+import { useProfile } from '@/context/profile-context';
 import { COUNTRY_CODES } from '../../constants/country-codes';
 
 export default function SignUpScreen() {
     const router = useRouter();
     const { showProfessionalError, showNotification } = useNotification();
+    const { setLoggedInManually } = useProfile();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
 
-    const [name, setName] = useState('harsh');
+    const [name, setName] = useState('');
     const [selectedCountry, setSelectedCountry] = useState(COUNTRY_CODES.find(c => c.name === 'India') || COUNTRY_CODES[0]);
     const [showCountryModal, setShowCountryModal] = useState(false);
     const [phone, setPhone] = useState('');
@@ -26,7 +28,7 @@ export default function SignUpScreen() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const handleSignUp = async () => {
+    const handleSignUp = () => {
         if (!name || !phone || !password) {
             showNotification('warning', 'Missing Information', 'Please fill in all the details to join MAHTO.');
             return;
@@ -37,29 +39,25 @@ export default function SignUpScreen() {
             return;
         }
 
-        setLoading(true);
-        try {
-            // Virtual Email Logic
-            const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
+        // INSTANT SIGNUP: Optimistic navigation
+        setLoggedInManually(true);
+        router.replace('/(tabs)');
 
-            // Create user in Firebase Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, virtualEmail, password);
-            const user = userCredential.user;
-
-            // Store extra info in Firestore
-            await setDoc(doc(db, 'users', user.uid), {
-                name,
-                phone,
-                email: virtualEmail,
-                createdAt: Date.now(),
+        // Background account creation
+        const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
+        createUserWithEmailAndPassword(auth, virtualEmail, password)
+            .then(async (userCredential) => {
+                const user = userCredential.user;
+                await setDoc(doc(db, 'users', user.uid), {
+                    name,
+                    phone,
+                    email: virtualEmail,
+                    createdAt: Date.now(),
+                });
+            })
+            .catch((error) => {
+                console.error('Background signup error:', error);
             });
-
-            router.replace('/(tabs)');
-        } catch (error: any) {
-            showProfessionalError(error, 'Sign Up Failed');
-        } finally {
-            setLoading(false);
-        }
     };
 
     return (
