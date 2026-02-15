@@ -9,7 +9,7 @@ import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Dimensions, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -812,40 +812,69 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        <View style={styles.rewardCard}>
+        {/* Promo Reward Card */}
+        <Pressable
+          style={styles.rewardCard}
+          onPress={() => router.push('/(tabs)/add')}
+        >
           <View style={styles.rewardIconContainer}>
-            <IconSymbol name="sparkles" size={32} color="#FFD700" />
+            <RNText style={{
+              fontSize: 32,
+              lineHeight: 45,
+              includeFontPadding: false,
+              textAlign: 'center',
+              color: '#fff'
+            }}>✨</RNText>
           </View>
           <View style={styles.rewardTextContainer}>
-            <ThemedText style={styles.rewardTag}>EXCLUSIVE REWARDS</ThemedText>
-            <ThemedText style={styles.rewardTitle}>Refer & Earn ₹5000</ThemedText>
-            <ThemedText style={styles.rewardSubtitle}>Refer a property and get instant cash rewards upon successful listing.</ThemedText>
+            <ThemedText style={styles.rewardTag}>LIMITED OFFER</ThemedText>
+            <ThemedText style={styles.rewardTitle}>Post Now - It's Free! 🎊</ThemedText>
+            <ThemedText style={styles.rewardSubtitle}>List your property today and reach thousands of buyers instantly.</ThemedText>
           </View>
-          <Pressable style={styles.rewardAction}>
-            <IconSymbol name="chevron.right" size={24} color="#FFF" />
-          </Pressable>
-        </View>
+          <View style={styles.rewardAction}>
+            <IconSymbol name="chevron.right" size={20} color="#FFFFFF" />
+          </View>
+        </Pressable>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>{t('Categories')}</ThemedText>
+            <ThemedText type="subtitle" style={styles.sectionTitle} numberOfLines={1}>
+              Categories
+            </ThemedText>
+            <Pressable onPress={() => router.push('/properties')}>
+              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>
+                See All
+              </ThemedText>
+            </Pressable>
           </View>
+
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.categoriesScroll}
             contentContainerStyle={styles.categoriesContent}
           >
-            {categories.map((item, index) => (
+            {categories.map((cat, index) => (
               <Pressable
                 key={index}
                 style={styles.categoryItem}
-                onPress={() => router.push({ pathname: '/properties', params: { category: item.name } })}
+                onPress={() => {
+                  router.push({
+                    pathname: '/properties',
+                    params: { category: cat.name }
+                  });
+                }}
               >
-                <View style={[styles.categoryIcon, { backgroundColor: colors.tint + '15' }]}>
-                  <IconSymbol name={item.icon as any} size={32} color={colors.tint} />
+                <View style={[styles.categoryIcon, { backgroundColor: colors.secondary }]}>
+                  <IconSymbol
+                    name={cat.icon as any}
+                    size={32}
+                    color={colors.tint}
+                  />
                 </View>
-                <ThemedText style={styles.categoryName}>{t(item.name)}</ThemedText>
+                <ThemedText style={styles.categoryName}>
+                  {cat.name}
+                </ThemedText>
               </Pressable>
             ))}
           </ScrollView>
@@ -853,8 +882,12 @@ export default function HomeScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>{t('Popular Cities')}</ThemedText>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>Explore Cities</ThemedText>
+            <Pressable onPress={() => setLocationModalVisible(true)}>
+              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>All India</ThemedText>
+            </Pressable>
           </View>
+
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -867,11 +900,19 @@ export default function HomeScreen() {
                 style={styles.cityCard}
                 onPress={() => {
                   setCity(cityItem.name);
-                  showNotification('success', 'Location Changed', `Showing properties in ${cityItem.name}`);
+                  showNotification('success', 'Location Updated', `Exploring properties in ${cityItem.name}`);
+                  router.push({
+                    pathname: '/properties',
+                    params: { city: cityItem.name }
+                  });
                 }}
               >
-                <View style={[styles.cityIconContainer, { backgroundColor: cityItem.color === 'special' ? colors.tint + '15' : '#F5F5F5' }]}>
-                  <ThemedText style={{ fontSize: 32 }}>🏙️</ThemedText>
+                <View style={[styles.cityIconContainer, { padding: 0, overflow: 'hidden', borderWidth: 0 }]}>
+                  <Image
+                    source={cityItem.image}
+                    style={{ width: '100%', height: '100%' }}
+                    resizeMode="cover"
+                  />
                 </View>
                 <ThemedText style={styles.cityName}>{cityItem.name}</ThemedText>
                 {cityItem.color === 'special' && (
@@ -886,21 +927,19 @@ export default function HomeScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>{t('Featured')}</ThemedText>
-            <Pressable>
-              <ThemedText style={{ color: colors.tint, fontWeight: '700' }}>View All</ThemedText>
-            </Pressable>
+            <ThemedText style={styles.sectionTitle}>Featured Listings</ThemedText>
           </View>
 
           <View style={styles.emptyState}>
-            <IconSymbol name="house.fill" size={48} color={colors.icon} style={{ opacity: 0.2 }} />
-            <ThemedText style={styles.emptyText}>No featured properties yet</ThemedText>
-            <ThemedText style={styles.emptySubText}>Be the first one to post a property in your area!</ThemedText>
+            <IconSymbol name="house.fill" size={60} color={colors.icon} />
+            <ThemedText style={styles.emptyText}>No listings yet.</ThemedText>
+            <ThemedText style={styles.emptySubText}>Be the first one to post a property!</ThemedText>
+
             <Pressable
               style={[styles.postButton, { backgroundColor: colors.tint }]}
               onPress={() => router.push('/(tabs)/add')}
             >
-              <ThemedText style={styles.postButtonText}>Post Property</ThemedText>
+              <ThemedText style={styles.postButtonText}>Post Now</ThemedText>
             </Pressable>
           </View>
         </View>
