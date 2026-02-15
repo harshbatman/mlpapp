@@ -264,10 +264,18 @@ export const INDIAN_LOCATIONS = [
         ]
     },
     {
+        name: 'Delhi',
+        districts: [
+            'Central Delhi', 'East Delhi', 'New Delhi', 'North Delhi', 'North East Delhi',
+            'North West Delhi', 'Shahdara', 'South Delhi', 'South East Delhi',
+            'South West Delhi', 'West Delhi'
+        ]
+    },
+    {
         name: 'Union Territories',
         districts: [
             'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
-            'Lakshadweep', 'Delhi', 'Puducherry', 'Jammu and Kashmir', 'Ladakh'
+            'Lakshadweep', 'Puducherry', 'Jammu and Kashmir', 'Ladakh'
         ]
     }
 ];
