@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
-import './config/i18n';
+import '../config/i18n';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
