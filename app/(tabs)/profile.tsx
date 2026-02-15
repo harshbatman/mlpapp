@@ -6,7 +6,7 @@ import { useNotification } from '@/context/notification-context';
 import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Image, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function ProfileScreen() {
@@ -154,7 +154,10 @@ export default function ProfileScreen() {
 
                 <View style={styles.section}>
                     <ThemedText style={styles.sectionTitle}>Information & Legal</ThemedText>
-                    <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/about')}
+                    >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="info.circle" size={22} color={colors.icon} />
                             <ThemedText style={styles.menuItemText}>About Us</ThemedText>
