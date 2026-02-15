@@ -72,18 +72,18 @@ const styles = StyleSheet.create({
   },
   splashTitle: {
     color: '#FFFFFF',
-    fontSize: 48,
+    fontSize: 64,
     fontWeight: '900',
     letterSpacing: 4,
-    lineHeight: 56, // Fixed: Added line height to prevent cropping
+    lineHeight: 72,
   },
   splashSubtitle: {
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '600',
     marginTop: 4,
     letterSpacing: 2,
-    lineHeight: 24, // Added line height for consistency
+    lineHeight: 28,
     textTransform: 'uppercase',
   },
 });
