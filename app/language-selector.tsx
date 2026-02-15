@@ -49,7 +49,7 @@ export default function LanguageSelectorScreen() {
                 <Pressable onPress={() => router.back()} style={styles.backButton}>
                     <IconSymbol name="chevron.left" size={28} color={colors.text} />
                 </Pressable>
-                <ThemedText type="title" style={styles.headerTitle}>Language</ThemedText>
+                <ThemedText type="title" style={styles.headerTitle}>Select Language</ThemedText>
                 <View style={{ width: 44 }} />
             </View>
 
@@ -58,45 +58,39 @@ export default function LanguageSelectorScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.heroSection}>
-                    <View style={[styles.glow, { backgroundColor: colors.tint + '10' }]} />
-                    <ThemedText style={styles.heroTitle}>Choose your language</ThemedText>
-                    <ThemedText style={styles.heroSubtitle}>Select the language that helps you build better with MAHTO.</ThemedText>
+                    <ThemedText style={styles.heroSubtitle}>Choose your preferred language for the MAHTO ecosystem.</ThemedText>
                 </View>
 
-                <View style={styles.grid}>
-                    {LANGUAGES.map((lang) => {
+                <View style={styles.listContainer}>
+                    {LANGUAGES.map((lang, index) => {
                         const isSelected = i18n.language === lang.code;
                         return (
                             <Pressable
                                 key={lang.code}
                                 style={[
-                                    styles.card,
-                                    {
-                                        backgroundColor: isSelected ? colors.tint + '10' : (colorScheme === 'light' ? '#FFFFFF' : '#1C1C1E'),
-                                        borderColor: isSelected ? colors.tint : (colorScheme === 'light' ? '#F0F0F0' : '#2C2C2E'),
-                                    }
+                                    styles.item,
+                                    isSelected && { backgroundColor: colors.tint + '10', borderColor: colors.tint },
+                                    index === 0 && styles.firstItem,
+                                    index === LANGUAGES.length - 1 && styles.lastItem
                                 ]}
                                 onPress={() => handleLanguageChange(lang.code)}
                             >
-                                <View style={styles.cardHeader}>
-                                    <View style={[styles.langInitialBox, { backgroundColor: isSelected ? colors.tint : (colorScheme === 'light' ? '#F5F5F5' : '#2C2C2E') }]}>
-                                        <ThemedText style={[styles.langInitial, { color: isSelected ? '#FFFFFF' : colors.text }]}>
+                                <View style={styles.itemContent}>
+                                    <View style={[styles.avatar, { backgroundColor: isSelected ? colors.tint : (colorScheme === 'light' ? '#F0F0F0' : '#2C2C2E') }]}>
+                                        <ThemedText style={[styles.avatarText, { color: isSelected ? '#FFF' : colors.text }]}>
                                             {lang.nativeName.charAt(0)}
                                         </ThemedText>
                                     </View>
-                                    {isSelected && (
-                                        <IconSymbol name="checkmark.circle.fill" size={22} color={colors.tint} />
-                                    )}
+                                    <View style={styles.textContainer}>
+                                        <ThemedText style={[styles.nativeName, isSelected && { color: colors.tint }]}>
+                                            {lang.nativeName}
+                                        </ThemedText>
+                                        <ThemedText style={styles.englishName}>{lang.name}</ThemedText>
+                                    </View>
                                 </View>
-
-                                <View style={styles.cardInfo}>
-                                    <ThemedText style={[styles.langNativeName, isSelected && { color: colors.tint }]}>
-                                        {lang.nativeName}
-                                    </ThemedText>
-                                    <ThemedText style={styles.langName}>
-                                        {lang.name}
-                                    </ThemedText>
-                                </View>
+                                {isSelected && (
+                                    <IconSymbol name="checkmark.circle.fill" size={24} color={colors.tint} />
+                                )}
                             </Pressable>
                         );
                     })}
@@ -113,7 +107,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingTop: Platform.OS === 'ios' ? 60 : 40,
-        paddingBottom: 20,
+        paddingBottom: 15,
         paddingHorizontal: 20,
     },
     backButton: {
@@ -122,90 +116,72 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 22,
-        backgroundColor: 'rgba(0,0,0,0.02)',
     },
     headerTitle: {
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: '800',
-        letterSpacing: -0.5,
     },
     scrollContent: {
         paddingBottom: 40,
     },
     heroSection: {
         paddingHorizontal: 24,
-        marginBottom: 32,
-        position: 'relative',
-    },
-    glow: {
-        position: 'absolute',
-        top: -40,
-        left: -20,
-        width: 150,
-        height: 150,
-        borderRadius: 75,
-        filter: 'blur(40px)',
-    },
-    heroTitle: {
-        fontSize: 32,
-        fontWeight: '900',
-        lineHeight: 38,
-        letterSpacing: -1,
-        marginBottom: 8,
+        marginBottom: 20,
     },
     heroSubtitle: {
         fontSize: 16,
-        opacity: 0.6,
+        opacity: 0.5,
         lineHeight: 22,
         fontWeight: '500',
     },
-    grid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        paddingHorizontal: 16,
-        gap: 12,
+    listContainer: {
+        marginHorizontal: 16,
+        backgroundColor: Platform.OS === 'ios' ? 'transparent' : 'rgba(0,0,0,0.02)',
+        borderRadius: 20,
     },
-    card: {
-        width: '48%',
-        padding: 16,
-        borderRadius: 24,
-        borderWidth: 2,
-        // iOS Shadow
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        // Android Shadow
-        elevation: 2,
-    },
-    cardHeader: {
+    item: {
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 16,
+        padding: 16,
+        backgroundColor: '#FFFFFF10',
+        marginBottom: 8,
+        borderRadius: 16,
+        borderWidth: 1.5,
+        borderColor: 'transparent',
     },
-    langInitialBox: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
-        justifyContent: 'center',
+    firstItem: {
+        // can add specific styling
+    },
+    lastItem: {
+        marginBottom: 0,
+    },
+    itemContent: {
+        flexDirection: 'row',
         alignItems: 'center',
     },
-    langInitial: {
+    avatar: {
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 16,
+    },
+    avatarText: {
         fontSize: 20,
+        fontWeight: 'bold',
+    },
+    textContainer: {
+        justifyContent: 'center',
+    },
+    nativeName: {
+        fontSize: 18,
         fontWeight: '700',
     },
-    cardInfo: {
-        marginTop: 4,
-    },
-    langNativeName: {
-        fontSize: 17,
-        fontWeight: '700',
-        marginBottom: 2,
-    },
-    langName: {
-        fontSize: 13,
+    englishName: {
+        fontSize: 14,
         opacity: 0.5,
-        fontWeight: '600',
+        marginTop: 2,
     }
 });
