@@ -366,6 +366,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  modalFooter: {
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
+  },
+  applyButton: {
+    height: 56,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  applyButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
 });
 
 
@@ -379,6 +400,7 @@ export default function HomeScreen() {
   const [locationModalVisible, setLocationModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedState, setSelectedState] = useState<any>(null);
+  const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -447,10 +469,24 @@ export default function HomeScreen() {
     );
   }, [searchQuery, selectedState, indianStates]);
 
-  const handleSelectCity = (cityName: string) => {
-    setCity(cityName);
+  const toggleDistrict = (districtName: string) => {
+    setSelectedDistricts(prev =>
+      prev.includes(districtName)
+        ? prev.filter(d => d !== districtName)
+        : [...prev, districtName]
+    );
+  };
+
+  const handleApplySelection = () => {
+    if (selectedDistricts.length === 0) {
+      setCity('Select Location');
+    } else if (selectedDistricts.length === 1) {
+      setCity(selectedDistricts[0]);
+    } else {
+      setCity(`${selectedDistricts.length} locations`);
+    }
     setLocationModalVisible(false);
-    setSelectedState(null); // Reset for next time
+    setSelectedState(null);
     setSearchQuery('');
   };
 
@@ -516,22 +552,49 @@ export default function HomeScreen() {
                   <ThemedText style={[styles.modalOptionText, { color: colors.tint, fontWeight: '700' }]}>Detect My Location</ThemedText>
                 </Pressable>
               )}
-
               {selectedState ? (
                 <View style={styles.districtGrid}>
                   <Pressable
-                    style={[styles.districtItem, { backgroundColor: colors.tint, width: '98%' }]}
-                    onPress={() => handleSelectCity(selectedState.name)}
+                    style={[
+                      styles.districtItem,
+                      {
+                        backgroundColor: selectedDistricts.includes(selectedState.name) ? colors.tint : colors.secondary,
+                        width: '98%',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }
+                    ]}
+                    onPress={() => toggleDistrict(selectedState.name)}
                   >
-                    <ThemedText style={[styles.districtText, { color: '#FFF' }]}>All {selectedState.name}</ThemedText>
+                    <ThemedText style={[styles.districtText, { color: selectedDistricts.includes(selectedState.name) ? '#FFF' : colors.text }]}>
+                      All {selectedState.name}
+                    </ThemedText>
+                    {selectedDistricts.includes(selectedState.name) && (
+                      <IconSymbol name="checkmark.circle.fill" size={18} color="#FFF" />
+                    )}
                   </Pressable>
                   {filteredList.map((district: any, dIndex: number) => (
                     <Pressable
                       key={dIndex}
-                      style={[styles.districtItem, { backgroundColor: colors.secondary }]}
-                      onPress={() => handleSelectCity(district)}
+                      style={[
+                        styles.districtItem,
+                        {
+                          backgroundColor: selectedDistricts.includes(district) ? colors.tint : colors.secondary,
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          paddingRight: selectedDistricts.includes(district) ? 12 : 16
+                        }
+                      ]}
+                      onPress={() => toggleDistrict(district)}
                     >
-                      <ThemedText style={styles.districtText}>{district}</ThemedText>
+                      <ThemedText style={[styles.districtText, { color: selectedDistricts.includes(district) ? '#FFF' : colors.text }]}>
+                        {district}
+                      </ThemedText>
+                      {selectedDistricts.includes(district) && (
+                        <IconSymbol name="checkmark.circle.fill" size={16} color="#FFF" style={{ marginLeft: 4 }} />
+                      )}
                     </Pressable>
                   ))}
                 </View>
@@ -545,12 +608,34 @@ export default function HomeScreen() {
                       setSearchQuery('');
                     }}
                   >
-                    <ThemedText style={styles.modalOptionText}>{state.name}</ThemedText>
-                    <IconSymbol name="chevron.right" size={16} color={colors.icon} />
+                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <ThemedText style={styles.modalOptionText}>{state.name}</ThemedText>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        {selectedDistricts.filter(d => state.districts.includes(d) || d === state.name).length > 0 && (
+                          <View style={{ backgroundColor: colors.tint, borderRadius: 10, paddingHorizontal: 6, paddingVertical: 2, marginRight: 8 }}>
+                            <ThemedText style={{ color: '#FFF', fontSize: 10, fontWeight: '700' }}>
+                              {selectedDistricts.filter(d => state.districts.includes(d) || d === state.name).length}
+                            </ThemedText>
+                          </View>
+                        )}
+                        <IconSymbol name="chevron.right" size={16} color={colors.icon} />
+                      </View>
+                    </View>
                   </Pressable>
                 ))
               )}
             </ScrollView>
+
+            <View style={styles.modalFooter}>
+              <Pressable
+                style={[styles.applyButton, { backgroundColor: colors.tint }]}
+                onPress={handleApplySelection}
+              >
+                <ThemedText style={styles.applyButtonText}>
+                  Apply {selectedDistricts.length > 0 ? `(${selectedDistricts.length})` : ''}
+                </ThemedText>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
@@ -745,7 +830,7 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
-    </ThemedView>
+    </ThemedView >
   );
 }
 
