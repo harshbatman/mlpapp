@@ -96,10 +96,11 @@ export default function LoginScreen() {
                         <Pressable
                             style={[styles.countryCodeButton, { borderColor: colors.border, backgroundColor: '#F6F6F6' }]}
                             onPress={() => setShowCountryModal(true)}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                         >
                             <ThemedText style={{ fontSize: 24 }}>{selectedCountry.flag}</ThemedText>
                             <ThemedText style={{ fontSize: 16, fontWeight: '600', marginLeft: 4 }}>{selectedCountry.code}</ThemedText>
-                            <IconSymbol name="chevron.down" size={14} color={colors.text} style={{ marginLeft: 6, opacity: 0.6 }} />
+                            <IconSymbol name="chevron.down" size={20} color={colors.text} style={{ marginLeft: 6, opacity: 0.6 }} />
                         </Pressable>
                         <TextInput
                             style={[styles.input, { flex: 1, borderColor: colors.border, color: colors.text }]}
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
         height: 56,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
+        paddingHorizontal: 16,
         borderRadius: 12,
         backgroundColor: '#F6F6F6',
     },
