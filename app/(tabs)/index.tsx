@@ -137,7 +137,11 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={[styles.header, { backgroundColor: colors.tint }]}>
             <View style={styles.headerTop}>
               <Pressable
@@ -181,6 +185,7 @@ export default function HomeScreen() {
             <Pressable
               style={[styles.filterButton, { backgroundColor: colors.tint }]}
               onPress={() => setLocationModalVisible(true)}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <IconSymbol name="slider.horizontal.3" size={18} color="#FFF" />
             </Pressable>
