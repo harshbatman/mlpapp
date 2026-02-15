@@ -38,7 +38,16 @@ export default function RefundPolicyScreen() {
     return (
         <ThemedView style={styles.container}>
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <Pressable
+                    onPress={() => {
+                        if (router.canGoBack()) {
+                            router.back();
+                        } else {
+                            router.replace('/(tabs)/profile');
+                        }
+                    }}
+                    style={styles.backButton}
+                >
                     <IconSymbol name="chevron.left" size={24} color={colors.text} />
                 </Pressable>
                 <ThemedText type="subtitle" style={styles.headerTitle}>Refund Policy</ThemedText>

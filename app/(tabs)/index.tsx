@@ -130,7 +130,12 @@ export default function HomeScreen() {
             </Pressable>
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoriesScroll}
+            contentContainerStyle={styles.categoriesContent}
+          >
             {categories.map((cat, index) => (
               <Pressable
                 key={index}
@@ -142,7 +147,12 @@ export default function HomeScreen() {
               >
                 <View style={[styles.categoryIcon, { backgroundColor: colors.secondary }]}>
                   <IconSymbol
-                    name={cat.name === 'Lands' ? 'mountain.2.fill' : cat.name === 'Commercial' ? 'building.2.fill' : 'house.fill'}
+                    name={
+                      cat.name === 'Lands' ? 'mountain.2.fill' :
+                        cat.name === 'Commercial' ? 'building.2.fill' :
+                          cat.name === 'Rentals' ? 'apartment.fill' :
+                            'house.fill'
+                    }
                     size={24}
                     color={colors.tint}
                   />
@@ -291,6 +301,8 @@ const styles = StyleSheet.create({
   },
   categoriesScroll: {
     marginHorizontal: -20,
+  },
+  categoriesContent: {
     paddingHorizontal: 20,
   },
   categoryItem: {

@@ -46,7 +46,14 @@ export default function LoginScreen() {
             style={[styles.container, { backgroundColor: colors.background }]}
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <Pressable
+                    onPress={() => {
+                        if (router.canGoBack()) {
+                            router.back();
+                        }
+                    }}
+                    style={styles.backButton}
+                >
                     <IconSymbol name="chevron.left" size={28} color={colors.text} />
                 </Pressable>
                 <View style={styles.header}>

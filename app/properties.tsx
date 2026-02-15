@@ -19,7 +19,16 @@ export default function PropertyListScreen() {
     return (
         <ThemedView style={styles.container}>
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <Pressable
+                    onPress={() => {
+                        if (router.canGoBack()) {
+                            router.back();
+                        } else {
+                            router.replace('/(tabs)');
+                        }
+                    }}
+                    style={styles.backButton}
+                >
                     <IconSymbol name="chevron.left" size={28} color={colors.text} />
                 </Pressable>
                 <ThemedText style={styles.headerTitle}>{category || 'Properties'}</ThemedText>
