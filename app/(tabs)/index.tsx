@@ -368,32 +368,7 @@ const styles = StyleSheet.create({
   },
 });
 
-// Optimization: Memoize the location group to avoid re-rendering every item
-const StateGroup = React.memo(({ state, searchQuery, onSelect, colors }: any) => {
-  const districts = React.useMemo(() =>
-    state.districts.filter((d: string) => searchQuery === '' || d.toLowerCase().includes(searchQuery.toLowerCase())),
-    [state.districts, searchQuery]
-  );
 
-  if (districts.length === 0) return null;
-
-  return (
-    <View style={styles.stateGroup}>
-      <ThemedText style={styles.stateHeader}>{state.name}</ThemedText>
-      <View style={styles.districtGrid}>
-        {districts.map((district: string, dIndex: number) => (
-          <Pressable
-            key={dIndex}
-            style={[styles.districtItem, { backgroundColor: colors.secondary }]}
-            onPress={() => onSelect(district)}
-          >
-            <ThemedText style={styles.districtText}>{district}</ThemedText>
-          </Pressable>
-        ))}
-      </View>
-    </View>
-  );
-});
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -403,6 +378,7 @@ export default function HomeScreen() {
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [locationModalVisible, setLocationModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedState, setSelectedState] = useState<any>(null);
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -456,18 +432,31 @@ export default function HomeScreen() {
     { name: 'Rentals', icon: 'apartment' },
   ];
 
-  // Optimization: Memoize filtered states
-  const filteredStatesList = React.useMemo(() => {
+  // Optimization: Memoize filtered states or districts based on selection
+  const filteredList = React.useMemo(() => {
+    if (selectedState) {
+      const districts = selectedState.districts;
+      return districts.filter((d: string) =>
+        searchQuery === '' || d.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
     return indianStates.filter(state =>
       searchQuery === '' ||
       state.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      state.districts.some(d => d.toLowerCase().includes(searchQuery.toLowerCase()))
+      state.districts.some((d: string) => d.toLowerCase().includes(searchQuery.toLowerCase()))
     );
-  }, [searchQuery]);
+  }, [searchQuery, selectedState, indianStates]);
 
   const handleSelectCity = (cityName: string) => {
     setCity(cityName);
     setLocationModalVisible(false);
+    setSelectedState(null); // Reset for next time
+    setSearchQuery('');
+  };
+
+  const handleBackToStates = () => {
+    setSelectedState(null);
+    setSearchQuery('');
   };
 
   return (
@@ -482,8 +471,21 @@ export default function HomeScreen() {
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
             <View style={styles.modalHeader}>
-              <ThemedText style={styles.modalTitle}>Select Location</ThemedText>
-              <Pressable onPress={() => setLocationModalVisible(false)} style={styles.closeButton}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {selectedState && (
+                  <Pressable onPress={handleBackToStates} style={{ marginRight: 12 }}>
+                    <IconSymbol name="chevron.left" size={24} color={colors.text} />
+                  </Pressable>
+                )}
+                <ThemedText style={styles.modalTitle}>
+                  {selectedState ? selectedState.name : 'Select State'}
+                </ThemedText>
+              </View>
+              <Pressable onPress={() => {
+                setLocationModalVisible(false);
+                setSelectedState(null);
+                setSearchQuery('');
+              }} style={styles.closeButton}>
                 <IconSymbol name="plus.circle.fill" size={24} color={colors.text} style={{ transform: [{ rotate: '45deg' }] }} />
               </Pressable>
             </View>
@@ -491,7 +493,7 @@ export default function HomeScreen() {
             <View style={[styles.modalSearch, { backgroundColor: colors.secondary }]}>
               <IconSymbol name="magnifyingglass" size={18} color={colors.icon} />
               <TextInput
-                placeholder="Search state or district..."
+                placeholder={selectedState ? "Search district..." : "Search state..."}
                 placeholderTextColor={colors.icon}
                 style={[styles.modalSearchInput, { color: colors.text }]}
                 value={searchQuery}
@@ -505,23 +507,49 @@ export default function HomeScreen() {
               keyboardShouldPersistTaps="always"
               removeClippedSubviews={Platform.OS === 'android'}
             >
-              <Pressable
-                style={styles.modalOption}
-                onPress={handleLocationRequest}
-              >
-                <IconSymbol name="location.fill" size={20} color={colors.tint} />
-                <ThemedText style={[styles.modalOptionText, { color: colors.tint, fontWeight: '700' }]}>Detect My Location</ThemedText>
-              </Pressable>
+              {!selectedState && (
+                <Pressable
+                  style={styles.modalOption}
+                  onPress={handleLocationRequest}
+                >
+                  <IconSymbol name="location.fill" size={20} color={colors.tint} />
+                  <ThemedText style={[styles.modalOptionText, { color: colors.tint, fontWeight: '700' }]}>Detect My Location</ThemedText>
+                </Pressable>
+              )}
 
-              {filteredStatesList.map((state, sIndex) => (
-                <StateGroup
-                  key={sIndex}
-                  state={state}
-                  searchQuery={searchQuery}
-                  onSelect={handleSelectCity}
-                  colors={colors}
-                />
-              ))}
+              {selectedState ? (
+                <View style={styles.districtGrid}>
+                  <Pressable
+                    style={[styles.districtItem, { backgroundColor: colors.tint, width: '98%' }]}
+                    onPress={() => handleSelectCity(selectedState.name)}
+                  >
+                    <ThemedText style={[styles.districtText, { color: '#FFF' }]}>All {selectedState.name}</ThemedText>
+                  </Pressable>
+                  {filteredList.map((district: any, dIndex: number) => (
+                    <Pressable
+                      key={dIndex}
+                      style={[styles.districtItem, { backgroundColor: colors.secondary }]}
+                      onPress={() => handleSelectCity(district)}
+                    >
+                      <ThemedText style={styles.districtText}>{district}</ThemedText>
+                    </Pressable>
+                  ))}
+                </View>
+              ) : (
+                filteredList.map((state: any, sIndex: number) => (
+                  <Pressable
+                    key={sIndex}
+                    style={styles.modalOption}
+                    onPress={() => {
+                      setSelectedState(state);
+                      setSearchQuery('');
+                    }}
+                  >
+                    <ThemedText style={styles.modalOptionText}>{state.name}</ThemedText>
+                    <IconSymbol name="chevron.right" size={16} color={colors.icon} />
+                  </Pressable>
+                ))
+              )}
             </ScrollView>
           </View>
         </View>
