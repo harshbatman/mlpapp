@@ -80,15 +80,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 24,
+    gap: 12,
+  },
   searchContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     height: 64,
     borderRadius: 16,
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 24,
     backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#EEEEEE',
@@ -110,12 +116,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
+    width: 64,
+    height: 64,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
   scrollContent: {
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
@@ -892,8 +902,8 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
-          <View style={styles.searchLeft}>
+        <View style={styles.searchRow}>
+          <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
             <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
             <TextInput
               placeholder="Search properties, land..."
@@ -911,9 +921,9 @@ export default function HomeScreen() {
               }
             ]}
             onPress={() => setMainFilterModalVisible(true)}
-            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <IconSymbol name="slider.horizontal.3" size={20} color="#FFF" />
+            <IconSymbol name="slider.horizontal.3" size={24} color="#FFF" />
           </Pressable>
         </View>
 
