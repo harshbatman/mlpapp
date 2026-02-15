@@ -79,11 +79,11 @@ const styles = StyleSheet.create({
   },
   splashSubtitle: {
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 24,
-    fontWeight: '600',
-    marginTop: 8,
-    letterSpacing: 2,
-    lineHeight: 32,
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 12,
+    letterSpacing: 9,
+    lineHeight: 24,
     textTransform: 'uppercase',
   },
 });
