@@ -5,13 +5,17 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+
+const { height } = Dimensions.get('window');
 
 export default function PropertyListScreen() {
     const { category } = useLocalSearchParams();
     const router = useRouter();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
+    const [filterModalVisible, setFilterModalVisible] = React.useState(false);
+    const [searchQuery, setSearchQuery] = React.useState('');
 
     // Empty array to be populated by users
     const properties: any[] = [];
@@ -41,7 +45,10 @@ export default function PropertyListScreen() {
                             style={[styles.searchInput, { color: colors.text }]}
                         />
                     </View>
-                    <Pressable style={[styles.filterButton, { backgroundColor: colors.tint }]}>
+                    <Pressable
+                        style={[styles.filterButton, { backgroundColor: colors.tint }]}
+                        onPress={() => setFilterModalVisible(true)}
+                    >
                         <IconSymbol name="slider.horizontal.3" size={22} color="#FFF" />
                     </Pressable>
                 </View>
@@ -75,6 +82,45 @@ export default function PropertyListScreen() {
                     </View>
                 }
             />
+
+            {/* Simple Filter Modal for Properties Page */}
+            <Modal
+                visible={filterModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setFilterModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+                        <View style={styles.modalHeader}>
+                            <ThemedText style={styles.modalTitle}>Sort & Filter</ThemedText>
+                            <Pressable onPress={() => setFilterModalVisible(false)} style={styles.closeButton}>
+                                <IconSymbol name="plus.circle.fill" size={24} color={colors.text} style={{ transform: [{ rotate: '45deg' }] }} />
+                            </Pressable>
+                        </View>
+
+                        <View style={styles.filterSection}>
+                            <ThemedText style={styles.filterSectionTitle}>Current Category: {category || 'All'}</ThemedText>
+                            <ThemedText style={{ opacity: 0.6, marginTop: 4 }}>
+                                You are currently viewing {category || 'all properties'}.
+                            </ThemedText>
+                        </View>
+
+                        <ThemedText style={{ padding: 20, textAlign: 'center', opacity: 0.5 }}>
+                            Advanced filtering (Price Range, BHK, Area) will be available in the next update.
+                        </ThemedText>
+
+                        <View style={styles.modalFooter}>
+                            <Pressable
+                                style={[styles.applyButton, { backgroundColor: colors.tint }]}
+                                onPress={() => setFilterModalVisible(false)}
+                            >
+                                <ThemedText style={styles.applyButtonText}>Close</ThemedText>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </ThemedView>
     );
 }
@@ -192,5 +238,52 @@ const styles = StyleSheet.create({
     emptyContainer: {
         marginTop: 100,
         alignItems: 'center',
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        height: height * 0.5,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        padding: 24,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: '800',
+    },
+    closeButton: {
+        padding: 4,
+    },
+    filterSection: {
+        marginBottom: 32,
+    },
+    filterSectionTitle: {
+        fontSize: 18,
+        fontWeight: '800',
+        marginBottom: 12,
+    },
+    modalFooter: {
+        marginTop: 'auto',
+        paddingTop: 16,
+    },
+    applyButton: {
+        height: 56,
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    applyButtonText: {
+        color: '#FFF',
+        fontSize: 18,
+        fontWeight: '700',
     },
 });
