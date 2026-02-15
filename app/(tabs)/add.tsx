@@ -100,26 +100,6 @@ export default function AddPropertyScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <ThemedText style={styles.label}>Property Images ({images.length}/5)</ThemedText>
-        <View style={styles.imageSection}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.imageScroll}>
-            {images.map((uri, index) => (
-              <View key={index} style={styles.imageWrapper}>
-                <Image source={{ uri }} style={styles.imagePreview} />
-                <Pressable style={styles.removeImageBtn} onPress={() => removeImage(index)}>
-                  <IconSymbol name="trash.fill" size={14} color="#fff" />
-                </Pressable>
-              </View>
-            ))}
-            {images.length < 5 && (
-              <Pressable style={[styles.imagePicker, { borderColor: colors.border }]} onPress={pickImages}>
-                <IconSymbol name="camera.fill" size={24} color={colors.icon} />
-                <ThemedText style={styles.imagePickerText}>Add Photo</ThemedText>
-              </Pressable>
-            )}
-          </ScrollView>
-        </View>
-
         <ThemedText style={styles.label}>Listing Title</ThemedText>
         <TextInput
           style={[styles.input, { borderColor: colors.border, color: colors.text }]}
@@ -128,6 +108,35 @@ export default function AddPropertyScreen() {
           value={title}
           onChangeText={setTitle}
         />
+
+        <ThemedText style={[styles.label, { marginTop: 32 }]}>Property Images ({images.length}/5)</ThemedText>
+        <View style={styles.imageSection}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.imageScroll}
+          >
+            {images.length < 5 && (
+              <Pressable
+                style={[styles.imagePicker, { borderColor: colors.border }]}
+                onPress={pickImages}
+              >
+                <View style={styles.pickerInner}>
+                  <IconSymbol name="camera.fill" size={28} color={colors.tint} />
+                  <ThemedText style={[styles.imagePickerText, { color: colors.tint }]}>Add Photo</ThemedText>
+                </View>
+              </Pressable>
+            )}
+            {images.map((uri, index) => (
+              <View key={index} style={styles.imageWrapper}>
+                <Image source={{ uri }} style={styles.imagePreview} />
+                <Pressable style={styles.removeImageBtn} onPress={() => removeImage(index)}>
+                  <IconSymbol name="trash.fill" size={12} color="#fff" />
+                </Pressable>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
 
         <View style={styles.row}>
           <View style={{ flex: 1, marginRight: 8 }}>
@@ -383,6 +392,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F6F6F6',
+  },
+  pickerInner: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   imagePickerText: {
     fontSize: 12,
