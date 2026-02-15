@@ -1,6 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { INDIAN_LOCATIONS } from '@/constants/locations';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ExpoLocation from 'expo-location';
@@ -19,21 +20,7 @@ export default function HomeScreen() {
   const [locationModalVisible, setLocationModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const indianStates = [
-    { name: 'Delhi NCR', districts: ['Central Delhi', 'East Delhi', 'New Delhi', 'North Delhi', 'South Delhi', 'Gurugram', 'Noida', 'Faridabad', 'Ghaziabad'] },
-    { name: 'Maharashtra', districts: ['Mumbai', 'Navi Mumbai', 'Pune', 'Nagpur', 'Thane', 'Nashik', 'Aurangabad'] },
-    { name: 'Karnataka', districts: ['Bengaluru', 'Mysuru', 'Hubballi', 'Mangaluru', 'Belagavi'] },
-    { name: 'Uttar Pradesh', districts: ['Lucknow', 'Kanpur', 'Agra', 'Varanasi', 'Prayagraj', 'Meerut'] },
-    { name: 'Gujarat', districts: ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar'] },
-    { name: 'Tamil Nadu', districts: ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem'] },
-    { name: 'Bihar', districts: ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Purnia'] },
-    { name: 'West Bengal', districts: ['Kolkata', 'Howrah', 'Durgapur', 'Asansol', 'Siliguri'] },
-    { name: 'Rajasthan', districts: ['Jaipur', 'Jodhpur', 'Kota', 'Ajmer', 'Bikaner'] },
-    { name: 'Haryana', districts: ['Gurugram', 'Faridabad', 'Panipat', 'Ambala', 'Karnal'] },
-    { name: 'Punjab', districts: ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda'] },
-    { name: 'Telangana', districts: ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar'] },
-    { name: 'Madhya Pradesh', districts: ['Indore', 'Bhopal', 'Jabalpur', 'Gwalior', 'Ujjain'] },
-  ];
+  const indianStates = INDIAN_LOCATIONS;
 
   const popularCities = [
     { name: 'Delhi NCR', icon: 'mappin.circle.fill', color: 'special' },
