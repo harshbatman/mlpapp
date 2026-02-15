@@ -36,13 +36,18 @@ export default function PropertyListScreen() {
             </View>
 
             <View style={styles.searchSection}>
-                <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
-                    <TextInput
-                        placeholder={`Search ${category || 'properties'}...`}
-                        placeholderTextColor={colors.icon}
-                        style={[styles.searchInput, { color: colors.text }]}
-                    />
+                <View style={styles.searchRow}>
+                    <View style={[styles.searchContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                        <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
+                        <TextInput
+                            placeholder={`Search ${category || 'properties'}...`}
+                            placeholderTextColor={colors.icon}
+                            style={[styles.searchInput, { color: colors.text }]}
+                        />
+                    </View>
+                    <Pressable style={[styles.filterButton, { backgroundColor: colors.primary }]}>
+                        <IconSymbol name="slider.horizontal.3" size={20} color="#FFF" />
+                    </Pressable>
                 </View>
             </View>
 
@@ -117,6 +122,18 @@ const styles = StyleSheet.create({
         marginLeft: 12,
         fontSize: 16,
         fontWeight: '500',
+    },
+    searchRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    filterButton: {
+        width: 52,
+        height: 52,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     listContent: {
         padding: 20,

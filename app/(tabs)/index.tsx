@@ -504,6 +504,13 @@ export default function HomeScreen() {
   const handleApplyCategories = () => {
     setCategoryModalVisible(false);
     setSearchQuery('');
+    router.push({
+      pathname: '/properties',
+      params: {
+        category: selectedCategories.join(','),
+        multiSelect: 'true'
+      }
+    });
   };
 
   const toggleDistrict = (districtName: string) => {
@@ -959,7 +966,13 @@ export default function HomeScreen() {
                   styles.categoryItem,
                   selectedCategories.includes(cat.name) && { transform: [{ scale: 1.05 }] }
                 ]}
-                onPress={() => toggleCategory(cat.name)}
+                onPress={() => {
+                  toggleCategory(cat.name);
+                  router.push({
+                    pathname: '/properties',
+                    params: { category: cat.name }
+                  });
+                }}
               >
                 <View style={[
                   styles.categoryIcon,
