@@ -7,7 +7,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Image, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -430,15 +430,15 @@ export default function HomeScreen() {
   const indianStates = INDIAN_LOCATIONS;
 
   const popularCities = [
-    { name: 'Delhi NCR', icon: 'mappin.circle.fill', color: 'special' },
-    { name: 'Mumbai', icon: 'building.2.fill', color: 'standard' },
-    { name: 'Bengaluru', icon: 'sparkles', color: 'standard' },
-    { name: 'Pune', icon: 'house.fill', color: 'standard' },
-    { name: 'Gurugram', icon: 'building.2.fill', color: 'standard' },
-    { name: 'Navi Mumbai', icon: 'apartment.fill', color: 'standard' },
-    { name: 'Ahmedabad', icon: 'map.fill', color: 'standard' },
-    { name: 'Chennai', icon: 'house.fill', color: 'standard' },
-    { name: 'Patna', icon: 'mappin.circle.fill', color: 'standard' },
+    { name: 'Delhi NCR', image: require('@/assets/images/cities/delhi.png'), color: 'special' },
+    { name: 'Mumbai', image: require('@/assets/images/cities/mumbai.png'), color: 'standard' },
+    { name: 'Bengaluru', image: require('@/assets/images/cities/bengaluru.png'), color: 'standard' },
+    { name: 'Pune', image: require('@/assets/images/cities/pune.png'), color: 'standard' },
+    { name: 'Gurugram', image: require('@/assets/images/cities/gurugram.png'), color: 'standard' },
+    { name: 'Navi Mumbai', image: require('@/assets/images/cities/navimumbai.png'), color: 'standard' },
+    { name: 'Ahmedabad', image: require('@/assets/images/cities/ahmedabad.png'), color: 'standard' },
+    { name: 'Chennai', image: require('@/assets/images/cities/chennai.png'), color: 'standard' },
+    { name: 'Patna', image: require('@/assets/images/cities/patna.png'), color: 'standard' },
   ];
 
   const handleLocationRequest = async () => {
@@ -897,11 +897,11 @@ export default function HomeScreen() {
                   });
                 }}
               >
-                <View style={[styles.cityIconContainer, { backgroundColor: cityItem.color === 'special' ? colors.tint : colors.secondary }]}>
-                  <IconSymbol
-                    name={cityItem.icon}
-                    size={28}
-                    color={cityItem.color === 'special' ? '#FFF' : colors.tint}
+                <View style={[styles.cityIconContainer, { padding: 0, overflow: 'hidden', borderWidth: 0 }]}>
+                  <Image
+                    source={cityItem.image}
+                    style={{ width: '100%', height: '100%' }}
+                    resizeMode="cover"
                   />
                 </View>
                 <ThemedText style={styles.cityName}>{cityItem.name}</ThemedText>
