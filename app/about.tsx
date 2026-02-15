@@ -16,7 +16,7 @@ export default function AboutScreen() {
     const ecosystem = [
         {
             id: 1,
-            title: 'MAHTO Marketplace',
+            title: 'MAHTO',
             desc: 'Worker, Contractor & Shops Marketplace',
             icon: 'cart.fill',
             color: '#FF9500'
