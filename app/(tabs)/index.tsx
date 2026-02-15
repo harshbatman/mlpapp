@@ -3,11 +3,12 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { INDIAN_LOCATIONS } from '@/constants/locations';
 import { Colors } from '@/constants/theme';
+import { useNotification } from '@/context/notification-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, Image, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -426,6 +427,7 @@ export default function HomeScreen() {
   const [selectedState, setSelectedState] = useState<any>(null);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [mainFilterModalVisible, setMainFilterModalVisible] = useState(false);
+  const { showNotification } = useNotification();
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -446,7 +448,8 @@ export default function HomeScreen() {
     let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       setLoadingLocation(false);
-      Alert.alert('Permission Denied', 'Allow location access to find properties near you.');
+      setLoadingLocation(false);
+      showNotification('error', 'Permission Denied', 'Please allow location access to find properties near you.');
       return;
     }
 
@@ -464,9 +467,10 @@ export default function HomeScreen() {
         const address = reverseGeocode[0];
         const cityName = address.city || address.district || address.region || 'Unknown Location';
         setCity(cityName);
+        showNotification('success', 'Location Updated', `Found you in ${cityName}`);
       }
     } catch (error) {
-      Alert.alert('Error', 'Could not fetch your location. Please try manually.');
+      showNotification('error', 'Location Error', 'Could not fetch your location. Please try manually.');
     } finally {
       setLoadingLocation(false);
     }

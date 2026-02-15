@@ -12,7 +12,9 @@ export const unstable_settings = {
   initialRouteName: '(auth)/login',
 };
 
+import { NotificationProvider } from '@/context/notification-context';
 import { ProfileProvider } from '@/context/profile-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -35,30 +37,34 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      <ProfileProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="edit-profile" options={{ presentation: 'modal' }} />
-          </Stack>
-          <StatusBar style="light" />
-        </ThemeProvider>
-      </ProfileProvider>
+    <SafeAreaProvider>
+      <NotificationProvider>
+        <View style={{ flex: 1 }}>
+          <ProfileProvider>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="edit-profile" options={{ presentation: 'modal' }} />
+              </Stack>
+              <StatusBar style="light" />
+            </ThemeProvider>
+          </ProfileProvider>
 
-      {!appIsReady && (
-        <Animated.View
-          style={[
-            styles.splashContainer,
-            { opacity: fadeAnim }
-          ]}
-        >
-          <ThemedText style={styles.splashTitle}>MAHTO</ThemedText>
-          <ThemedText style={styles.splashSubtitle}>Land & Properties</ThemedText>
-        </Animated.View>
-      )}
-    </View>
+          {!appIsReady && (
+            <Animated.View
+              style={[
+                styles.splashContainer,
+                { opacity: fadeAnim }
+              ]}
+            >
+              <ThemedText style={styles.splashTitle}>MAHTO</ThemedText>
+              <ThemedText style={styles.splashSubtitle}>Land & Properties</ThemedText>
+            </Animated.View>
+          )}
+        </View>
+      </NotificationProvider>
+    </SafeAreaProvider>
   );
 }
 
