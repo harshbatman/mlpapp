@@ -540,10 +540,10 @@ export default function HomeScreen() {
   };
 
   const categories = [
-    { name: t('Homes'), icon: 'house.fill' },
-    { name: t('Lands'), icon: 'mountain.2.fill' },
-    { name: t('Commercial'), icon: 'building.2.fill' },
-    { name: t('Rentals'), icon: 'apartment.fill' },
+    { name: t('Homes'), image: require('@/assets/images/categories/home.png') },
+    { name: t('Lands'), image: require('@/assets/images/categories/lands.png') },
+    { name: t('Commercial'), image: require('@/assets/images/categories/commercial.png') },
+    { name: t('Rentals'), image: require('@/assets/images/categories/rentals.png') },
   ];
 
   const filteredList = React.useMemo(() => {
@@ -915,11 +915,11 @@ export default function HomeScreen() {
                   });
                 }}
               >
-                <View style={[styles.categoryIcon, { backgroundColor: colors.secondary }]}>
-                  <IconSymbol
-                    name={cat.icon as any}
-                    size={32}
-                    color={colors.tint}
+                <View style={[styles.categoryIcon, { backgroundColor: colors.secondary, overflow: 'hidden' }]}>
+                  <Image
+                    source={cat.image}
+                    style={{ width: '100%', height: '100%' }}
+                    resizeMode="contain"
                   />
                 </View>
                 <ThemedText style={styles.categoryName}>
