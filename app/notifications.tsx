@@ -109,7 +109,7 @@ export default function NotificationsScreen() {
             ) : (
                 <View style={styles.emptyContainer}>
                     <IconSymbol name="bell.fill" size={64} color={colors.icon} style={{ opacity: 0.2, marginBottom: 16 }} />
-                    <ThemedText style={styles.emptyText}>You're all caught up!</ThemedText>
+                    <ThemedText style={styles.emptyText}>You&apos;re all caught up!</ThemedText>
                 </View>
             )}
         </ThemedView>

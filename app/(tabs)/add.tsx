@@ -5,6 +5,8 @@ import { Colors } from '@/constants/theme';
 import { ListingType, PropertyType } from '@/constants/types';
 import { useNotification } from '@/context/notification-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '@/config/firebase';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
@@ -86,10 +88,37 @@ export default function AddPropertyScreen() {
     }
   };
 
-  const handleSubmit = () => {
-    // Logic to save property
-    showNotification('success', 'Listing Posted', 'Your property has been successfully listed on MAHTO.');
-    router.replace('/(tabs)');
+  const handleSubmit = async () => {
+    if (!title || !price || !location) {
+      showNotification('error', 'Required Fields', 'Please fill in title, price and location.');
+      return;
+    }
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      showNotification('error', 'Auth Error', 'You must be logged in to post a listing.');
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'properties'), {
+        title,
+        description,
+        price,
+        location,
+        area,
+        type,
+        listingType,
+        images,
+        ownerId: currentUser.uid,
+        createdAt: serverTimestamp(),
+      });
+
+      showNotification('success', 'Listing Posted', 'Your property has been successfully listed on MAHTO.');
+      router.replace('/(tabs)');
+    } catch (error) {
+      showProfessionalError(error, 'Submission Failed');
+    }
   };
 
   const propertyTypes: PropertyType[] = ['Home', 'Apartment', 'Villa', 'Commercial', 'Land'];

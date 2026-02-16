@@ -75,7 +75,11 @@ export default function MessagesScreen() {
     return (
         <ThemedView style={styles.container}>
             <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-                <ThemedText type="title">Messages</ThemedText>
+                <Pressable onPress={() => router.back()} style={styles.backButton}>
+                    <IconSymbol name="chevron.left" size={24} color={colors.text} />
+                </Pressable>
+                <ThemedText type="subtitle" style={styles.headerTitle}>Messages</ThemedText>
+                <View style={{ width: 40 }} />
             </View>
 
             <FlatList
@@ -102,10 +106,22 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         paddingTop: 60,
         paddingHorizontal: 20,
         paddingBottom: 20,
         borderBottomWidth: 1,
+    },
+    backButton: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
     },
     list: {
         paddingVertical: 10,

@@ -100,6 +100,16 @@ export default function ProfileScreen() {
                     <ThemedText style={styles.sectionTitle}>{t('Account Preferences')}</ThemedText>
                     <Pressable
                         style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={() => router.push('/messages')}
+                    >
+                        <View style={styles.menuItemLeft}>
+                            <IconSymbol name="bubble.left.fill" size={22} color={colors.icon} />
+                            <ThemedText style={styles.menuItemText}>{t('Messages')}</ThemedText>
+                        </View>
+                        <IconSymbol name="chevron.right" size={20} color={colors.icon} />
+                    </Pressable>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
                         onPress={() => router.push('/notifications')}
                     >
                         <View style={styles.menuItemLeft}>

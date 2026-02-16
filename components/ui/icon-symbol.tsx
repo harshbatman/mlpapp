@@ -56,6 +56,8 @@ const MAPPING: IconMapping = {
   'hammer.fill': 'construction',
   'banknote.fill': 'payments',
   'bubble.left.fill': 'chat-bubble',
+  'pencil': 'edit',
+  'trash': 'delete',
 };
 
 /**

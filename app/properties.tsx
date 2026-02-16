@@ -5,11 +5,12 @@ import { INDIAN_LOCATIONS } from '@/constants/locations';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useChat } from '@/context/chat-context';
 import { useProfile } from '@/context/profile-context';
-import { auth } from '@/config/firebase';
+import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { db, auth } from '@/config/firebase';
 
 const { height } = Dimensions.get('window');
 
@@ -21,34 +22,35 @@ export default function PropertyListScreen() {
     const { startConversation } = useChat();
     const { profile } = useProfile();
 
+    const [properties, setProperties] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
     const [filterModalVisible, setFilterModalVisible] = useState(false);
     const [locationModalVisible, setLocationModalVisible] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
     const [modalSearchQuery, setModalSearchQuery] = useState('');
     const [selectedState, setSelectedState] = useState<any>(null);
     const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
 
-    // Dummy Data for demonstration
-    const properties = [
-        {
-            id: '1',
-            title: 'Modern Apartment in Delhi',
-            location: 'South Delhi, New Delhi',
-            price: '₹2.5 Cr',
-            image: '🏢',
-            ownerId: 'test-owner-1',
-            category: 'Homes'
-        },
-        {
-            id: '2',
-            title: 'Spacious Land Plot',
-            location: 'Ranchi, Jharkhand',
-            price: '₹45 Lakh',
-            image: '🏞️',
-            ownerId: 'test-owner-2',
-            category: 'Lands'
+    useEffect(() => {
+        let q = query(collection(db, 'properties'), orderBy('createdAt', 'desc'));
+
+        if (category && category !== 'All Properties') {
+            q = query(collection(db, 'properties'), where('category', '==', category), orderBy('createdAt', 'desc'));
         }
-    ];
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const data = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setProperties(data);
+            setLoading(false);
+        }, (err) => {
+            console.error("Error fetching properties:", err);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [category]);
 
     const indianStates = INDIAN_LOCATIONS;
 
