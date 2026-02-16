@@ -19,6 +19,7 @@ export const unstable_settings = {
 
 import { NotificationProvider } from '@/context/notification-context';
 import { ProfileProvider } from '@/context/profile-context';
+import { ChatProvider } from '@/context/chat-context';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
@@ -58,14 +59,17 @@ export default function RootLayout() {
       <NotificationProvider>
         <View style={{ flex: 1 }}>
           <ProfileProvider>
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="edit-profile" options={{ presentation: 'modal' }} />
-              </Stack>
-              <StatusBar style="light" />
-            </ThemeProvider>
+            <ChatProvider>
+              <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="edit-profile" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="chat/[id]" options={{ presentation: 'card', title: 'Chat' }} />
+                </Stack>
+                <StatusBar style="light" />
+              </ThemeProvider>
+            </ChatProvider>
           </ProfileProvider>
 
           {!appIsReady && (

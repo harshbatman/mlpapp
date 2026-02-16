@@ -7,6 +7,9 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { Dimensions, FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { useChat } from '@/context/chat-context';
+import { useProfile } from '@/context/profile-context';
+import { auth } from '@/config/firebase';
 
 const { height } = Dimensions.get('window');
 
@@ -15,12 +18,37 @@ export default function PropertyListScreen() {
     const router = useRouter();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
+    const { startConversation } = useChat();
+    const { profile } = useProfile();
+
     const [filterModalVisible, setFilterModalVisible] = useState(false);
     const [locationModalVisible, setLocationModalVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [modalSearchQuery, setModalSearchQuery] = useState('');
     const [selectedState, setSelectedState] = useState<any>(null);
     const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
+
+    // Dummy Data for demonstration
+    const properties = [
+        {
+            id: '1',
+            title: 'Modern Apartment in Delhi',
+            location: 'South Delhi, New Delhi',
+            price: '₹2.5 Cr',
+            image: '🏢',
+            ownerId: 'test-owner-1',
+            category: 'Homes'
+        },
+        {
+            id: '2',
+            title: 'Spacious Land Plot',
+            location: 'Ranchi, Jharkhand',
+            price: '₹45 Lakh',
+            image: '🏞️',
+            ownerId: 'test-owner-2',
+            category: 'Lands'
+        }
+    ];
 
     const indianStates = INDIAN_LOCATIONS;
 
@@ -51,8 +79,28 @@ export default function PropertyListScreen() {
         setModalSearchQuery('');
     };
 
-    // Empty array to be populated by users
-    const properties: any[] = [];
+    const handleContact = async (ownerId: string, propertyId: string, propertyTitle: string) => {
+        if (!profile.isLoggedIn) {
+            router.push('/(auth)/login');
+            return;
+        }
+
+        const currentUid = auth.currentUser?.uid;
+        // Prevent chatting with self
+        if (currentUid && ownerId === currentUid) {
+            alert("This is your own property!");
+            return;
+        }
+
+        try {
+            const conversationId = await startConversation(ownerId, propertyId, propertyTitle);
+            router.push(`/chat/${conversationId}`);
+        } catch (error) {
+            console.error("Error starting chat", error);
+        }
+    };
+
+    const filteredProperties = properties.filter(p => !category || p.category === category || category === 'All Properties');
 
     return (
         <ThemedView style={styles.container}>
@@ -89,7 +137,7 @@ export default function PropertyListScreen() {
             </View>
 
             <FlatList
-                data={properties}
+                data={filteredProperties}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
@@ -103,9 +151,17 @@ export default function PropertyListScreen() {
                             <ThemedText style={styles.propertyLocation}>{item.location}</ThemedText>
                             <View style={styles.priceRow}>
                                 <ThemedText style={[styles.propertyPrice, { color: colors.accent }]}>{item.price}</ThemedText>
-                                <Pressable style={[styles.viewButton, { backgroundColor: colors.primary }]}>
-                                    <ThemedText style={styles.viewButtonText}>View</ThemedText>
-                                </Pressable>
+                                <View style={{ flexDirection: 'row', gap: 8 }}>
+                                    <Pressable
+                                        style={[styles.viewButton, { backgroundColor: colors.secondary }]}
+                                        onPress={() => handleContact(item.ownerId, item.id, item.title)}
+                                    >
+                                        <ThemedText style={[styles.viewButtonText, { color: colors.text }]}>Chat</ThemedText>
+                                    </Pressable>
+                                    <Pressable style={[styles.viewButton, { backgroundColor: colors.primary }]}>
+                                        <ThemedText style={styles.viewButtonText}>View</ThemedText>
+                                    </Pressable>
+                                </View>
                             </View>
                         </View>
                     </Pressable>
@@ -369,8 +425,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         height: 64,
-        borderRadius: 16,
-        backgroundColor: '#FFF',
+        borderRadius: 16, // Use colors from theme
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
