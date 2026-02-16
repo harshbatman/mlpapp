@@ -55,6 +55,7 @@ const MAPPING: IconMapping = {
   'cart.fill': 'shopping-cart',
   'hammer.fill': 'construction',
   'banknote.fill': 'payments',
+  'bubble.left.fill': 'chat-bubble',
 };
 
 /**

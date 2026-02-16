@@ -19,6 +19,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { format } from 'date-fns';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ChatScreen() {
     const { id } = useLocalSearchParams();
@@ -33,6 +34,7 @@ export default function ChatScreen() {
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
     const currentUser = auth.currentUser;
+    const insets = useSafeAreaInsets();
 
     useEffect(() => {
         if (!id || typeof id !== 'string') return;
@@ -143,7 +145,14 @@ export default function ChatScreen() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
             >
-                <View style={[styles.inputContainer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+                <View style={[
+                    styles.inputContainer,
+                    {
+                        backgroundColor: colors.background,
+                        borderTopColor: colors.border,
+                        paddingBottom: Math.max(insets.bottom, 16)
+                    }
+                ]}>
                     <TextInput
                         style={[styles.input, { backgroundColor: colors.secondary, color: colors.text }]}
                         placeholder="Type a message..."
