@@ -461,6 +461,7 @@ export default function HomeScreen() {
     { name: 'Varanasi', image: require('@/assets/images/cities/varanasi.png'), color: 'standard' },
     { name: 'Kochi', image: require('@/assets/images/cities/kochi.png'), color: 'standard' },
     { name: 'Srinagar', image: require('@/assets/images/cities/srinagar.png'), color: 'standard' },
+    { name: 'Shimla', image: require('@/assets/images/cities/shimla.png'), color: 'standard' },
     { name: 'Bhubaneswar', image: require('@/assets/images/cities/bhubaneswar.png'), color: 'standard' },
   ];
 
