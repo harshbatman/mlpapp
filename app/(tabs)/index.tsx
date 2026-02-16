@@ -459,6 +459,7 @@ export default function HomeScreen() {
     { name: 'Noida', image: require('@/assets/images/cities/noida.png'), color: 'standard' },
     { name: 'Chandigarh', image: require('@/assets/images/cities/chandigarh.png'), color: 'standard' },
     { name: 'Varanasi', image: require('@/assets/images/cities/varanasi.png'), color: 'standard' },
+    { name: 'Kochi', image: require('@/assets/images/cities/kochi.png'), color: 'standard' },
     { name: 'Bhubaneswar', image: require('@/assets/images/cities/bhubaneswar.png'), color: 'standard' },
   ];
 
