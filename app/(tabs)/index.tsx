@@ -463,6 +463,7 @@ export default function HomeScreen() {
     { name: 'Srinagar', image: require('@/assets/images/cities/srinagar.png'), color: 'standard' },
     { name: 'Shimla', image: require('@/assets/images/cities/shimla.png'), color: 'standard' },
     { name: 'Dehradun', image: require('@/assets/images/cities/dehradun.png'), color: 'standard' },
+    { name: 'Shillong', image: require('@/assets/images/cities/shillong.png'), color: 'standard' },
     { name: 'Bhubaneswar', image: require('@/assets/images/cities/bhubaneswar.png'), color: 'standard' },
   ];
 
