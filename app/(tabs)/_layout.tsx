@@ -32,17 +32,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="messages"
-        options={{
-          title: t('Messages'),
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="bubble.left.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="add"
         options={{
           title: t('Post'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="messages"
+        options={{
+          title: t('Messages'),
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="bubble.left.fill" color={color} />,
         }}
       />
       <Tabs.Screen
