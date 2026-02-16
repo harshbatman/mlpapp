@@ -58,6 +58,7 @@ const MAPPING: IconMapping = {
   'bubble.left.fill': 'chat-bubble',
   'pencil': 'edit',
   'trash': 'delete',
+  'arrow.up': 'arrow-upward',
 };
 
 /**

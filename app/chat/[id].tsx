@@ -166,7 +166,7 @@ export default function ChatScreen() {
                         style={[styles.sendButton, { backgroundColor: colors.tint, opacity: inputText.trim() ? 1 : 0.5 }]}
                         disabled={!inputText.trim()}
                     >
-                        <IconSymbol name="arrow.up" size={20} color="#FFF" />
+                        <IconSymbol name="paperplane.fill" size={22} color="#FFF" />
                     </Pressable>
                 </View>
             </KeyboardAvoidingView>
