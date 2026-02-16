@@ -10,12 +10,12 @@
       }
     },
     "orientation": "portrait",
-    "icon": "./assets/images/harsh.jpg",
+    "icon": "./assets/images/mlpapp.png",
     "scheme": "mlpapp",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/images/harsh.jpg"
+      "icon": "./assets/images/mlpapp.png"
     },
     "android": {
       "versionCode": 1,
@@ -23,7 +23,7 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#000000",
-        "foregroundImage": "./assets/images/harsh.jpg",
+        "foregroundImage": "./assets/images/mlpapp.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       }
