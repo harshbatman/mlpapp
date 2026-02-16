@@ -163,10 +163,18 @@ const styles = StyleSheet.create({
   categoryIcon: {
     width: 72,
     height: 72,
-    borderRadius: 8, // Square with slight rounding
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   categoryName: {
     fontSize: 13,
@@ -915,7 +923,7 @@ export default function HomeScreen() {
                   });
                 }}
               >
-                <View style={[styles.categoryIcon, { backgroundColor: colors.secondary, overflow: 'hidden' }]}>
+                <View style={[styles.categoryIcon, { overflow: 'hidden' }]}>
                   <Image
                     source={cat.image}
                     style={{ width: '100%', height: '100%' }}
