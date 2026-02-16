@@ -459,6 +459,14 @@ export default function HomeScreen() {
       onPrimaryAction: async () => {
         setLoadingLocation(true);
         try {
+          // 1. Check if location services are enabled
+          const servicesEnabled = await ExpoLocation.hasServicesEnabledAsync();
+          if (!servicesEnabled) {
+            showProfessionalError({ code: 'location-services-disabled', message: t('Please enable location services on your device.') });
+            setLoadingLocation(false);
+            return;
+          }
+
           let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
           if (status !== 'granted') {
             showProfessionalError({ code: 'location-denied', message: t('Location permission is required to find properties near you.') });
@@ -470,10 +478,29 @@ export default function HomeScreen() {
 
           // If no last known position or if user wants fresh data, try current position with timeout
           if (!location) {
-            location = await ExpoLocation.getCurrentPositionAsync({
-              accuracy: ExpoLocation.Accuracy.Balanced,
-              timeout: 10000, // 10s timeout to prevent buffering forever
-            });
+            try {
+              // Create a promise that rejects after 5 seconds to prevent indefinite hanging
+              const timeoutPromise = new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('LOCATION_TIMEOUT')), 5000)
+              );
+
+              // Use Low accuracy for faster results (sufficient for City/Region level)
+              const locationPromise = ExpoLocation.getCurrentPositionAsync({
+                accuracy: ExpoLocation.Accuracy.Low,
+              });
+
+              location = await Promise.race([locationPromise, timeoutPromise]) as ExpoLocation.LocationObject;
+            } catch (err: any) {
+              if (err.message === 'LOCATION_TIMEOUT') {
+                // If it timed out, try one last time with Lowest accuracy before giving up
+                console.log("Location timed out, trying lowest accuracy...");
+                location = await ExpoLocation.getCurrentPositionAsync({
+                  accuracy: ExpoLocation.Accuracy.Lowest,
+                });
+              } else {
+                throw err;
+              }
+            }
           }
 
           if (location) {
@@ -488,6 +515,8 @@ export default function HomeScreen() {
               const cityName = address.city || address.district || address.region || address.subregion || t('Unknown Location');
               setCity(cityName);
               showNotification('success', t('Location Updated'), `${t('Found you in')} ${cityName}`);
+            } else {
+              showNotification('warning', t('Location Found'), t('Could not determine city name from coordinates.'));
             }
           } else {
             throw new Error("Could not fetch location");
@@ -496,8 +525,10 @@ export default function HomeScreen() {
         } catch (error: any) {
           console.log("Location error:", error);
           // Fallback if specific error known
-          if (error.code === 'E_LOCATION_TIMEOUT') {
-            showNotification('warning', t('Location Timeout'), t('Could not get precise location. Please try again.'));
+          if (error.code === 'E_LOCATION_TIMEOUT' || error.message === 'LOCATION_TIMEOUT') {
+            showNotification('warning', t('Location Timeout'), t('Taking too long to find you. Please select location manually.'));
+            // Open manual selector as fallback
+            setLocationModalVisible(true);
           } else {
             showProfessionalError(error, t('Location Error'));
           }
