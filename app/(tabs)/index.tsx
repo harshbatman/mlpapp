@@ -461,27 +461,46 @@ export default function HomeScreen() {
         try {
           let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
           if (status !== 'granted') {
-            showProfessionalError({ code: 'location-denied' });
+            showProfessionalError({ code: 'location-denied', message: t('Location permission is required to find properties near you.') });
             return;
           }
 
-          let location = await ExpoLocation.getCurrentPositionAsync({
-            accuracy: ExpoLocation.Accuracy.Balanced,
-          });
+          // Try to get the last known position first (faster)
+          let location = await ExpoLocation.getLastKnownPositionAsync({});
 
-          const reverseGeocode = await ExpoLocation.reverseGeocodeAsync({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          });
-
-          if (reverseGeocode.length > 0) {
-            const address = reverseGeocode[0];
-            const cityName = address.city || address.district || address.region || t('Unknown Location');
-            setCity(cityName);
-            showNotification('success', t('Location Updated'), `${t('Found you in')} ${cityName}`);
+          // If no last known position or if user wants fresh data, try current position with timeout
+          if (!location) {
+            location = await ExpoLocation.getCurrentPositionAsync({
+              accuracy: ExpoLocation.Accuracy.Balanced,
+              timeout: 10000, // 10s timeout to prevent buffering forever
+            });
           }
+
+          if (location) {
+            const reverseGeocode = await ExpoLocation.reverseGeocodeAsync({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            });
+
+            if (reverseGeocode.length > 0) {
+              const address = reverseGeocode[0];
+              // Prioritize city, then district, then region, then subregion
+              const cityName = address.city || address.district || address.region || address.subregion || t('Unknown Location');
+              setCity(cityName);
+              showNotification('success', t('Location Updated'), `${t('Found you in')} ${cityName}`);
+            }
+          } else {
+            throw new Error("Could not fetch location");
+          }
+
         } catch (error: any) {
-          showProfessionalError(error, t('Location Error'));
+          console.log("Location error:", error);
+          // Fallback if specific error known
+          if (error.code === 'E_LOCATION_TIMEOUT') {
+            showNotification('warning', t('Location Timeout'), t('Could not get precise location. Please try again.'));
+          } else {
+            showProfessionalError(error, t('Location Error'));
+          }
         } finally {
           setLoadingLocation(false);
         }
