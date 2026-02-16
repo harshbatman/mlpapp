@@ -26,7 +26,7 @@ export default function LoginScreen() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!phone || !password) {
             showNotification('warning', 'Missing Details', 'Please enter your phone number and password');
             return;
@@ -37,16 +37,23 @@ export default function LoginScreen() {
             return;
         }
 
-        // INSTANT LOGIN: Optimistic navigation
-        setLoggedInManually(true);
-        router.replace('/(tabs)');
-
-        // Perform actual Auth in background
+        setLoading(true);
+        // Perform actual Auth
         const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
-        signInWithEmailAndPassword(auth, virtualEmail, password).catch((error) => {
-            console.error('Background login error:', error);
-            // The ProfileProvider will handle the logged-out state if this fails
-        });
+
+        try {
+            await signInWithEmailAndPassword(auth, virtualEmail, password);
+            // Success - The auth listener in ProfileContext will handle state
+            // But we can also manually redirect to be snappy if needed, 
+            // though relying on the auth listener is safer.
+            // We'll let the listener or a post-await redirect handle it.
+            router.replace('/(tabs)');
+        } catch (error: any) {
+            console.error('Login error:', error);
+            showProfessionalError(error, 'Login Failed');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

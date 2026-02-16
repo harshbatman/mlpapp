@@ -28,7 +28,7 @@ export default function SignUpScreen() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const handleSignUp = () => {
+    const handleSignUp = async () => {
         if (!name || !phone || !password) {
             showNotification('warning', 'Missing Information', 'Please fill in all the details to join MAHTO.');
             return;
@@ -39,25 +39,31 @@ export default function SignUpScreen() {
             return;
         }
 
-        // INSTANT SIGNUP: Optimistic navigation
-        setLoggedInManually(true);
-        router.replace('/(tabs)');
-
-        // Background account creation
+        setLoading(true);
         const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
-        createUserWithEmailAndPassword(auth, virtualEmail, password)
-            .then(async (userCredential) => {
-                const user = userCredential.user;
-                await setDoc(doc(db, 'users', user.uid), {
-                    name,
-                    phone,
-                    email: virtualEmail,
-                    createdAt: Date.now(),
-                });
-            })
-            .catch((error) => {
-                console.error('Background signup error:', error);
+
+        try {
+            // Create user
+            const userCredential = await createUserWithEmailAndPassword(auth, virtualEmail, password);
+            const user = userCredential.user;
+
+            // Create user doc
+            await setDoc(doc(db, 'users', user.uid), {
+                name,
+                phone,
+                email: virtualEmail,
+                createdAt: Date.now(),
             });
+
+            // Success! ProfileContext listener will pick this up.
+            // But we can also manually trigger a move if we want instant feedback.
+            router.replace('/(tabs)');
+        } catch (error: any) {
+            console.error('Signup error:', error);
+            showProfessionalError(error, 'Account Creation Failed');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
