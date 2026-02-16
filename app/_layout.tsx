@@ -1,11 +1,15 @@
 import { ThemedText } from '@/components/themed-text';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
 import '../config/i18n';
+
+// Prevent the native splash screen from auto-hiding before we're ready
+SplashScreen.preventAutoHideAsync();
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
@@ -14,14 +18,27 @@ export const unstable_settings = {
 };
 
 import { NotificationProvider } from '@/context/notification-context';
-import { ProfileProvider, useProfile } from '@/context/profile-context';
+import { ProfileProvider } from '@/context/profile-context';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
   const [appIsReady, setAppIsReady] = useState(false);
   const fadeAnim = useState(new Animated.Value(1))[0];
+  const scaleAnim = useState(new Animated.Value(0.95))[0];
 
   useEffect(() => {
+    // Hide native splash screen immediately so our coded one shows up
+    SplashScreen.hideAsync();
+
+    // Scale in animation
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      tension: 10,
+      friction: 2,
+      useNativeDriver: true,
+    }).start();
+
     // Simulate some loading time for splash screen
     const timer = setTimeout(() => {
       Animated.timing(fadeAnim, {
@@ -41,7 +58,14 @@ export default function RootLayout() {
       <NotificationProvider>
         <View style={{ flex: 1 }}>
           <ProfileProvider>
-            <RootNavigator />
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="edit-profile" options={{ presentation: 'modal' }} />
+              </Stack>
+              <StatusBar style="light" />
+            </ThemeProvider>
           </ProfileProvider>
 
           {!appIsReady && (
@@ -51,50 +75,19 @@ export default function RootLayout() {
                 { opacity: fadeAnim }
               ]}
             >
-              <ThemedText style={styles.splashTitle}>MAHTO</ThemedText>
-              <ThemedText style={styles.splashSubtitle}>Land & Properties</ThemedText>
+              <Animated.View style={[styles.splashContent, { transform: [{ scale: scaleAnim }] }]}>
+                <ThemedText style={styles.splashTitle}>MAHTO</ThemedText>
+                <ThemedText style={styles.splashSubtitle}>Land & Properties</ThemedText>
+              </Animated.View>
+
+              <View style={styles.splashFooter}>
+                <ThemedText style={styles.footerText}>BUILDING THE FUTURE</ThemedText>
+              </View>
             </Animated.View>
           )}
         </View>
       </NotificationProvider>
     </SafeAreaProvider>
-  );
-}
-
-function RootNavigator() {
-  const colorScheme = useColorScheme();
-  const { profile, loading } = useProfile();
-  const segments = useSegments();
-  const router = useRouter();
-  const [isNavigationReady, setIsNavigationReady] = useState(false);
-
-  useEffect(() => {
-    if (!isNavigationReady) return;
-    if (loading) return;
-
-    const inAuthGroup = segments[0] === '(auth)';
-
-    if (profile.isLoggedIn && inAuthGroup) {
-      router.replace('/(tabs)');
-    } else if (!profile.isLoggedIn && segments[0] !== '(auth)') {
-      router.replace('/(auth)/signup');
-    }
-  }, [profile.isLoggedIn, loading, segments, isNavigationReady]);
-
-  // Ensure navigation is ready before attempting redirects
-  useEffect(() => {
-    setIsNavigationReady(true);
-  }, []);
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="edit-profile" options={{ presentation: 'modal' }} />
-      </Stack>
-      <StatusBar style="light" />
-    </ThemeProvider>
   );
 }
 
@@ -106,20 +99,43 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 9999,
   },
+  splashContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   splashTitle: {
     color: '#FFFFFF',
-    fontSize: 80,
+    fontSize: 72,
     fontWeight: '900',
-    letterSpacing: 4,
-    lineHeight: 88,
+    letterSpacing: 8,
+    lineHeight: 80,
+    textAlign: 'center',
+  },
+  splashDivider: {
+    width: 40,
+    height: 4,
+    backgroundColor: '#FFFFFF',
+    marginVertical: 20,
+    borderRadius: 2,
   },
   splashSubtitle: {
-    color: 'rgba(255,255,255,0.7)',
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '700',
-    marginTop: 12,
-    letterSpacing: 7.2,
-    lineHeight: 24,
+    fontWeight: '600',
+    letterSpacing: 4,
     textTransform: 'uppercase',
+    textAlign: 'center',
+    opacity: 0.9,
   },
+  splashFooter: {
+    position: 'absolute',
+    bottom: 60,
+    alignItems: 'center',
+  },
+  footerText: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 3,
+  }
 });

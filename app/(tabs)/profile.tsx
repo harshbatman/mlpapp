@@ -23,18 +23,18 @@ export default function ProfileScreen() {
 
     const handleLogoutClick = () => {
         showConfirm({
-            title: 'Logout',
-            message: 'Are you sure you want to log out of your MAHTO account? You will need to sign in again to access your listings and saved properties.',
+            title: t('Logout Confirm Title'),
+            message: t('Logout Confirm Msg'),
             icon: 'log-out',
             iconColor: '#EF4444',
-            primaryActionText: 'Logout',
-            secondaryActionText: 'Stay Logged In',
+            primaryActionText: t('Logout'),
+            secondaryActionText: t('Stay Logged In'),
             onPrimaryAction: async () => {
                 try {
                     await logout();
                     router.replace('/(auth)/login');
                 } catch (error) {
-                    showProfessionalError(error, 'Logout Failed');
+                    showProfessionalError(error, t('Logout Failed'));
                 }
             }
         });
@@ -47,10 +47,10 @@ export default function ProfileScreen() {
     const confirmDelete = () => {
         if (confirmPhone === '1234567890' && confirmPassword === '123456') {
             setShowDeleteConfirm(false);
-            showNotification('success', 'Account Deleted', 'Your account has been permanently removed from the MAHTO ecosystem.');
+            showNotification('success', t('Account Deleted'), t('Account Deleted Msg'));
             router.replace('/(auth)/login');
         } else {
-            showNotification('error', 'Authentication Failed', 'The phone number or password you entered is incorrect.');
+            showNotification('error', t('Authentication Failed'), t('Auth Failed Msg'));
         }
     };
 
@@ -73,7 +73,7 @@ export default function ProfileScreen() {
                             style={[styles.editButton, { borderColor: colors.tint }]}
                             onPress={() => router.push('/edit-profile')}
                         >
-                            <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>Edit Profile</ThemedText>
+                            <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>{t('Edit Profile')}</ThemedText>
                         </Pressable>
                     </View>
                 </View>
@@ -81,30 +81,30 @@ export default function ProfileScreen() {
                 <View style={styles.statsRow}>
                     <Pressable style={styles.statBox} onPress={() => router.push('/my-listings')}>
                         <ThemedText type="subtitle">0</ThemedText>
-                        <ThemedText style={styles.statLabel}>My Listings</ThemedText>
+                        <ThemedText style={styles.statLabel}>{t('My Listings')}</ThemedText>
                     </Pressable>
                     <Pressable
                         style={[styles.statBox, { borderLeftWidth: 1, borderRightWidth: 1, borderColor: colors.border }]}
                         onPress={() => router.push('/saved-properties')}
                     >
                         <ThemedText type="subtitle">0</ThemedText>
-                        <ThemedText style={styles.statLabel}>Saved</ThemedText>
+                        <ThemedText style={styles.statLabel}>{t('Saved')}</ThemedText>
                     </Pressable>
                     <View style={styles.statBox}>
                         <ThemedText type="subtitle">0</ThemedText>
-                        <ThemedText style={styles.statLabel}>Views</ThemedText>
+                        <ThemedText style={styles.statLabel}>{t('Views')}</ThemedText>
                     </View>
                 </View>
 
                 <View style={styles.section}>
-                    <ThemedText style={styles.sectionTitle}>Account & Preferences</ThemedText>
+                    <ThemedText style={styles.sectionTitle}>{t('Account Preferences')}</ThemedText>
                     <Pressable
                         style={[styles.menuItem, { borderBottomColor: colors.border }]}
                         onPress={() => router.push('/notifications')}
                     >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="bell.fill" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Notifications Inbox</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Notifications Inbox')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
@@ -114,7 +114,7 @@ export default function ProfileScreen() {
                     >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="bell.fill" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Notification Settings</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Notification Settings')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
@@ -131,14 +131,14 @@ export default function ProfileScreen() {
                 </View>
 
                 <View style={styles.section}>
-                    <ThemedText style={styles.sectionTitle}>Support & Feedback</ThemedText>
+                    <ThemedText style={styles.sectionTitle}>{t('Support Feedback')}</ThemedText>
                     <Pressable
                         style={[styles.menuItem, { borderBottomColor: colors.border }]}
                         onPress={() => router.push('/help-center')}
                     >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="questionmark.circle" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Help Center / FAQ</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Helping Center')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
@@ -148,21 +148,21 @@ export default function ProfileScreen() {
                     >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="envelope" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Contact Us</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Contact Us')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
                     <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="star" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Rate Us</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Rate Us')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
                 </View>
 
                 <View style={styles.section}>
-                    <ThemedText style={styles.sectionTitle}>Information & Legal</ThemedText>
+                    <ThemedText style={styles.sectionTitle}>{t('Information Legal')}</ThemedText>
                     <Pressable
                         style={[styles.menuItem, { borderBottomColor: colors.border }]}
                         onPress={() => router.push('/about')}
@@ -179,7 +179,7 @@ export default function ProfileScreen() {
                     >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="doc.text" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Terms & Conditions</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Terms Conditions')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
@@ -189,7 +189,7 @@ export default function ProfileScreen() {
                     >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="lock" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Privacy Policy</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Privacy Policy')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
@@ -199,14 +199,14 @@ export default function ProfileScreen() {
                     >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="banknote" size={22} color={colors.icon} />
-                            <ThemedText style={styles.menuItemText}>Refund Policy</ThemedText>
+                            <ThemedText style={styles.menuItemText}>{t('Refund Policy')}</ThemedText>
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
                 </View>
 
                 <View style={[styles.section, { marginBottom: 40 }]}>
-                    <ThemedText style={styles.sectionTitle}>Account Actions</ThemedText>
+                    <ThemedText style={styles.sectionTitle}>{t('Account Actions')}</ThemedText>
                     <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]} onPress={handleLogoutClick}>
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="rectangle.portrait.and.arrow.right" size={22} color="#000000" />
@@ -219,7 +219,7 @@ export default function ProfileScreen() {
                     >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="trash.fill" size={22} color="#EF4444" />
-                            <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>Permanent Delete</ThemedText>
+                            <ThemedText style={[styles.menuItemText, { color: '#EF4444' }]}>{t('Permanent Delete')}</ThemedText>
                         </View>
                     </Pressable>
                 </View>
@@ -234,13 +234,13 @@ export default function ProfileScreen() {
                 >
                     <View style={styles.modalOverlay}>
                         <View style={[styles.confirmCard, { backgroundColor: colors.background }]}>
-                            <ThemedText style={[styles.confirmTitle, { color: '#EF4444' }]}>Delete Account</ThemedText>
-                            <ThemedText style={styles.confirmSubTitle}>Please enter your details to confirm permanent deletion.</ThemedText>
+                            <ThemedText style={[styles.confirmTitle, { color: '#EF4444' }]}>{t('Delete Account')}</ThemedText>
+                            <ThemedText style={styles.confirmSubTitle}>{t('Delete Confirm Msg')}</ThemedText>
 
                             <View style={styles.inputGroup}>
                                 <TextInput
                                     style={[styles.confirmInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.secondary }]}
-                                    placeholder="Phone Number"
+                                    placeholder={t('Phone Number')}
                                     placeholderTextColor={colors.icon}
                                     value={confirmPhone}
                                     onChangeText={setConfirmPhone}
@@ -248,7 +248,7 @@ export default function ProfileScreen() {
                                 />
                                 <TextInput
                                     style={[styles.confirmInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.secondary }]}
-                                    placeholder="Password"
+                                    placeholder={t('Password')}
                                     placeholderTextColor={colors.icon}
                                     value={confirmPassword}
                                     onChangeText={setConfirmPassword}
@@ -261,13 +261,13 @@ export default function ProfileScreen() {
                                     style={[styles.confirmButton, { backgroundColor: colors.secondary }]}
                                     onPress={() => setShowDeleteConfirm(false)}
                                 >
-                                    <ThemedText style={[styles.noText, { color: colors.text }]}>Cancel</ThemedText>
+                                    <ThemedText style={[styles.noText, { color: colors.text }]}>{t('Cancel')}</ThemedText>
                                 </Pressable>
                                 <Pressable
                                     style={[styles.confirmButton, { backgroundColor: '#EF4444' }]}
                                     onPress={confirmDelete}
                                 >
-                                    <ThemedText style={styles.yesText}>Delete Forever</ThemedText>
+                                    <ThemedText style={styles.yesText}>{t('Delete permanently')}</ThemedText>
                                 </Pressable>
                             </View>
                         </View>

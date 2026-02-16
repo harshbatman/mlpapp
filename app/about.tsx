@@ -17,28 +17,28 @@ export default function AboutScreen() {
         {
             id: 1,
             title: 'MAHTO',
-            desc: 'Worker, Contractor & Shops Marketplace',
+            desc: t('Marketplace'),
             icon: 'cart.fill',
             color: '#FF9500'
         },
         {
             id: 2,
-            title: 'Mine (by MAHTO)',
-            desc: 'Full-stack Construction & Renovation Services',
+            title: `Mine (${t('by MAHTO')})`,
+            desc: t('Mine'),
             icon: 'hammer.fill',
             color: '#FF3B30'
         },
         {
             id: 3,
-            title: 'MAHTO Home Loans',
-            desc: 'Home Loans Marketplace',
+            title: `MAHTO ${t('Home Loans')}`,
+            desc: t('Home Loans'),
             icon: 'banknote.fill',
             color: '#34C759'
         },
         {
             id: 4,
-            title: 'MAHTO Land & Properties',
-            desc: 'Land & Property Listings',
+            title: `MAHTO ${t('Land Properties')}`,
+            desc: t('Land Properties'),
             icon: 'house.fill',
             color: '#007AFF'
         }
@@ -56,24 +56,24 @@ export default function AboutScreen() {
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.heroSection}>
-                    <ThemedText style={styles.brandTag}>BUILDING THE FUTURE</ThemedText>
-                    <ThemedText type="title" style={styles.mainTitle}>Home Building OS</ThemedText>
+                    <ThemedText style={styles.brandTag}>{t('Building Future')}</ThemedText>
+                    <ThemedText type="title" style={styles.mainTitle}>{t('Home Building OS')}</ThemedText>
                     <ThemedText style={styles.heroDescription}>
-                        MAHTO is the operating system for home building. We are building one unified system that brings together everything required to build a home.
+                        {t('MAHTO Manifesto')}
                     </ThemedText>
                 </View>
 
                 <View style={[styles.manifestoCard, { backgroundColor: colorScheme === 'light' ? '#F9F9F9' : '#1C1C1E' }]}>
                     <ThemedText style={styles.manifestoText}>
-                        Today, building a home means dealing with fragmented vendors, contractors, workers, and middlemen.
+                        {t('Fragmented Reality')}
                         {"\n\n"}
-                        <ThemedText style={{ fontWeight: '700', color: colors.tint }}>MAHTO simplifies this entire journey</ThemedText> into a single, integrated platform — end to end.
+                        <ThemedText style={{ fontWeight: '700', color: colors.tint }}>{t('MAHTO Solution')}</ThemedText>
                     </ThemedText>
                 </View>
 
                 <View style={styles.section}>
-                    <ThemedText style={styles.sectionLabel}>WHAT WE'RE BUILDING</ThemedText>
-                    <ThemedText type="subtitle" style={styles.sectionTitle}>MAHTO Ecosystem</ThemedText>
+                    <ThemedText style={styles.sectionLabel}>{t('What Building')}</ThemedText>
+                    <ThemedText type="subtitle" style={styles.sectionTitle}>{t('MAHTO Ecosystem')}</ThemedText>
 
                     <View style={styles.grid}>
                         {ecosystem.map((item) => (
@@ -91,7 +91,7 @@ export default function AboutScreen() {
                 <View style={[styles.highlightSection, { backgroundColor: colors.tint + '10' }]}>
                     <View style={styles.quoteLine} />
                     <ThemedText style={styles.highlightText}>
-                        "Full-stack" at MAHTO means from <ThemedText style={{ fontWeight: '800' }}>land to lending</ThemedText> — not just design to construction.
+                        {t('Full Stack Quote')}
                     </ThemedText>
                 </View>
 

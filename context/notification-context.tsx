@@ -28,39 +28,35 @@ interface ConfirmProps {
 const ERROR_MAPPING: Record<string, { title: string; message: string }> = {
     'auth/user-not-found': {
         title: 'Account Not Found',
-        message: "We couldn't find an account with this number. Please check the number or create a new account."
+        message: "We couldn't find a MAHTO ID with this number. Please check the number or create a new account."
     },
     'auth/wrong-password': {
-        title: 'Authentication Failed',
-        message: 'The details you entered are incorrect. Please try again.'
-    },
-    'auth/invalid-credential': {
-        title: 'Authentication Failed',
-        message: 'The phone number or password you entered is incorrect. Please try again.'
+        title: 'Incorrect Password',
+        message: 'The password you entered is incorrect. Please try again.'
     },
     'auth/invalid-email': {
-        title: 'Invalid Format',
-        message: 'Please check the phone number format and try again.'
+        title: 'ID Format Issue',
+        message: 'There was an issue with your MAHTO ID format. Please verify your number.'
     },
     'auth/user-disabled': {
-        title: 'Account Suspended',
-        message: 'This account has been temporarily suspended. Please contact support.'
+        title: 'Account Disabled',
+        message: 'This MAHTO ID has been temporarily disabled for security. Please contact support.'
     },
     'auth/network-request-failed': {
         title: 'Connection Issue',
-        message: "We're having trouble connecting. Please check your internet connection."
+        message: "We're having trouble connecting to our servers. Please check your internet connection."
     },
     'auth/email-already-in-use': {
         title: 'Already Registered',
-        message: 'This phone number is already registered. Please log in instead.'
+        message: 'This phone number is already linked to a MAHTO ID. Please log in instead.'
     },
     'auth/too-many-requests': {
-        title: 'Too Many Attempts',
-        message: 'For your security, please wait a few minutes before trying again.'
+        title: 'Security Notice',
+        message: 'Too many attempts. For your security, please wait a moment before trying again.'
     },
     'auth/internal-error': {
-        title: 'Service Notice',
-        message: 'We encountered a momentary issue. Please try again shortly.'
+        title: 'Service Interruption',
+        message: 'We encountered a momentary issue. Please try again in a few seconds.'
     },
     'location-denied': {
         title: 'Permission Required',

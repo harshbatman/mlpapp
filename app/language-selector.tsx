@@ -49,7 +49,7 @@ export default function LanguageSelectorScreen() {
                 <Pressable onPress={() => router.back()} style={styles.backButton}>
                     <IconSymbol name="chevron.left" size={28} color={colors.text} />
                 </Pressable>
-                <ThemedText type="title" style={styles.headerTitle}>Select Language</ThemedText>
+                <ThemedText type="title" style={styles.headerTitle}>{t('Select Language')}</ThemedText>
                 <View style={{ width: 44 }} />
             </View>
 
@@ -58,7 +58,7 @@ export default function LanguageSelectorScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.heroSection}>
-                    <ThemedText style={styles.heroSubtitle}>Choose your preferred language for the MAHTO ecosystem.</ThemedText>
+                    <ThemedText style={styles.heroSubtitle}>{t('Choose Language Pref')}</ThemedText>
                 </View>
 
                 <View style={styles.listContainer}>

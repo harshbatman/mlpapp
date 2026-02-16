@@ -40,14 +40,12 @@ export default function SignUpScreen() {
         }
 
         setLoading(true);
-        const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
-
         try {
-            // Create user
+            const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
             const userCredential = await createUserWithEmailAndPassword(auth, virtualEmail, password);
             const user = userCredential.user;
 
-            // Create user doc
+            // Create user document in Firestore
             await setDoc(doc(db, 'users', user.uid), {
                 name,
                 phone,
@@ -55,12 +53,27 @@ export default function SignUpScreen() {
                 createdAt: Date.now(),
             });
 
-            // Success! ProfileContext listener will pick this up.
-            // But we can also manually trigger a move if we want instant feedback.
+            // If everything is successful, navigate
+            setLoggedInManually(true);
             router.replace('/(tabs)');
         } catch (error: any) {
             console.error('Signup error:', error);
-            showProfessionalError(error, 'Account Creation Failed');
+
+            let errorMessage = 'An unexpected error occurred during signup. Please try again.';
+            let errorTitle = 'Signup Failed';
+
+            if (error.code === 'auth/email-already-in-use') {
+                errorTitle = 'Account Exists';
+                errorMessage = 'This phone number is already registered. Please login instead.';
+            } else if (error.code === 'auth/weak-password') {
+                errorTitle = 'Weak Password';
+                errorMessage = 'The password is too weak. Please use at least 6 characters.';
+            } else if (error.code === 'auth/network-request-failed') {
+                errorTitle = 'Network Error';
+                errorMessage = 'Please check your internet connection and try again.';
+            }
+
+            showNotification('error', errorTitle, errorMessage);
         } finally {
             setLoading(false);
         }

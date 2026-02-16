@@ -419,7 +419,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme as 'light' | 'dark'];
-  const [city, setCity] = useState('Select Location');
+  const [city, setCity] = useState(t('Select Location'));
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [locationModalVisible, setLocationModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -450,12 +450,12 @@ export default function HomeScreen() {
 
   const handleLocationRequest = async () => {
     showConfirm({
-      title: 'Location Access',
-      message: 'Allow MAHTO to access your location to find the best properties and services near you.',
+      title: t('Location Access'),
+      message: t('Allow MAHTO to access your location to find the best properties and services near you.'),
       icon: 'location',
       iconColor: colors.tint,
-      primaryActionText: 'Allow Access',
-      secondaryActionText: 'Maybe Later',
+      primaryActionText: t('Allow Access'),
+      secondaryActionText: t('Maybe Later'),
       onPrimaryAction: async () => {
         setLoadingLocation(true);
         try {
@@ -476,12 +476,12 @@ export default function HomeScreen() {
 
           if (reverseGeocode.length > 0) {
             const address = reverseGeocode[0];
-            const cityName = address.city || address.district || address.region || 'Unknown Location';
+            const cityName = address.city || address.district || address.region || t('Unknown Location');
             setCity(cityName);
-            showNotification('success', 'Location Updated', `Found you in ${cityName}`);
+            showNotification('success', t('Location Updated'), `${t('Found you in')} ${cityName}`);
           }
         } catch (error: any) {
-          showProfessionalError(error, 'Location Error');
+          showProfessionalError(error, t('Location Error'));
         } finally {
           setLoadingLocation(false);
         }
@@ -490,10 +490,10 @@ export default function HomeScreen() {
   };
 
   const categories = [
-    { name: 'Homes', icon: 'house.fill' },
-    { name: 'Lands', icon: 'mountain.2.fill' },
-    { name: 'Commercial', icon: 'building.2.fill' },
-    { name: 'Rentals', icon: 'apartment.fill' },
+    { name: t('Homes'), icon: 'house.fill' },
+    { name: t('Lands'), icon: 'mountain.2.fill' },
+    { name: t('Commercial'), icon: 'building.2.fill' },
+    { name: t('Rentals'), icon: 'apartment.fill' },
   ];
 
   const filteredList = React.useMemo(() => {
@@ -766,7 +766,7 @@ export default function HomeScreen() {
               style={styles.locationInfo}
               onPress={() => setLocationModalVisible(true)}
             >
-              <ThemedText style={styles.locationLabel}>Current Location</ThemedText>
+              <ThemedText style={styles.locationLabel}>{t('Current Location')}</ThemedText>
               <View style={styles.cityRow}>
                 <ThemedText style={styles.cityText}>{city}</ThemedText>
                 <IconSymbol name="chevron.right" size={16} color="rgba(255,255,255,0.6)" />
@@ -827,9 +827,9 @@ export default function HomeScreen() {
             }}>✨</RNText>
           </View>
           <View style={styles.rewardTextContainer}>
-            <ThemedText style={styles.rewardTag}>LIMITED OFFER</ThemedText>
-            <ThemedText style={styles.rewardTitle}>Post Now - It's Free! 🎊</ThemedText>
-            <ThemedText style={styles.rewardSubtitle}>List your property today and reach thousands of buyers instantly.</ThemedText>
+            <ThemedText style={styles.rewardTag}>{t('LIMITED OFFER')}</ThemedText>
+            <ThemedText style={styles.rewardTitle}>{t('Post Free Title')}</ThemedText>
+            <ThemedText style={styles.rewardSubtitle}>{t('Post Free Desc')}</ThemedText>
           </View>
           <View style={styles.rewardAction}>
             <IconSymbol name="chevron.right" size={20} color="#FFFFFF" />
@@ -839,11 +839,11 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <ThemedText type="subtitle" style={styles.sectionTitle} numberOfLines={1}>
-              Categories
+              {t('Categories')}
             </ThemedText>
             <Pressable onPress={() => router.push('/properties')}>
               <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>
-                See All
+                {t('See All')}
               </ThemedText>
             </Pressable>
           </View>
@@ -882,9 +882,9 @@ export default function HomeScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>Explore Cities</ThemedText>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>{t('Explore Cities')}</ThemedText>
             <Pressable onPress={() => setLocationModalVisible(true)}>
-              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>All India</ThemedText>
+              <ThemedText style={{ color: colors.tint, fontWeight: '700', fontSize: 14 }}>{t('All India')}</ThemedText>
             </Pressable>
           </View>
 
@@ -900,7 +900,7 @@ export default function HomeScreen() {
                 style={styles.cityCard}
                 onPress={() => {
                   setCity(cityItem.name);
-                  showNotification('success', 'Location Updated', `Exploring properties in ${cityItem.name}`);
+                  showNotification('success', t('Location Updated'), `${t('Exploring properties in')} ${cityItem.name}`);
                   router.push({
                     pathname: '/properties',
                     params: { city: cityItem.name }
@@ -927,19 +927,19 @@ export default function HomeScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>Featured Listings</ThemedText>
+            <ThemedText style={styles.sectionTitle}>{t('Featured Listings')}</ThemedText>
           </View>
 
           <View style={styles.emptyState}>
             <IconSymbol name="house.fill" size={60} color={colors.icon} />
-            <ThemedText style={styles.emptyText}>No listings yet.</ThemedText>
-            <ThemedText style={styles.emptySubText}>Be the first one to post a property!</ThemedText>
+            <ThemedText style={styles.emptyText}>{t('No listings yet.')}</ThemedText>
+            <ThemedText style={styles.emptySubText}>{t('Be the first one to post!')}</ThemedText>
 
             <Pressable
               style={[styles.postButton, { backgroundColor: colors.tint }]}
               onPress={() => router.push('/(tabs)/add')}
             >
-              <ThemedText style={styles.postButtonText}>Post Now</ThemedText>
+              <ThemedText style={styles.postButtonText}>{t('Post Now')}</ThemedText>
             </Pressable>
           </View>
         </View>

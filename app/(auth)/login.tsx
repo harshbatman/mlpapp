@@ -38,19 +38,31 @@ export default function LoginScreen() {
         }
 
         setLoading(true);
-        // Perform actual Auth
-        const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
-
         try {
+            const virtualEmail = `${selectedCountry.code.replace('+', '')}${phone}@mahto.app`;
             await signInWithEmailAndPassword(auth, virtualEmail, password);
-            // Success - The auth listener in ProfileContext will handle state
-            // But we can also manually redirect to be snappy if needed, 
-            // though relying on the auth listener is safer.
-            // We'll let the listener or a post-await redirect handle it.
+
+            // If successful, navigate
+            setLoggedInManually(true);
             router.replace('/(tabs)');
         } catch (error: any) {
             console.error('Login error:', error);
-            showProfessionalError(error, 'Login Failed');
+
+            let errorMessage = 'An unexpected error occurred. Please try again.';
+            let errorTitle = 'Login Failed';
+
+            if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                errorTitle = 'Invalid Credentials';
+                errorMessage = 'The phone number or password you entered is incorrect. Please double-check and try again.';
+            } else if (error.code === 'auth/too-many-requests') {
+                errorTitle = 'Account Locked';
+                errorMessage = 'Too many failed login attempts. Please try again later or reset your password.';
+            } else if (error.code === 'auth/network-request-failed') {
+                errorTitle = 'Network Error';
+                errorMessage = 'Please check your internet connection and try again.';
+            }
+
+            showNotification('error', errorTitle, errorMessage);
         } finally {
             setLoading(false);
         }
