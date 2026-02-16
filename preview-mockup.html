@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAHTO App Preview - Icon & Splash</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .preview-card {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+        }
+
+        .phone-mockup {
+            width: 280px;
+            height: 580px;
+            background: #000;
+            border: 8px solid #334155;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        /* Splash Screen Mockup */
+        .splash-view {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .splash-img {
+            width: 150px;
+            height: 150px;
+        }
+
+        /* App Launcher Mockup */
+        .home-screen {
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            padding: 40px 20px;
+            gap: 20px;
+        }
+
+        .app-icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 60px;
+        }
+
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-label {
+            font-size: 10px;
+            color: white;
+            margin-top: 4px;
+            text-align: center;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .dummy-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .desc {
+            margin-top: 24px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-align: center;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="margin-bottom: 40px; font-weight: 800; letter-spacing: -1px;">MAHTO Brand Preview</h1>
+
+    <div class="container">
+        <!-- Splash Preview -->
+        <div class="preview-card">
+            <h2>Splash Screen</h2>
+            <div class="phone-mockup">
+                <div class="splash-view">
+                    <div style="font-size: 40px; font-weight: 900; letter-spacing: 4px;">MAHTO</div>
+                    <div style="font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;">Land
+                        & Properties</div>
+                </div>
+            </div>
+            <p class="desc">This is the first screen users see when opening the app. Minimalist black branding for a
+                premium feel.</p>
+        </div>
+
+        <!-- App Icon Preview -->
+        <div class="preview-card">
+            <h2>App Launcher Icon</h2>
+            <div class="phone-mockup">
+                <div class="home-screen">
+                    <div class="app-icon-wrapper">
+                        <img src="assets/images/icon.png" class="app-icon" alt="App Icon">
+                        <div class="app-label">MAHTO</div>
+                    </div>
+                    <!-- Dummy Icons for context -->
+                    <div class="app-icon-wrapper">
+                        <div class="dummy-icon"></div>
+                        <div class="app-label">Photos</div>
+                    </div>
+                    <div class="app-icon-wrapper">
+                        <div class="dummy-icon"></div>
+                        <div class="app-label">Safari</div>
+                    </div>
+                    <div class="app-icon-wrapper">
+                        <div class="dummy-icon"></div>
+                        <div class="app-label">Maps</div>
+                    </div>
+                </div>
+            </div>
+            <p class="desc">How your icon will look on the user's home screen. The white-on-black design stands out
+                among other apps.</p>
+        </div>
+    </div>
+</body>
+
+</html>

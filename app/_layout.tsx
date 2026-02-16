@@ -14,7 +14,7 @@ SplashScreen.preventAutoHideAsync();
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
-  initialRouteName: '(auth)/login',
+  initialRouteName: '(auth)/signup',
 };
 
 import { NotificationProvider } from '@/context/notification-context';
