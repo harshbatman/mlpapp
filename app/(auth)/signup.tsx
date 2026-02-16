@@ -1,4 +1,5 @@
 import { ThemedText } from '@/components/themed-text';
+import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -27,6 +28,7 @@ export default function SignUpScreen() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showLocationModal, setShowLocationModal] = useState(false);
 
     const handleSignUp = async () => {
         if (!name || !phone || !password) {
@@ -55,7 +57,12 @@ export default function SignUpScreen() {
 
             // If everything is successful, navigate
             setLoggedInManually(true);
-            router.replace('/(tabs)');
+
+            if (Platform.OS === 'ios') {
+                setShowLocationModal(true);
+            } else {
+                router.replace('/(tabs)');
+            }
         } catch (error: any) {
             console.error('Signup error:', error);
 
@@ -213,6 +220,13 @@ export default function SignUpScreen() {
                         </View>
                     </View>
                 </Modal>
+                <LocationPermissionModal
+                    visible={showLocationModal}
+                    onClose={() => {
+                        setShowLocationModal(false);
+                        router.replace('/(tabs)');
+                    }}
+                />
             </ScrollView>
         </KeyboardAvoidingView>
     );
