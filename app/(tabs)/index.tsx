@@ -453,6 +453,7 @@ export default function HomeScreen() {
     { name: 'Lucknow', image: require('@/assets/images/cities/lucknow.png'), color: 'standard' },
     { name: 'Begusarai', image: require('@/assets/images/cities/begusarai.png'), color: 'standard' },
     { name: 'Rohtak', image: require('@/assets/images/cities/rohtak.png'), color: 'standard' },
+    { name: 'Jaipur', image: require('@/assets/images/cities/jaipur.png'), color: 'standard' },
     { name: 'Bhubaneswar', image: require('@/assets/images/cities/bhubaneswar.png'), color: 'standard' },
   ];
 
