@@ -1,16 +1,18 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { auth, db, storage } from '@/config/firebase';
 import { Colors } from '@/constants/theme';
 import { ListingType, PropertyType } from '@/constants/types';
 import { useNotification } from '@/context/notification-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '@/config/firebase';
 import * as ImagePicker from 'expo-image-picker';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, Image, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function AddPropertyScreen() {
@@ -27,7 +29,9 @@ export default function AddPropertyScreen() {
   const [type, setType] = useState<PropertyType>('Home');
   const [listingType, setListingType] = useState<ListingType>('Sell');
   const [isLocating, setIsLocating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [images, setImages] = useState<string[]>([]);
+
 
   const pickImages = async () => {
     if (images.length >= 5) {
@@ -100,7 +104,24 @@ export default function AddPropertyScreen() {
       return;
     }
 
+    setIsUploading(true);
     try {
+      const uploadedImageUrls = await Promise.all(
+        images.map(async (uri) => {
+          // If the URI is already a web URL, don't re-upload
+          if (uri.startsWith('http')) return uri;
+
+          const filename = uri.split('/').pop();
+          const storageRef = ref(storage, `properties/${currentUser.uid}/${Date.now()}-${filename}`);
+
+          const response = await fetch(uri);
+          const blob = await response.blob();
+
+          await uploadBytes(storageRef, blob);
+          return await getDownloadURL(storageRef);
+        })
+      );
+
       await addDoc(collection(db, 'properties'), {
         title,
         description,
@@ -109,7 +130,7 @@ export default function AddPropertyScreen() {
         area,
         type,
         listingType,
-        images,
+        images: uploadedImageUrls,
         ownerId: currentUser.uid,
         createdAt: serverTimestamp(),
       });
@@ -118,7 +139,10 @@ export default function AddPropertyScreen() {
       router.replace('/(tabs)');
     } catch (error) {
       showProfessionalError(error, 'Submission Failed');
+    } finally {
+      setIsUploading(false);
     }
+
   };
 
   const propertyTypes: PropertyType[] = ['Home', 'Apartment', 'Villa', 'Commercial', 'Land'];
@@ -272,9 +296,18 @@ export default function AddPropertyScreen() {
           numberOfLines={4}
         />
 
-        <Pressable style={[styles.submitButton, { backgroundColor: colors.tint }]} onPress={handleSubmit}>
-          <ThemedText style={styles.submitButtonText}>Post Listing</ThemedText>
+        <Pressable
+          style={[styles.submitButton, { backgroundColor: colors.tint }, (isUploading || isLocating) && { opacity: 0.7 }]}
+          onPress={handleSubmit}
+          disabled={isUploading || isLocating}
+        >
+          {isUploading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <ThemedText style={styles.submitButtonText}>Post Listing</ThemedText>
+          )}
         </Pressable>
+
         <View style={{ height: 40 }} />
       </ScrollView>
     </ThemedView>
