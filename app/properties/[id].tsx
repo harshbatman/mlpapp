@@ -7,11 +7,12 @@ import { useChat } from '@/context/chat-context';
 import { useNotification } from '@/context/notification-context';
 import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { FontAwesome } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { arrayRemove, arrayUnion, doc, getDoc, increment, onSnapshot, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Dimensions, Image, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, Linking, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -81,6 +82,27 @@ export default function PropertyDetailsScreen() {
                 await updateDoc(docRef, {
                     shares: increment(1)
                 });
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleWhatsAppShare = async () => {
+        const message = `Check out this property: *${property.title}* for *₹${property.price}* on MAHTO.\n\nView details: https://mahto.app/properties/${id}`;
+        const url = `whatsapp://send?text=${encodeURIComponent(message)}`;
+
+        try {
+            const canOpen = await Linking.canOpenURL(url);
+            if (canOpen) {
+                await Linking.openURL(url);
+                // Increment share count in Firestore
+                const docRef = doc(db, 'properties', id as string);
+                await updateDoc(docRef, {
+                    shares: increment(1)
+                });
+            } else {
+                alert("WhatsApp is not installed on your device.");
             }
         } catch (error) {
             console.error(error);
@@ -179,6 +201,9 @@ export default function PropertyDetailsScreen() {
                             <IconSymbol name="chevron.left" size={24} color="#000" />
                         </Pressable>
                         <View style={styles.headerRight}>
+                            <Pressable onPress={handleWhatsAppShare} style={[styles.iconBtn, { backgroundColor: '#25D366' }]}>
+                                <FontAwesome name="whatsapp" size={24} color="#FFF" />
+                            </Pressable>
                             <Pressable onPress={handleShare} style={styles.iconBtn}>
                                 <IconSymbol name="square.and.arrow.up" size={20} color="#000" />
                             </Pressable>
