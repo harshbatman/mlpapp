@@ -129,6 +129,63 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  heroContainer: {
+    height: 380,
+    width: '100%',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.35)', // Darken image for readability
+  },
+  heroContent: {
+    paddingTop: Platform.OS === 'ios' ? 60 : 50,
+    paddingHorizontal: 24,
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: 40,
+  },
+  heroBrandSection: {
+    marginTop: 10,
+  },
+  heroBrand: {
+    color: '#FFFFFF',
+    fontSize: 48,
+    fontWeight: '900',
+    letterSpacing: -1,
+  },
+  heroTagline: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '700',
+    marginTop: -8,
+    opacity: 0.9,
+  },
+  heroMainTextSection: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  heroBuySellRent: {
+    color: '#FFFFFF',
+    fontSize: 42,
+    fontWeight: '900',
+    textAlign: 'center',
+    letterSpacing: -0.5,
+  },
+  heroProperties: {
+    color: '#FFFFFF',
+    fontSize: 54,
+    fontWeight: '900',
+    textAlign: 'center',
+    marginTop: -10,
+    letterSpacing: -1,
+  },
   premiumSearchCard: {
     backgroundColor: '#FFFFFF',
     marginHorizontal: 16,
@@ -199,7 +256,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   scrollContent: {
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingBottom: 100,
   },
   section: {
@@ -917,7 +973,27 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.topHeader}>
+        {/* Premium Hero Section */}
+        <View style={styles.heroContainer}>
+          <Image
+            source={{ uri: 'https://images.unsplash.com/photo-1594913785162-e6786b02cada?q=80&w=2070&auto=format&fit=crop' }}
+            style={styles.heroImage}
+          />
+          <View style={styles.heroOverlay} />
+          <View style={styles.heroContent}>
+            <View style={styles.heroBrandSection}>
+              <ThemedText style={styles.heroBrand}>MAHTO</ThemedText>
+              <ThemedText style={styles.heroTagline}>Land & Properties</ThemedText>
+            </View>
+
+            <View style={styles.heroMainTextSection}>
+              <ThemedText style={styles.heroBuySellRent}>Buy • Sell • Rent</ThemedText>
+              <ThemedText style={styles.heroProperties}>Properties</ThemedText>
+            </View>
+          </View>
+        </View>
+
+        <View style={[styles.topHeader, { marginTop: 20 }]}>
           <Pressable
             style={styles.profileSection}
             onPress={() => router.push('/(tabs)/profile')}
