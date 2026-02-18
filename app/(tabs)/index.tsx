@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
   heroCenterTagline: {
     color: '#FFF',
     fontSize: 34,
-    fontWeight: '900',
+    fontWeight: '800',
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
     textShadowOffset: { width: 0, height: 2 },
@@ -1249,7 +1249,7 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.heroCenterContent}>
-              <ThemedText style={styles.heroCenterTagline}>Buy . Sell . Rent</ThemedText>
+              <ThemedText style={styles.heroCenterTagline}>BUY . SELL . RENT</ThemedText>
               <ThemedText style={styles.heroCenterSubtitle}>Land & Properties</ThemedText>
             </View>
           </View>
