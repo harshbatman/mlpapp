@@ -62,6 +62,7 @@ const MAPPING: IconMapping = {
   'arrow.up': 'arrow-upward',
   'square.dashed': 'straighten',
   'heart': 'favorite-border',
+  'heart.fill': 'favorite',
   'square.and.arrow.up': 'share',
 };
 

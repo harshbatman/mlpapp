@@ -29,6 +29,8 @@ export default function PropertyDetailsScreen() {
     const [owner, setOwner] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [isFavorited, setIsFavorited] = useState(false);
+
 
     useEffect(() => {
         if (!id) return;
@@ -36,7 +38,7 @@ export default function PropertyDetailsScreen() {
         const docRef = doc(db, 'properties', id as string);
         const unsubscribe = onSnapshot(docRef, async (docSnap) => {
             if (docSnap.exists()) {
-                const data = { id: docSnap.id, ...docSnap.data() };
+                const data = { id: docSnap.id, ...docSnap.data() } as any;
                 setProperty(data);
 
                 // Fetch owner details
@@ -90,6 +92,12 @@ export default function PropertyDetailsScreen() {
         }
     };
 
+    const toggleFavorite = () => {
+        setIsFavorited(!isFavorited);
+        // We can add Firestore persistence here later
+    };
+
+
     if (loading) {
         return (
             <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
@@ -135,11 +143,19 @@ export default function PropertyDetailsScreen() {
                             <Pressable onPress={handleShare} style={styles.iconBtn}>
                                 <IconSymbol name="square.and.arrow.up" size={20} color="#000" />
                             </Pressable>
-                            <Pressable style={styles.iconBtn}>
-                                <IconSymbol name="heart" size={20} color="#000" />
+                            <Pressable
+                                onPress={toggleFavorite}
+                                style={[styles.iconBtn, isFavorited && { backgroundColor: '#FF3B30' }]}
+                            >
+                                <IconSymbol
+                                    name={isFavorited ? "heart.fill" : "heart"}
+                                    size={20}
+                                    color={isFavorited ? "#FFF" : "#000"}
+                                />
                             </Pressable>
                         </View>
                     </View>
+
 
                     {/* Image Indicator */}
                     {property.images && property.images.length > 1 && (
