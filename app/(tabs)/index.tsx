@@ -901,7 +901,7 @@ export default function HomeScreen() {
               style={styles.notificationBell}
               onPress={() => router.push('/messages')}
             >
-              <IconSymbol name="bubble.left.fill" size={22} color={colors.icon} />
+              <IconSymbol name="message.fill" size={22} color={colors.icon} />
             </Pressable>
             <Pressable
               style={styles.notificationBell}

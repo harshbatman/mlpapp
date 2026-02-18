@@ -56,6 +56,7 @@ const MAPPING: IconMapping = {
   'hammer.fill': 'construction',
   'banknote.fill': 'payments',
   'bubble.left.fill': 'chat-bubble',
+  'message.fill': 'message',
   'pencil': 'edit',
   'trash': 'delete',
   'arrow.up': 'arrow-upward',
