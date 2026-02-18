@@ -10,12 +10,12 @@
       }
     },
     "orientation": "portrait",
-    "icon": "./assets/images/launcher.PNG",
+    "icon": "./assets/images/launcher_icon.png",
     "scheme": "mlpapp",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/images/launcher.PNG"
+      "icon": "./assets/images/launcher_icon.png"
     },
     "android": {
       "versionCode": 16,
@@ -23,7 +23,7 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#000000",
-        "foregroundImage": "./assets/images/launcher.PNG",
+        "foregroundImage": "./assets/images/launcher_icon.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       }
