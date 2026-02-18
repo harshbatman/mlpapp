@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   premiumSearchCard: {
     backgroundColor: '#FFFFFF',
     marginHorizontal: 16,
-    marginTop: -30, // Pull it over the header
+    marginTop: 8, // Adjusted since the header above is removed
     padding: 16,
     borderRadius: 30,
     shadowColor: '#000',
@@ -954,37 +954,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={[styles.header, { backgroundColor: colors.tint }]}>
-          <View style={styles.headerTop}>
-            <Pressable
-              style={styles.locationInfo}
-              onPress={() => setLocationModalVisible(true)}
-            >
-              <ThemedText style={styles.locationLabel}>{t('Location')}</ThemedText>
-              <View style={styles.cityRow}>
-                <ThemedText style={styles.cityText}>{city}</ThemedText>
-                <IconSymbol name="chevron.right" size={16} color="rgba(255,255,255,0.6)" />
-              </View>
-            </Pressable>
 
-            <Pressable
-              style={styles.notificationBell}
-              onPress={handleLocationRequest}
-              disabled={loadingLocation}
-            >
-              {loadingLocation ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <IconSymbol name="location.fill" size={20} color="#fff" />
-              )}
-            </Pressable>
-          </View>
-
-          <View style={styles.greetingContainer}>
-            <ThemedText style={styles.greeting}>{t('Find Dream')}</ThemedText>
-            <ThemedText style={styles.subGreeting}>{t('Property')}</ThemedText>
-          </View>
-        </View>
 
         <View style={styles.premiumSearchCard}>
           <View style={styles.searchBarWrapper}>
