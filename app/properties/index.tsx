@@ -5,6 +5,7 @@ import { auth, db } from '@/config/firebase';
 import { INDIAN_LOCATIONS } from '@/constants/locations';
 import { Colors } from '@/constants/theme';
 import { useChat } from '@/context/chat-context';
+import { useNotification } from '@/context/notification-context';
 import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -23,6 +24,7 @@ export default function PropertyListScreen() {
     const colors = Colors[colorScheme as 'light' | 'dark'];
     const { startConversation } = useChat();
     const { profile } = useProfile();
+    const { showNotification } = useNotification();
 
     const [properties, setProperties] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -92,7 +94,7 @@ export default function PropertyListScreen() {
         const currentUid = auth.currentUser?.uid;
         // Prevent chatting with self
         if (currentUid && ownerId === currentUid) {
-            alert("This is your own property!");
+            showNotification('info', 'My Property', "This is your own property!");
             return;
         }
 
@@ -161,7 +163,7 @@ export default function PropertyListScreen() {
 
                             <View style={styles.imageOverlay}>
                                 <View style={styles.badgeRow}>
-                                    <View style={[styles.typeBadge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                                    <View style={[styles.typeBadge, { backgroundColor: (item.listingType === 'Sell' || item.listingType === 'Sale') ? '#FF3B30' : 'rgba(0,0,0,0.6)' }]}>
                                         <ThemedText style={styles.typeBadgeText}>{t(item.listingType || 'Sale')}</ThemedText>
                                     </View>
                                     <Pressable style={styles.favoriteButton}>
@@ -537,6 +539,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    imageOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.1)',
+        justifyContent: 'space-between',
+        padding: 12,
+    },
     badgeRow: {
         position: 'absolute',
         top: 12,
@@ -576,6 +584,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'baseline',
         gap: 2,
+    },
+    priceContainer: {
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 10,
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        gap: 2,
+        position: 'absolute',
+        bottom: 12,
+        left: 12,
     },
     priceSymbol: {
         color: '#FFF',
@@ -656,6 +677,28 @@ const styles = StyleSheet.create({
     emptyContainer: {
         marginTop: 100,
         alignItems: 'center',
+        paddingHorizontal: 40,
+    },
+    emptyIconWrapper: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: '#F2F2F7',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    emptyTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+    emptySubtitle: {
+        fontSize: 14,
+        color: '#8E8E93',
+        textAlign: 'center',
+        fontWeight: '500',
     },
     modalOverlay: {
         flex: 1,

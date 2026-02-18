@@ -100,7 +100,7 @@ export default function MyListingsScreen() {
 
                 <View style={styles.imageOverlay}>
                     <View style={styles.badgeRow}>
-                        <View style={[styles.typeBadge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                        <View style={[styles.typeBadge, { backgroundColor: (item.listingType === 'Sell' || item.listingType === 'Sale') ? '#FF3B30' : 'rgba(0,0,0,0.6)' }]}>
                             <ThemedText style={styles.typeBadgeText}>{t(item.listingType)}</ThemedText>
                         </View>
                         <View style={[styles.categoryBadge, { backgroundColor: colors.tint }]}>
@@ -294,7 +294,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 12,
-        backdropFilter: 'blur(10px)', // Only works on web, but looks good
     },
     typeBadgeText: {
         color: '#FFF',

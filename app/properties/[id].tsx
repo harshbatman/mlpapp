@@ -23,7 +23,7 @@ export default function PropertyDetailsScreen() {
     const { t } = useTranslation();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
-    const { showProfessionalError } = useNotification();
+    const { showProfessionalError, showNotification } = useNotification();
     const { startConversation } = useChat();
     const { profile } = useProfile();
     const insets = useSafeAreaInsets();
@@ -100,13 +100,13 @@ export default function PropertyDetailsScreen() {
             const canOpen = await Linking.canOpenURL(url);
             if (canOpen) {
                 await Linking.openURL(url);
-                // Increment share count in Firestore
+                // Increment WhatsApp share count in Firestore
                 const docRef = doc(db, 'properties', id as string);
                 await updateDoc(docRef, {
-                    shares: increment(1)
+                    whatsappShares: increment(1)
                 });
             } else {
-                alert("WhatsApp is not installed on your device.");
+                showNotification('warning', 'App Not Found', "WhatsApp is not installed on your device.");
             }
         } catch (error) {
             console.error(error);
@@ -126,7 +126,7 @@ export default function PropertyDetailsScreen() {
         }
 
         if (auth.currentUser.uid === property.ownerId) {
-            alert("This is your own property!");
+            showNotification('info', 'My Property', "This is your own property!");
             return;
         }
 
@@ -140,7 +140,7 @@ export default function PropertyDetailsScreen() {
 
     const handleCall = () => {
         if (!owner?.phone) {
-            alert("No phone number available for this owner.");
+            showNotification('error', 'Contact Unavailable', "No phone number available for this owner.");
             return;
         }
         Linking.openURL(`tel:${owner.phone}`);
@@ -283,7 +283,7 @@ export default function PropertyDetailsScreen() {
                 {/* Content Section */}
                 <View style={styles.content}>
                     <View style={styles.mainInfo}>
-                        <View style={[styles.typeBadge, { backgroundColor: colors.tint }]}>
+                        <View style={[styles.typeBadge, { backgroundColor: (property.listingType === 'Sell' || property.listingType === 'Sale') ? '#FF3B30' : colors.tint }]}>
                             <ThemedText style={styles.typeBadgeText}>{t(property.listingType || 'Sale')}</ThemedText>
                         </View>
                         <ThemedText style={styles.title}>{property.title}</ThemedText>
@@ -292,7 +292,6 @@ export default function PropertyDetailsScreen() {
                             <ThemedText style={styles.location}>{property.location}</ThemedText>
                         </View>
 
-                        {/* Likes & Shares Display */}
                         <View style={styles.likesRow}>
                             <View style={styles.statsItem}>
                                 <IconSymbol name="heart.fill" size={14} color="#FF3B30" />
@@ -304,6 +303,12 @@ export default function PropertyDetailsScreen() {
                                 <IconSymbol name="square.and.arrow.up" size={14} color="#8E8E93" />
                                 <ThemedText style={styles.statsText}>
                                     {property.shares || 0} {t('shares')}
+                                </ThemedText>
+                            </View>
+                            <View style={styles.statsItem}>
+                                <FontAwesome name="whatsapp" size={14} color="#25D366" />
+                                <ThemedText style={styles.statsText}>
+                                    {property.whatsappShares || 0} {t('WhatsApp')}
                                 </ThemedText>
                             </View>
                         </View>
@@ -379,7 +384,7 @@ export default function PropertyDetailsScreen() {
                         style={[styles.callBtn, { borderColor: colors.tint }]}
                         onPress={handleCall}
                     >
-                        <IconSymbol name="phone.fill" size={20} color={colors.tint} />
+                        <IconSymbol name="phone.fill" size={20} color="#4CAF50" />
                         <ThemedText style={[styles.callBtnText, { color: colors.tint }]}>{t('Call Owner')}</ThemedText>
                     </Pressable>
                     <Pressable

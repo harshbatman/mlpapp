@@ -1314,7 +1314,7 @@ export default function HomeScreen() {
                     )}
                     <View style={styles.imageOverlay}>
                       <View style={styles.featuredBadgeRow}>
-                        <View style={[styles.featuredTypeBadge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                        <View style={[styles.featuredTypeBadge, { backgroundColor: (item.listingType === 'Sell' || item.listingType === 'Sale') ? '#FF3B30' : 'rgba(0,0,0,0.6)' }]}>
                           <ThemedText style={styles.featuredTypeBadgeText}>{t(item.listingType || 'Sale')}</ThemedText>
                         </View>
                         {item.type && (

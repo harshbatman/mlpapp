@@ -85,7 +85,10 @@ const resources = {
             "Account Actions": "Account Actions",
             "Rate Us": "Rate Us",
             "Select Language": "Select Language",
-            "Choose Language Pref": "Choose your preferred language for the MAHTO ecosystem."
+            "Choose Language Pref": "Choose your preferred language for the MAHTO ecosystem.",
+            "likes": "likes",
+            "shares": "shares",
+            "WhatsApp": "WhatsApp"
         }
     },
     hi: {
@@ -169,7 +172,10 @@ const resources = {
             "Account Actions": "खाता क्रियाएं",
             "Rate Us": "हमें रेट करें",
             "Select Language": "भाषा चुनें",
-            "Choose Language Pref": "MAHTO इकोसिस्टम के लिए अपनी पसंद की भाषा चुनें।"
+            "Choose Language Pref": "MAHTO इकोसिस्टम के लिए अपनी पसंद की भाषा चुनें।",
+            "likes": "पसंद",
+            "shares": "शेयर",
+            "WhatsApp": "व्हाट्सएप"
         }
     },
     pa: {

@@ -24,7 +24,7 @@ export default function AddPropertyScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [location, setLocation] = useState('Begusarai, Bihar');
+  const [location, setLocation] = useState('');
   const [area, setArea] = useState('');
   const [type, setType] = useState<PropertyType>('Home');
   const [listingType, setListingType] = useState<ListingType>('Sell');
@@ -132,6 +132,10 @@ export default function AddPropertyScreen() {
         listingType,
         images: uploadedImageUrls,
         ownerId: currentUser.uid,
+        shares: 0,
+        whatsappShares: 0,
+        likes: 0,
+        likedBy: [],
         createdAt: serverTimestamp(),
       });
 
@@ -269,7 +273,7 @@ export default function AddPropertyScreen() {
         </View>
         <TextInput
           style={[styles.input, { borderColor: colors.border, color: colors.text }]}
-          placeholder="e.g. Ranchi, Jharkhand"
+          placeholder="e.g. Bihar, Begusarai"
           placeholderTextColor={colors.icon}
           value={location}
           onChangeText={setLocation}
