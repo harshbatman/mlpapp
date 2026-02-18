@@ -4,6 +4,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { INDIAN_LOCATIONS } from '@/constants/locations';
 import { Colors } from '@/constants/theme';
 import { useNotification } from '@/context/notification-context';
+import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
@@ -52,9 +53,48 @@ const styles = StyleSheet.create({
   },
   cityText: {
     color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '700',
     marginRight: 4,
+  },
+  topHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+  },
+  profileIconPlaceholder: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F0F0F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileTextContainer: {
+    marginLeft: 12,
+  },
+  profileGreeting: {
+    fontSize: 14,
+    opacity: 0.6,
+    fontWeight: '600',
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: '800',
+    letterSpacing: -0.5,
   },
   greetingContainer: {
     marginTop: 20,
@@ -435,6 +475,7 @@ export default function HomeScreen() {
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [mainFilterModalVisible, setMainFilterModalVisible] = useState(false);
   const { showNotification, showProfessionalError, showConfirm } = useNotification();
+  const { profile } = useProfile();
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -830,18 +871,47 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={styles.topHeader}>
+          <Pressable
+            style={styles.profileSection}
+            onPress={() => router.push('/(tabs)/profile')}
+          >
+            {profile.image ? (
+              <Image source={{ uri: profile.image }} style={styles.profileImage} />
+            ) : (
+              <View style={styles.profileIconPlaceholder}>
+                <IconSymbol name="person.fill" size={24} color={colors.icon} />
+              </View>
+            )}
+            <View style={styles.profileTextContainer}>
+              <ThemedText style={styles.profileGreeting}>{t('Hi')},</ThemedText>
+              <ThemedText style={styles.profileName}>
+                {profile.name}
+              </ThemedText>
+            </View>
+          </Pressable>
+
+          <Pressable
+            style={styles.notificationBell}
+            onPress={() => router.push('/notifications')}
+          >
+            <IconSymbol name="bell.fill" size={22} color={colors.icon} />
+          </Pressable>
+        </View>
+
         <View style={[styles.header, { backgroundColor: colors.tint }]}>
           <View style={styles.headerTop}>
             <Pressable
               style={styles.locationInfo}
               onPress={() => setLocationModalVisible(true)}
             >
-              <ThemedText style={styles.locationLabel}>{t('Current Location')}</ThemedText>
+              <ThemedText style={styles.locationLabel}>{t('Location')}</ThemedText>
               <View style={styles.cityRow}>
                 <ThemedText style={styles.cityText}>{city}</ThemedText>
                 <IconSymbol name="chevron.right" size={16} color="rgba(255,255,255,0.6)" />
               </View>
             </Pressable>
+
             <Pressable
               style={styles.notificationBell}
               onPress={handleLocationRequest}
@@ -850,7 +920,7 @@ export default function HomeScreen() {
               {loadingLocation ? (
                 <ActivityIndicator color="#fff" size="small" />
               ) : (
-                <IconSymbol name="location.fill" size={24} color="#fff" />
+                <IconSymbol name="location.fill" size={20} color="#fff" />
               )}
             </Pressable>
           </View>
