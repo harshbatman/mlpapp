@@ -1271,29 +1271,32 @@ export default function HomeScreen() {
                         <IconSymbol name="house.fill" size={30} color={colors.icon} />
                       </View>
                     )}
-                    <View style={styles.featuredBadgeRow}>
-                      <View style={[styles.featuredTypeBadge, { backgroundColor: '#000000' }]}>
-                        <ThemedText style={styles.featuredTypeBadgeText}>{t(item.listingType || 'Sale')}</ThemedText>
+                    <View style={styles.imageOverlay}>
+                      <View style={styles.featuredBadgeRow}>
+                        <View style={[styles.featuredTypeBadge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                          <ThemedText style={styles.featuredTypeBadgeText}>{t(item.listingType || 'Sale')}</ThemedText>
+                        </View>
                       </View>
-                    </View>
-                    <View style={styles.featuredFloatingPrice}>
-                      <ThemedText style={styles.featuredPriceText}>₹{item.price}</ThemedText>
+                      <View style={styles.priceContainer}>
+                        <ThemedText style={styles.priceSymbol}>₹</ThemedText>
+                        <ThemedText style={styles.priceText}>{item.price}</ThemedText>
+                      </View>
                     </View>
                   </View>
                   <View style={styles.featuredCardContent}>
                     <ThemedText style={styles.featuredCardTitle} numberOfLines={1}>{item.title}</ThemedText>
                     <View style={styles.featuredLocationRow}>
-                      <IconSymbol name="mappin.and.ellipse" size={12} color="#8E8E93" />
+                      <IconSymbol name="mappin.circle.fill" size={12} color="#8E8E93" />
                       <ThemedText style={styles.featuredCardLocation} numberOfLines={1}>{item.location}</ThemedText>
                     </View>
                     <View style={styles.featuredFeaturesRow}>
                       <View style={styles.featuredFeatureItem}>
-                        <IconSymbol name="bed.double.fill" size={12} color="#8E8E93" />
-                        <ThemedText style={styles.featuredFeatureText}>3</ThemedText>
+                        <IconSymbol name="square.dashed" size={12} color="#8E8E93" />
+                        <ThemedText style={styles.featuredFeatureText}>{item.area || '3 BHK'}</ThemedText>
                       </View>
                       <View style={styles.featuredFeatureItem}>
-                        <IconSymbol name="shower.fill" size={12} color="#8E8E93" />
-                        <ThemedText style={styles.featuredFeatureText}>2</ThemedText>
+                        <IconSymbol name="checkmark.shield.fill" size={12} color="#4CAF50" />
+                        <ThemedText style={[styles.featuredFeatureText, { color: '#4CAF50' }]}>Verified</ThemedText>
                       </View>
                     </View>
                   </View>

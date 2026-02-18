@@ -7,7 +7,7 @@ import { useNotification } from '@/context/notification-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
 import { collection, deleteDoc, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, View } from 'react-native';
 
@@ -97,55 +97,71 @@ export default function MyListingsScreen() {
                         <IconSymbol name="house.fill" size={40} color={colors.icon} />
                     </View>
                 )}
-                <View style={styles.badgeRow}>
-                    <View style={[styles.typeBadge, { backgroundColor: '#000000' }]}>
-                        <ThemedText style={styles.typeBadgeText}>{t(item.listingType)}</ThemedText>
-                    </View>
-                    <View style={[styles.statusBadge, { backgroundColor: 'rgba(255,255,255,0.9)' }]}>
-                        <View style={styles.statusDot} />
-                        <ThemedText style={styles.statusText}>{t('Active')}</ThemedText>
-                    </View>
-                </View>
 
-                <View style={styles.floatingPrice}>
-                    <ThemedText style={styles.priceSymbol}>₹</ThemedText>
-                    <ThemedText style={styles.priceText}>{item.price}</ThemedText>
+                <View style={styles.imageOverlay}>
+                    <View style={styles.badgeRow}>
+                        <View style={[styles.typeBadge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                            <ThemedText style={styles.typeBadgeText}>{t(item.listingType)}</ThemedText>
+                        </View>
+                        <View style={[styles.categoryBadge, { backgroundColor: colors.tint }]}>
+                            <ThemedText style={styles.categoryBadgeText}>{t(item.type || 'Property')}</ThemedText>
+                        </View>
+                    </View>
+
+                    <View style={styles.priceContainer}>
+                        <ThemedText style={styles.priceSymbol}>₹</ThemedText>
+                        <ThemedText style={styles.priceText}>{item.price}</ThemedText>
+                    </View>
                 </View>
             </View>
 
             <View style={styles.cardContent}>
-                <View style={styles.cardMainInfo}>
+                <View style={styles.mainInfo}>
                     <ThemedText style={styles.cardTitle} numberOfLines={1}>{item.title}</ThemedText>
                     <View style={styles.locationRow}>
-                        <IconSymbol name="mappin.and.ellipse" size={14} color="#8E8E93" />
+                        <IconSymbol name="mappin.circle.fill" size={14} color="#8E8E93" />
                         <ThemedText style={styles.cardLocation} numberOfLines={1}>
                             {item.location}
                         </ThemedText>
                     </View>
                 </View>
 
+                {item.area && (
+                    <View style={styles.detailsRow}>
+                        <View style={styles.detailItem}>
+                            <IconSymbol name="square.dashed" size={14} color={colors.icon} />
+                            <ThemedText style={styles.detailText}>{item.area}</ThemedText>
+                        </View>
+                        <View style={styles.statusChip}>
+                            <View style={styles.statusDot} />
+                            <ThemedText style={styles.statusText}>{t('Active')}</ThemedText>
+                        </View>
+                    </View>
+                )}
+
                 <View style={styles.cardFooter}>
-                    <View style={styles.footerActions}>
+                    <View style={styles.actionButtons}>
                         <Pressable
-                            style={[styles.iconActionButton, { backgroundColor: '#F2F2F7' }]}
+                            style={[styles.actionButton, styles.editButton]}
                             onPress={() => router.push({ pathname: '/(tabs)/add', params: { editId: item.id } })}
                         >
-                            <IconSymbol name="pencil" size={18} color="#000" />
+                            <IconSymbol name="pencil" size={16} color="#000" />
+                            <ThemedText style={styles.actionButtonText}>Edit</ThemedText>
                         </Pressable>
                         <Pressable
-                            style={[styles.iconActionButton, { backgroundColor: '#FFF5F5' }]}
+                            style={[styles.actionButton, styles.deleteButton]}
                             onPress={() => handleDelete(item.id, item.title)}
                         >
-                            <IconSymbol name="trash.fill" size={18} color="#FF3B30" />
+                            <IconSymbol name="trash.fill" size={16} color="#FF3B30" />
                         </Pressable>
                     </View>
 
                     <Pressable
-                        style={[styles.viewButton, { backgroundColor: colors.tint }]}
+                        style={[styles.manageButton, { backgroundColor: colors.tint }]}
                         onPress={() => router.push({ pathname: '/(tabs)/add', params: { editId: item.id } })}
                     >
-                        <ThemedText style={styles.viewButtonText}>{t('Manage')}</ThemedText>
-                        <IconSymbol name="arrow.right" size={14} color="#FFF" />
+                        <ThemedText style={styles.manageButtonText}>Manage</ThemedText>
+                        <IconSymbol name="chevron.right" size={14} color="#FFF" />
                     </Pressable>
                 </View>
             </View>
@@ -156,10 +172,18 @@ export default function MyListingsScreen() {
         <ThemedView style={styles.container}>
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
                 <Pressable onPress={() => router.back()} style={styles.backButton}>
-                    <IconSymbol name="chevron.left" size={24} color={colors.text} />
+                    <IconSymbol name="chevron.left" size={28} color={colors.text} />
                 </Pressable>
-                <ThemedText type="subtitle" style={styles.headerTitle}>My Listings</ThemedText>
-                <View style={{ width: 40 }} />
+                <View>
+                    <ThemedText type="subtitle" style={styles.headerTitle}>My Listings</ThemedText>
+                    <ThemedText style={styles.headerSubtitle}>{listings.length} properties active</ThemedText>
+                </View>
+                <Pressable
+                    onPress={() => router.push('/(tabs)/add')}
+                    style={[styles.headerAddBtn, { backgroundColor: colors.tint }]}
+                >
+                    <IconSymbol name="plus" size={20} color={colorScheme === 'dark' ? '#000' : '#fff'} />
+                </Pressable>
             </View>
 
             {loading ? (
@@ -173,6 +197,7 @@ export default function MyListingsScreen() {
                     renderItem={renderItem}
                     ListEmptyComponent={renderEmpty}
                     contentContainerStyle={styles.listContent}
+                    showsVerticalScrollIndicator={false}
                 />
             )}
         </ThemedView>
@@ -180,38 +205,79 @@ export default function MyListingsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: { flex: 1, backgroundColor: '#F8F9FA' },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: Platform.OS === 'ios' ? 60 : 40,
-        paddingBottom: 15,
+        paddingTop: Platform.OS === 'ios' ? 60 : 50,
+        paddingBottom: 20,
         paddingHorizontal: 20,
+        backgroundColor: '#FFF',
         borderBottomWidth: 1,
     },
-    backButton: { width: 40, height: 40, justifyContent: 'center' },
-    headerTitle: { fontSize: 18, fontWeight: '700' },
-    listContent: { padding: 16, paddingBottom: 40 },
+    backButton: {
+        width: 44,
+        height: 44,
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+    },
+    headerTitle: {
+        fontSize: 22,
+        fontWeight: '800',
+        letterSpacing: -0.5,
+        textAlign: 'center',
+    },
+    headerSubtitle: {
+        fontSize: 13,
+        color: '#8E8E93',
+        fontWeight: '500',
+        textAlign: 'center',
+        marginTop: -2,
+    },
+    headerAddBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    listContent: {
+        padding: 20,
+        paddingBottom: 100
+    },
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     card: {
-        borderRadius: 24,
-        marginBottom: 20,
+        borderRadius: 28,
+        marginBottom: 24,
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-        elevation: 5,
+        backgroundColor: '#FFF',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 12 },
+                shadowOpacity: 0.12,
+                shadowRadius: 16,
+            },
+            android: {
+                elevation: 8,
+            },
+        }),
     },
     imageContainer: {
-        height: 200,
+        height: 240,
         width: '100%',
         position: 'relative',
     },
     image: {
         width: '100%',
         height: '100%',
+    },
+    imageOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.1)',
+        justifyContent: 'space-between',
+        padding: 16,
     },
     imagePlaceholder: {
         width: '100%',
@@ -220,118 +286,175 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     badgeRow: {
-        position: 'absolute',
-        top: 15,
-        left: 15,
-        right: 15,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
     typeBadge: {
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+        backdropFilter: 'blur(10px)', // Only works on web, but looks good
     },
     typeBadgeText: {
         color: '#FFF',
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: '800',
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
-    statusBadge: {
+    categoryBadge: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+    },
+    categoryBadgeText: {
+        color: '#FFF',
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    priceContainer: {
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 16,
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        gap: 2,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
+    },
+    priceSymbol: {
+        color: '#000',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    priceText: {
+        color: '#000',
+        fontSize: 22,
+        fontWeight: '900',
+        letterSpacing: -0.5,
+    },
+    cardContent: {
+        padding: 20,
+    },
+    mainInfo: {
+        marginBottom: 12,
+    },
+    cardTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        marginBottom: 4,
+        letterSpacing: -0.5,
+        color: '#1C1C1E',
+    },
+    locationRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
         gap: 6,
+    },
+    cardLocation: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#8E8E93',
+    },
+    detailsRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: '#F2F2F7',
+    },
+    detailItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: '#F2F2F7',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 8,
+    },
+    detailText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: '#1C1C1E',
+    },
+    statusChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: '#E8F5E9',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 8,
     },
     statusDot: {
         width: 6,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#34C759',
+        backgroundColor: '#4CAF50',
     },
     statusText: {
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: '700',
-        color: '#000',
-    },
-    floatingPrice: {
-        position: 'absolute',
-        bottom: 15,
-        left: 15,
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 12,
-        flexDirection: 'row',
-        alignItems: 'baseline',
-        gap: 2,
-    },
-    priceSymbol: {
-        color: '#FFF',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    priceText: {
-        color: '#FFF',
-        fontSize: 18,
-        fontWeight: '800',
-    },
-    cardContent: {
-        padding: 20,
-    },
-    cardMainInfo: {
-        marginBottom: 15,
-    },
-    cardTitle: {
-        fontSize: 18,
-        fontWeight: '800',
-        marginBottom: 6,
-        letterSpacing: -0.3,
-    },
-    locationRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-    },
-    cardLocation: {
-        fontSize: 13,
-        fontWeight: '500',
-        color: '#8E8E93',
+        color: '#2E7D32',
     },
     cardFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 15,
-        borderTopWidth: 1,
-        borderTopColor: '#F2F2F7',
+        gap: 12,
     },
-    footerActions: {
+    actionButtons: {
         flexDirection: 'row',
-        gap: 10,
+        gap: 8,
     },
-    iconActionButton: {
-        width: 44,
+    actionButton: {
         height: 44,
-        borderRadius: 12,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
+        flexDirection: 'row',
+        gap: 6,
+        paddingHorizontal: 12,
     },
-    viewButton: {
+    editButton: {
+        backgroundColor: '#F2F2F7',
+        paddingHorizontal: 16,
+    },
+    deleteButton: {
+        backgroundColor: '#FFF5F5',
+        width: 44,
+    },
+    actionButtonText: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#000',
+    },
+    manageButton: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 12,
-        gap: 6,
+        justifyContent: 'center',
+        height: 44,
+        borderRadius: 14,
+        gap: 8,
     },
-    viewButtonText: {
+    manageButtonText: {
         color: '#FFF',
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '700',
     },
     emptyContainer: {
@@ -339,22 +462,52 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 40,
-        marginTop: 100,
+        marginTop: 80,
     },
     emptyIconWrapper: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 120,
+        height: 120,
+        borderRadius: 60,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: 32,
+        backgroundColor: '#F2F2F7',
     },
-    emptyTitle: { fontSize: 22, fontWeight: '700', marginBottom: 8 },
-    emptySubtitle: { fontSize: 15, opacity: 0.5, textAlign: 'center', lineHeight: 22, marginBottom: 32 },
+    emptyTitle: {
+        fontSize: 24,
+        fontWeight: '800',
+        marginBottom: 12,
+        textAlign: 'center',
+        letterSpacing: -0.5,
+    },
+    emptySubtitle: {
+        fontSize: 16,
+        color: '#8E8E93',
+        textAlign: 'center',
+        lineHeight: 24,
+        marginBottom: 40,
+        fontWeight: '500',
+    },
     addButton: {
-        paddingVertical: 14,
-        paddingHorizontal: 28,
-        borderRadius: 12,
+        paddingVertical: 16,
+        paddingHorizontal: 32,
+        borderRadius: 18,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.15,
+                shadowRadius: 10,
+            },
+            android: {
+                elevation: 6,
+            },
+        }),
     },
-    addButtonText: { color: '#FFF', fontWeight: '700', fontSize: 16 },
+    addButtonText: {
+        color: '#FFF',
+        fontWeight: '800',
+        fontSize: 17,
+        letterSpacing: -0.2,
+    },
 });

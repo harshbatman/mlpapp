@@ -9,7 +9,7 @@ import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
@@ -159,18 +159,20 @@ export default function PropertyListScreen() {
                                 </View>
                             )}
 
-                            <View style={styles.badgeRow}>
-                                <View style={[styles.typeBadge, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
-                                    <ThemedText style={styles.typeBadgeText}>{t(item.listingType || 'Sale')}</ThemedText>
+                            <View style={styles.imageOverlay}>
+                                <View style={styles.badgeRow}>
+                                    <View style={[styles.typeBadge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                                        <ThemedText style={styles.typeBadgeText}>{t(item.listingType || 'Sale')}</ThemedText>
+                                    </View>
+                                    <Pressable style={styles.favoriteButton}>
+                                        <IconSymbol name="heart" size={18} color="#FFF" />
+                                    </Pressable>
                                 </View>
-                                <Pressable style={styles.favoriteButton}>
-                                    <IconSymbol name="heart" size={18} color="#FFF" />
-                                </Pressable>
-                            </View>
 
-                            <View style={styles.floatingPrice}>
-                                <ThemedText style={styles.priceSymbol}>₹</ThemedText>
-                                <ThemedText style={styles.priceText}>{item.price}</ThemedText>
+                                <View style={styles.priceContainer}>
+                                    <ThemedText style={styles.priceSymbol}>₹</ThemedText>
+                                    <ThemedText style={styles.priceText}>{item.price}</ThemedText>
+                                </View>
                             </View>
                         </View>
 
@@ -178,7 +180,7 @@ export default function PropertyListScreen() {
                             <View style={styles.cardInfo}>
                                 <ThemedText style={styles.propertyTitle} numberOfLines={1}>{item.title}</ThemedText>
                                 <View style={styles.locationRow}>
-                                    <IconSymbol name="mappin.and.ellipse" size={14} color="#8E8E93" />
+                                    <IconSymbol name="mappin.circle.fill" size={14} color="#8E8E93" />
                                     <ThemedText style={styles.propertyLocation} numberOfLines={1}>
                                         {item.location}
                                     </ThemedText>
@@ -187,10 +189,17 @@ export default function PropertyListScreen() {
 
                             <View style={styles.cardFooter}>
                                 <View style={styles.featuresRow}>
-                                    <View style={styles.featureItem}>
-                                        <IconSymbol name="bed.double.fill" size={14} color="#8E8E93" />
-                                        <ThemedText style={styles.featureText}>3</ThemedText>
-                                    </View>
+                                    {item.area ? (
+                                        <View style={styles.featureItem}>
+                                            <IconSymbol name="square.dashed" size={14} color="#8E8E93" />
+                                            <ThemedText style={styles.featureText}>{item.area}</ThemedText>
+                                        </View>
+                                    ) : (
+                                        <View style={styles.featureItem}>
+                                            <IconSymbol name="bed.double.fill" size={14} color="#8E8E93" />
+                                            <ThemedText style={styles.featureText}>3</ThemedText>
+                                        </View>
+                                    )}
                                     <View style={styles.featureItem}>
                                         <IconSymbol name="shower.fill" size={14} color="#8E8E93" />
                                         <ThemedText style={styles.featureText}>2</ThemedText>
@@ -209,6 +218,7 @@ export default function PropertyListScreen() {
                                         onPress={() => router.push({ pathname: '/properties/[id]', params: { id: item.id } })}
                                     >
                                         <ThemedText style={styles.detailsButtonText}>{t('Details')}</ThemedText>
+                                        <IconSymbol name="chevron.right" size={12} color="#FFF" />
                                     </Pressable>
                                 </View>
                             </View>
@@ -217,7 +227,11 @@ export default function PropertyListScreen() {
                 )}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <ThemedText>No properties found in this category.</ThemedText>
+                        <View style={styles.emptyIconWrapper}>
+                            <IconSymbol name="house.fill" size={48} color={colors.icon} style={{ opacity: 0.2 }} />
+                        </View>
+                        <ThemedText style={styles.emptyTitle}>No properties found</ThemedText>
+                        <ThemedText style={styles.emptySubtitle}>Try adjusting your filters or category</ThemedText>
                     </View>
                 }
             />
