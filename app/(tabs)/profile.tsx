@@ -39,21 +39,19 @@ export default function ProfileScreen() {
             setListingsCount(snapshot.size);
         });
 
-        // Fetch Saved Count (Placeholder - implementation depends on how you save properties)
-        // If you have a 'saved' collection:
-        /*
+        // Fetch Saved Count
         const savedQuery = query(
-            collection(db, 'saved'),
-            where('userId', '==', currentUser.uid)
+            collection(db, 'properties'),
+            where('likedBy', 'array-contains', currentUser.uid)
         );
+
         const unsubscribeSaved = onSnapshot(savedQuery, (snapshot) => {
             setSavedCount(snapshot.size);
         });
-        */
 
         return () => {
             unsubscribeListings();
-            // unsubscribeSaved();
+            unsubscribeSaved();
         };
     }, []);
 
@@ -123,7 +121,7 @@ export default function ProfileScreen() {
                         style={[styles.statBox, { borderLeftWidth: 1, borderRightWidth: 1, borderColor: colors.border }]}
                         onPress={() => router.push('/saved-properties')}
                     >
-                        <ThemedText type="subtitle">0</ThemedText>
+                        <ThemedText type="subtitle">{savedCount}</ThemedText>
                         <ThemedText style={styles.statLabel}>{t('Saved')}</ThemedText>
                     </Pressable>
                     <View style={styles.statBox}>
