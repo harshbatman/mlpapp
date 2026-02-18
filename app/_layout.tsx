@@ -17,9 +17,9 @@ export const unstable_settings = {
   initialRouteName: '(auth)/signup',
 };
 
+import { ChatProvider } from '@/context/chat-context';
 import { NotificationProvider } from '@/context/notification-context';
 import { ProfileProvider } from '@/context/profile-context';
-import { ChatProvider } from '@/context/chat-context';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
@@ -44,12 +44,12 @@ export default function RootLayout() {
     const timer = setTimeout(() => {
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 800,
+        duration: 400,
         useNativeDriver: true,
       }).start(() => {
         setAppIsReady(true);
       });
-    }, 2000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);

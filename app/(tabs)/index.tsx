@@ -12,7 +12,7 @@ import { useRouter } from 'expo-router';
 import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Dimensions, Image, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, ImageBackground, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   scrollContent: {
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingTop: 0,
     paddingBottom: 100,
   },
   section: {
@@ -649,6 +649,132 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginBottom: 12,
   },
+  heroSection: {
+    height: 340,
+    width: '100%',
+    position: 'relative',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  heroContentInside: {
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    paddingHorizontal: 20,
+    flex: 1,
+  },
+  heroBrandContainer: {
+    marginTop: 10,
+  },
+  heroBrandMain: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  heroBrandIcon: {
+    width: 32,
+    height: 32,
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heroBrandIconText: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#000',
+  },
+  heroBrandTitle: {
+    color: '#FFF',
+    fontSize: 28,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  heroCenterContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  heroBrandSubtitleTop: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '700',
+    opacity: 0.9,
+    marginTop: -4,
+    marginLeft: 2,
+  },
+  heroCenterTagline: {
+    color: '#FFF',
+    fontSize: 34,
+    fontWeight: '900',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.4)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 6,
+  },
+  heroCenterSubtitle: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginTop: 2,
+    opacity: 0.95,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  topHeaderHero: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  topHeaderRightHero: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  notificationBellHero: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  profileSectionHero: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileImageHero: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: '#FFF',
+  },
+  profileIconPlaceholderHero: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchCardOverlay: {
+    marginTop: -60,
+    paddingTop: 10,
+  },
 });
 
 export default function HomeScreen() {
@@ -1080,90 +1206,103 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.topHeader}>
-          <Pressable
-            style={styles.profileSection}
-            onPress={() => router.push('/(tabs)/profile')}
-          >
-            {profile.image ? (
-              <Image source={{ uri: profile.image }} style={styles.profileImage} />
-            ) : (
-              <View style={styles.profileIconPlaceholder}>
-                <IconSymbol name="person.fill" size={24} color={colors.icon} />
-              </View>
-            )}
-            <View style={styles.profileTextContainer}>
-              <ThemedText style={styles.profileGreeting}>{t('Hi')},</ThemedText>
-              <ThemedText style={styles.profileName} numberOfLines={1}>
-                {profile.name}
-              </ThemedText>
-            </View>
-          </Pressable>
-
-          <View style={styles.topHeaderRight}>
-            <Pressable
-              style={styles.notificationBell}
-              onPress={() => router.push('/notifications')}
-            >
-              <IconSymbol name="bell.fill" size={22} color={colors.icon} />
-            </Pressable>
-            <Pressable
-              style={styles.notificationBell}
-              onPress={() => router.push('/messages')}
-            >
-              <IconSymbol name="message.fill" size={22} color={colors.icon} />
-            </Pressable>
-          </View>
-        </View>
-
-
-
-        <View style={styles.premiumSearchCard}>
-          <View style={styles.searchBarWrapper}>
-            <View style={styles.searchInputContainer}>
-              <IconSymbol name="magnifyingglass" size={20} color="#8E8E93" />
-              <TextInput
-                placeholder={t('Search city, land, property...')}
-                placeholderTextColor="#8E8E93"
-                style={styles.premiumSearchInput}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
-            <Pressable
-              style={styles.searchChipButton}
-              onPress={handleLocationRequest}
-            >
-              {loadingLocation ? (
-                <ActivityIndicator color="#FFF" size="small" />
-              ) : (
-                <IconSymbol name="mappin.and.ellipse" size={22} color="#FFF" />
-              )}
-            </Pressable>
-            <Pressable
-              style={styles.searchChipButton}
-              onPress={() => setMainFilterModalVisible(true)}
-            >
-              <IconSymbol name="slider.horizontal.3" size={22} color="#FFF" />
-            </Pressable>
-          </View>
-
-          <View style={styles.filterToggles}>
-            {['Buy', 'Rent', 'Sell'].map((type) => (
+        <ImageBackground
+          source={require('@/assets/images/gurugram.png')}
+          style={styles.heroSection}
+          resizeMode="cover"
+        >
+          <View style={styles.heroOverlay} />
+          <View style={styles.heroContentInside}>
+            <View style={styles.topHeaderHero}>
               <Pressable
-                key={type}
-                onPress={() => setActiveType(type)}
-                style={[
-                  styles.toggleButton,
-                  activeType === type && styles.activeToggleButton
-                ]}
+                style={styles.profileSectionHero}
+                onPress={() => router.push('/(tabs)/profile')}
               >
-                <ThemedText style={[
-                  styles.toggleText,
-                  activeType === type && styles.activeToggleText
-                ]}>{t(type)}</ThemedText>
+                {profile.image ? (
+                  <Image source={{ uri: profile.image }} style={styles.profileImageHero} />
+                ) : (
+                  <View style={styles.profileIconPlaceholderHero}>
+                    <IconSymbol name="person.fill" size={24} color="#000" />
+                  </View>
+                )}
               </Pressable>
-            ))}
+
+              <View style={styles.topHeaderRightHero}>
+                <Pressable
+                  style={styles.notificationBellHero}
+                  onPress={() => router.push('/notifications')}
+                >
+                  <IconSymbol name="bell.fill" size={22} color="#000" />
+                </Pressable>
+                <Pressable
+                  style={styles.notificationBellHero}
+                  onPress={() => router.push('/messages')}
+                >
+                  <IconSymbol name="message.fill" size={22} color="#000" />
+                </Pressable>
+              </View>
+            </View>
+
+            <View style={styles.heroBrandContainer}>
+              <ThemedText style={styles.heroBrandTitle}>MAHTO</ThemedText>
+              <ThemedText style={styles.heroBrandSubtitleTop}>Land & Properties</ThemedText>
+            </View>
+
+            <View style={styles.heroCenterContent}>
+              <ThemedText style={styles.heroCenterTagline}>Buy . Sell . Rent</ThemedText>
+              <ThemedText style={styles.heroCenterSubtitle}>Land & Properties</ThemedText>
+            </View>
+          </View>
+        </ImageBackground>
+
+        <View style={styles.searchCardOverlay}>
+          <View style={styles.premiumSearchCard}>
+            <View style={styles.searchBarWrapper}>
+              <View style={styles.searchInputContainer}>
+                <IconSymbol name="magnifyingglass" size={20} color="#8E8E93" />
+                <TextInput
+                  placeholder={t('Search city, land, property...')}
+                  placeholderTextColor="#8E8E93"
+                  style={styles.premiumSearchInput}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+              <Pressable
+                style={styles.searchChipButton}
+                onPress={handleLocationRequest}
+              >
+                {loadingLocation ? (
+                  <ActivityIndicator color="#FFF" size="small" />
+                ) : (
+                  <IconSymbol name="mappin.and.ellipse" size={22} color="#FFF" />
+                )}
+              </Pressable>
+              <Pressable
+                style={styles.searchChipButton}
+                onPress={() => setMainFilterModalVisible(true)}
+              >
+                <IconSymbol name="slider.horizontal.3" size={22} color="#FFF" />
+              </Pressable>
+            </View>
+
+            <View style={styles.filterToggles}>
+              {['Buy', 'Rent', 'Sell'].map((type) => (
+                <Pressable
+                  key={type}
+                  onPress={() => setActiveType(type)}
+                  style={[
+                    styles.toggleButton,
+                    activeType === type && styles.activeToggleButton
+                  ]}
+                >
+                  <ThemedText style={[
+                    styles.toggleText,
+                    activeType === type && styles.activeToggleText
+                  ]}>{t(type)}</ThemedText>
+                </Pressable>
+              ))}
+            </View>
           </View>
         </View>
 
