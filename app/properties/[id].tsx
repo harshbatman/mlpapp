@@ -8,7 +8,7 @@ import { useNotification } from '@/context/notification-context';
 import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, doc, getDoc, increment, onSnapshot, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Dimensions, Image, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
@@ -47,6 +47,12 @@ export default function PropertyDetailsScreen() {
                     if (userSnap.exists()) {
                         setOwner(userSnap.data());
                     }
+                }
+
+                // Update favorited state from DB
+                const currentUid = auth.currentUser?.uid;
+                if (currentUid && data.likedBy) {
+                    setIsFavorited(data.likedBy.includes(currentUid));
                 }
             } else {
                 showProfessionalError({ code: 'not-found', message: 'Property not found' });
@@ -92,9 +98,34 @@ export default function PropertyDetailsScreen() {
         }
     };
 
-    const toggleFavorite = () => {
-        setIsFavorited(!isFavorited);
-        // We can add Firestore persistence here later
+    const toggleFavorite = async () => {
+        if (!auth.currentUser) {
+            router.push('/(auth)/login');
+            return;
+        }
+
+        const currentUid = auth.currentUser.uid;
+        const docRef = doc(db, 'properties', id as string);
+
+        try {
+            if (isFavorited) {
+                // Unlike
+                await updateDoc(docRef, {
+                    likedBy: arrayRemove(currentUid),
+                    likes: increment(-1)
+                });
+            } else {
+                // Like
+                await updateDoc(docRef, {
+                    likedBy: arrayUnion(currentUid),
+                    likes: increment(1)
+                });
+            }
+            // State will be updated by the onSnapshot listener
+        } catch (error) {
+            console.error("Error toggling favorite:", error);
+            showProfessionalError(error, 'Error');
+        }
     };
 
 
@@ -184,7 +215,16 @@ export default function PropertyDetailsScreen() {
                             <IconSymbol name="mappin.circle.fill" size={16} color="#8E8E93" />
                             <ThemedText style={styles.location}>{property.location}</ThemedText>
                         </View>
+
+                        {/* Likes Display */}
+                        <View style={styles.likesRow}>
+                            <IconSymbol name="heart.fill" size={14} color="#FF3B30" />
+                            <ThemedText style={styles.likesText}>
+                                {property.likes || 0} {t('likes')}
+                            </ThemedText>
+                        </View>
                     </View>
+
 
                     <View style={styles.priceContainer}>
                         <ThemedText style={styles.priceLabel}>{t('Asking Price')}</ThemedText>
@@ -345,6 +385,18 @@ const styles = StyleSheet.create({
         color: '#8E8E93',
         fontWeight: '500',
     },
+    likesRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginTop: 8,
+    },
+    likesText: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#8E8E93',
+    },
+
     priceContainer: {
         marginVertical: 24,
     },
