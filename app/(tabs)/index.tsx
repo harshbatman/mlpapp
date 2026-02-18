@@ -132,7 +132,8 @@ const styles = StyleSheet.create({
   premiumSearchCard: {
     backgroundColor: '#FFFFFF',
     marginHorizontal: 16,
-    marginTop: 8, // Adjusted since the header above is removed
+    marginTop: 20, // Increased to provide space from header
+    marginBottom: 20, // Added to prevent overlap with reward banner
     padding: 16,
     borderRadius: 30,
     shadowColor: '#000',
@@ -332,6 +333,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 10, // Added small top margin for air
     marginBottom: 24,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.15)',
