@@ -70,10 +70,18 @@ export default function PropertyDetailsScreen() {
 
     const handleShare = async () => {
         try {
-            await Share.share({
+            const result = await Share.share({
                 message: `Check out this property: ${property.title} for ₹${property.price} on MAHTO.`,
                 url: `https://mahto.app/properties/${id}`,
             });
+
+            if (result.action === Share.sharedAction) {
+                // Increment share count in Firestore
+                const docRef = doc(db, 'properties', id as string);
+                await updateDoc(docRef, {
+                    shares: increment(1)
+                });
+            }
         } catch (error) {
             console.error(error);
         }
@@ -216,12 +224,20 @@ export default function PropertyDetailsScreen() {
                             <ThemedText style={styles.location}>{property.location}</ThemedText>
                         </View>
 
-                        {/* Likes Display */}
+                        {/* Likes & Shares Display */}
                         <View style={styles.likesRow}>
-                            <IconSymbol name="heart.fill" size={14} color="#FF3B30" />
-                            <ThemedText style={styles.likesText}>
-                                {property.likes || 0} {t('likes')}
-                            </ThemedText>
+                            <View style={styles.statsItem}>
+                                <IconSymbol name="heart.fill" size={14} color="#FF3B30" />
+                                <ThemedText style={styles.statsText}>
+                                    {property.likes || 0} {t('likes')}
+                                </ThemedText>
+                            </View>
+                            <View style={styles.statsItem}>
+                                <IconSymbol name="square.and.arrow.up" size={14} color="#8E8E93" />
+                                <ThemedText style={styles.statsText}>
+                                    {property.shares || 0} {t('shares')}
+                                </ThemedText>
+                            </View>
                         </View>
                     </View>
 
@@ -388,10 +404,15 @@ const styles = StyleSheet.create({
     likesRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 16,
         marginTop: 8,
     },
-    likesText: {
+    statsItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    statsText: {
         fontSize: 13,
         fontWeight: '700',
         color: '#8E8E93',
