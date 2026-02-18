@@ -64,6 +64,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 12,
   },
+  topHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -117,7 +122,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(0,0,0,0.05)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -891,12 +896,20 @@ export default function HomeScreen() {
             </View>
           </Pressable>
 
-          <Pressable
-            style={styles.notificationBell}
-            onPress={() => router.push('/notifications')}
-          >
-            <IconSymbol name="bell.fill" size={22} color={colors.icon} />
-          </Pressable>
+          <View style={styles.topHeaderRight}>
+            <Pressable
+              style={styles.notificationBell}
+              onPress={() => router.push('/messages')}
+            >
+              <IconSymbol name="bubble.left.fill" size={22} color={colors.icon} />
+            </Pressable>
+            <Pressable
+              style={styles.notificationBell}
+              onPress={() => router.push('/notifications')}
+            >
+              <IconSymbol name="bell.fill" size={22} color={colors.icon} />
+            </Pressable>
+          </View>
         </View>
 
         <View style={[styles.header, { backgroundColor: colors.tint }]}>
