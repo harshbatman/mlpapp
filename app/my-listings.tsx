@@ -1,17 +1,19 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { auth, db } from '@/config/firebase';
 import { Colors } from '@/constants/theme';
+import { useNotification } from '@/context/notification-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Platform, Pressable, StyleSheet, View, Image, ActivityIndicator, Alert } from 'react-native';
-import { collection, query, where, onSnapshot, deleteDoc, doc, orderBy } from 'firebase/firestore';
-import { auth, db } from '@/config/firebase';
-import { useNotification } from '@/context/notification-context';
+import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 export default function MyListingsScreen() {
     const router = useRouter();
+    const { t } = useTranslation();
     const { showNotification, showConfirm } = useNotification();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
@@ -83,7 +85,10 @@ export default function MyListingsScreen() {
     );
 
     const renderItem = ({ item }: { item: any }) => (
-        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Pressable
+            style={[styles.card, { backgroundColor: colors.background }]}
+            onPress={() => router.push({ pathname: '/(tabs)/add', params: { editId: item.id } })}
+        >
             <View style={styles.imageContainer}>
                 {item.images && item.images.length > 0 ? (
                     <Image source={{ uri: item.images[0] }} style={styles.image} />
@@ -92,39 +97,59 @@ export default function MyListingsScreen() {
                         <IconSymbol name="house.fill" size={40} color={colors.icon} />
                     </View>
                 )}
-                <View style={[styles.typeBadge, { backgroundColor: colors.tint }]}>
-                    <ThemedText style={styles.typeBadgeText}>{item.listingType}</ThemedText>
-                </View>
-            </View>
-            <View style={styles.cardContent}>
-                <View style={styles.cardHeader}>
-                    <View style={{ flex: 1 }}>
-                        <ThemedText style={styles.cardTitle} numberOfLines={1}>{item.title}</ThemedText>
-                        <ThemedText style={styles.cardLocation} numberOfLines={1}>
-                            <IconSymbol name="mappin.circle.fill" size={12} color={colors.icon} /> {item.location}
-                        </ThemedText>
+                <View style={styles.badgeRow}>
+                    <View style={[styles.typeBadge, { backgroundColor: '#000000' }]}>
+                        <ThemedText style={styles.typeBadgeText}>{t(item.listingType)}</ThemedText>
                     </View>
-                    <ThemedText style={[styles.cardPrice, { color: colors.tint }]}>₹{item.price}</ThemedText>
+                    <View style={[styles.statusBadge, { backgroundColor: 'rgba(255,255,255,0.9)' }]}>
+                        <View style={styles.statusDot} />
+                        <ThemedText style={styles.statusText}>{t('Active')}</ThemedText>
+                    </View>
                 </View>
 
-                <View style={styles.cardActions}>
+                <View style={styles.floatingPrice}>
+                    <ThemedText style={styles.priceSymbol}>₹</ThemedText>
+                    <ThemedText style={styles.priceText}>{item.price}</ThemedText>
+                </View>
+            </View>
+
+            <View style={styles.cardContent}>
+                <View style={styles.cardMainInfo}>
+                    <ThemedText style={styles.cardTitle} numberOfLines={1}>{item.title}</ThemedText>
+                    <View style={styles.locationRow}>
+                        <IconSymbol name="mappin.and.ellipse" size={14} color="#8E8E93" />
+                        <ThemedText style={styles.cardLocation} numberOfLines={1}>
+                            {item.location}
+                        </ThemedText>
+                    </View>
+                </View>
+
+                <View style={styles.cardFooter}>
+                    <View style={styles.footerActions}>
+                        <Pressable
+                            style={[styles.iconActionButton, { backgroundColor: '#F2F2F7' }]}
+                            onPress={() => router.push({ pathname: '/(tabs)/add', params: { editId: item.id } })}
+                        >
+                            <IconSymbol name="pencil" size={18} color="#000" />
+                        </Pressable>
+                        <Pressable
+                            style={[styles.iconActionButton, { backgroundColor: '#FFF5F5' }]}
+                            onPress={() => handleDelete(item.id, item.title)}
+                        >
+                            <IconSymbol name="trash.fill" size={18} color="#FF3B30" />
+                        </Pressable>
+                    </View>
+
                     <Pressable
-                        style={[styles.actionButton, { borderColor: colors.border }]}
+                        style={[styles.viewButton, { backgroundColor: colors.tint }]}
                         onPress={() => router.push({ pathname: '/(tabs)/add', params: { editId: item.id } })}
                     >
-                        <IconSymbol name="pencil" size={16} color={colors.text} />
-                        <ThemedText style={styles.actionButtonText}>Edit</ThemedText>
-                    </Pressable>
-                    <Pressable
-                        style={[styles.actionButton, { borderColor: '#FEE2E2' }]}
-                        onPress={() => handleDelete(item.id, item.title)}
-                    >
-                        <IconSymbol name="trash.fill" size={16} color="#EF4444" />
-                        <ThemedText style={[styles.actionButtonText, { color: '#EF4444' }]}>Delete</ThemedText>
+                        <ThemedText style={styles.viewButtonText}>{t('Manage')}</ThemedText>
+                        <IconSymbol name="arrow.right" size={14} color="#FFF" />
                     </Pressable>
                 </View>
             </View>
-        </View>
+        </Pressable>
     );
 
     return (
@@ -170,18 +195,17 @@ const styles = StyleSheet.create({
     listContent: { padding: 16, paddingBottom: 40 },
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     card: {
-        borderRadius: 16,
-        borderWidth: 1,
-        marginBottom: 16,
+        borderRadius: 24,
+        marginBottom: 20,
         overflow: 'hidden',
-        elevation: 2,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 12,
+        elevation: 5,
     },
     imageContainer: {
-        height: 160,
+        height: 200,
         width: '100%',
         position: 'relative',
     },
@@ -195,59 +219,120 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    typeBadge: {
+    badgeRow: {
         position: 'absolute',
-        top: 12,
-        right: 12,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
+        top: 15,
+        left: 15,
+        right: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    typeBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
         borderRadius: 8,
     },
     typeBadgeText: {
         color: '#FFF',
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: 11,
+        fontWeight: '800',
         textTransform: 'uppercase',
     },
-    cardContent: {
-        padding: 16,
-    },
-    cardHeader: {
+    statusBadge: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 16,
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        gap: 6,
     },
-    cardTitle: {
-        fontSize: 18,
+    statusDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: '#34C759',
+    },
+    statusText: {
+        fontSize: 11,
         fontWeight: '700',
-        marginBottom: 4,
+        color: '#000',
     },
-    cardLocation: {
-        fontSize: 13,
-        opacity: 0.6,
+    floatingPrice: {
+        position: 'absolute',
+        bottom: 15,
+        left: 15,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        gap: 2,
     },
-    cardPrice: {
+    priceSymbol: {
+        color: '#FFF',
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    priceText: {
+        color: '#FFF',
         fontSize: 18,
         fontWeight: '800',
     },
-    cardActions: {
-        flexDirection: 'row',
-        gap: 12,
+    cardContent: {
+        padding: 20,
     },
-    actionButton: {
-        flex: 1,
+    cardMainInfo: {
+        marginBottom: 15,
+    },
+    cardTitle: {
+        fontSize: 18,
+        fontWeight: '800',
+        marginBottom: 6,
+        letterSpacing: -0.3,
+    },
+    locationRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 10,
-        borderRadius: 10,
-        borderWidth: 1,
-        gap: 8,
+        gap: 4,
     },
-    actionButtonText: {
+    cardLocation: {
+        fontSize: 13,
+        fontWeight: '500',
+        color: '#8E8E93',
+    },
+    cardFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingTop: 15,
+        borderTopWidth: 1,
+        borderTopColor: '#F2F2F7',
+    },
+    footerActions: {
+        flexDirection: 'row',
+        gap: 10,
+    },
+    iconActionButton: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    viewButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 12,
+        gap: 6,
+    },
+    viewButtonText: {
+        color: '#FFF',
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: '700',
     },
     emptyContainer: {
         flex: 1,
