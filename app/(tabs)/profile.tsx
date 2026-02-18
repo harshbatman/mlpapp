@@ -10,7 +10,7 @@ import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Image, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function ProfileScreen() {
     const router = useRouter();
@@ -54,6 +54,10 @@ export default function ProfileScreen() {
             unsubscribeSaved();
         };
     }, []);
+
+    const handleRateUs = () => {
+        Linking.openURL('https://play.google.com/store/apps/details?id=com.mahto.landproperties&pcampaignid=web_share');
+    };
 
     const handleLogoutClick = () => {
         showConfirm({
@@ -196,7 +200,10 @@ export default function ProfileScreen() {
                         </View>
                         <IconSymbol name="chevron.right" size={20} color={colors.icon} />
                     </Pressable>
-                    <Pressable style={[styles.menuItem, { borderBottomColor: colors.border }]}>
+                    <Pressable
+                        style={[styles.menuItem, { borderBottomColor: colors.border }]}
+                        onPress={handleRateUs}
+                    >
                         <View style={styles.menuItemLeft}>
                             <IconSymbol name="star" size={22} color={colors.icon} />
                             <ThemedText style={styles.menuItemText}>{t('Rate Us')}</ThemedText>
