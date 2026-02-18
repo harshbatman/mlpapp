@@ -90,11 +90,14 @@ const styles = StyleSheet.create({
   },
   profileTextContainer: {
     marginLeft: 12,
+    flexDirection: 'row',
+    alignItems: 'baseline',
   },
   profileGreeting: {
-    fontSize: 14,
-    opacity: 0.6,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+    marginRight: 4,
   },
   profileName: {
     fontSize: 18,
@@ -890,7 +893,7 @@ export default function HomeScreen() {
             )}
             <View style={styles.profileTextContainer}>
               <ThemedText style={styles.profileGreeting}>{t('Hi')},</ThemedText>
-              <ThemedText style={styles.profileName}>
+              <ThemedText style={styles.profileName} numberOfLines={1}>
                 {profile.name}
               </ThemedText>
             </View>
