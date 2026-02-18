@@ -130,61 +130,59 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heroContainer: {
-    height: 380,
+    height: 400,
     width: '100%',
     position: 'relative',
-    overflow: 'hidden',
+    backgroundColor: '#1A1A1A', // Fallback color
   },
   heroImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.9,
   },
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)', // Darken image for readability
+    backgroundColor: 'rgba(0,0,0,0.4)',
   },
   heroContent: {
-    paddingTop: Platform.OS === 'ios' ? 60 : 50,
+    paddingTop: Platform.OS === 'ios' ? 70 : 60, // Move down from status bar
     paddingHorizontal: 24,
     flex: 1,
-    justifyContent: 'space-between',
-    paddingBottom: 40,
   },
   heroBrandSection: {
-    marginTop: 10,
+    marginBottom: 40,
   },
   heroBrand: {
     color: '#FFFFFF',
-    fontSize: 48,
+    fontSize: 40,
     fontWeight: '900',
     letterSpacing: -1,
   },
   heroTagline: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '700',
-    marginTop: -8,
+    marginTop: -4,
     opacity: 0.9,
   },
   heroMainTextSection: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 20,
   },
   heroBuySellRent: {
     color: '#FFFFFF',
-    fontSize: 42,
+    fontSize: 36,
     fontWeight: '900',
     textAlign: 'center',
     letterSpacing: -0.5,
+    lineHeight: 44,
   },
   heroProperties: {
     color: '#FFFFFF',
-    fontSize: 54,
+    fontSize: 48,
     fontWeight: '900',
     textAlign: 'center',
-    marginTop: -10,
     letterSpacing: -1,
+    lineHeight: 56,
   },
   premiumSearchCard: {
     backgroundColor: '#FFFFFF',
@@ -976,8 +974,9 @@ export default function HomeScreen() {
         {/* Premium Hero Section */}
         <View style={styles.heroContainer}>
           <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1594913785162-e6786b02cada?q=80&w=2070&auto=format&fit=crop' }}
+            source={{ uri: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop' }}
             style={styles.heroImage}
+            resizeMode="cover"
           />
           <View style={styles.heroOverlay} />
           <View style={styles.heroContent}>
