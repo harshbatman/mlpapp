@@ -60,6 +60,7 @@ const MAPPING: IconMapping = {
   'pencil': 'edit',
   'trash': 'delete',
   'arrow.up': 'arrow-upward',
+  'square.dashed': 'straighten',
 };
 
 /**
