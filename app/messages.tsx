@@ -16,15 +16,24 @@ export default function MessagesScreen() {
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
     const [searchQuery, setSearchQuery] = useState('');
+    const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
     const filteredConversations = useMemo(() => {
-        if (!searchQuery.trim()) return conversations;
-        return conversations.filter(conv =>
-            conv.otherUser?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            conv.propertyTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            conv.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    }, [conversations, searchQuery]);
+        let filtered = conversations;
+
+        if (showUnreadOnly) {
+            filtered = filtered.filter(conv => conv.unreadCount > 0);
+        }
+
+        if (searchQuery.trim()) {
+            filtered = filtered.filter(conv =>
+                conv.otherUser?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                conv.propertyTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                conv.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+        return filtered;
+    }, [conversations, searchQuery, showUnreadOnly]);
 
     const handlePress = (conversationId: string) => {
         router.push(`/chat/${conversationId}`);
@@ -95,8 +104,18 @@ export default function MessagesScreen() {
                         <IconSymbol name="chevron.left" size={22} color={colors.text} />
                     </Pressable>
                     <ThemedText style={styles.headerTitle}>Messages</ThemedText>
-                    <Pressable style={[styles.iconButton, { backgroundColor: colors.secondary }]}>
-                        <IconSymbol name="slider.horizontal.3" size={20} color={colors.text} />
+                    <Pressable
+                        onPress={() => setShowUnreadOnly(!showUnreadOnly)}
+                        style={[
+                            styles.iconButton,
+                            { backgroundColor: showUnreadOnly ? colors.tint : colors.secondary }
+                        ]}
+                    >
+                        <IconSymbol
+                            name="slider.horizontal.3"
+                            size={20}
+                            color={showUnreadOnly ? '#FFF' : colors.text}
+                        />
                     </Pressable>
                 </View>
 
@@ -130,7 +149,7 @@ export default function MessagesScreen() {
                             </View>
                             <ThemedText style={styles.emptyTitle}>No conversations</ThemedText>
                             <ThemedText style={styles.emptySubtitle}>
-                                {searchQuery ? 'Try a different search term' : 'Contact an owner to start a conversation'}
+                                {searchQuery || showUnreadOnly ? 'Try adjusting your filters' : 'Contact an owner to start a conversation'}
                             </ThemedText>
                         </View>
                     }
