@@ -362,11 +362,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  featuredBadgeRow: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
+  imageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    justifyContent: 'space-between',
+    padding: 12,
   },
+
+  featuredBadgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
   featuredTypeBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -392,6 +400,39 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '800',
   },
+  priceContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  priceSymbol: {
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  priceText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+
   featuredCardContent: {
     padding: 12,
   },
@@ -1276,12 +1317,18 @@ export default function HomeScreen() {
                         <View style={[styles.featuredTypeBadge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
                           <ThemedText style={styles.featuredTypeBadgeText}>{t(item.listingType || 'Sale')}</ThemedText>
                         </View>
+                        {item.type && (
+                          <View style={[styles.featuredTypeBadge, { backgroundColor: colors.tint }]}>
+                            <ThemedText style={styles.featuredTypeBadgeText}>{t(item.type)}</ThemedText>
+                          </View>
+                        )}
                       </View>
                       <View style={styles.priceContainer}>
                         <ThemedText style={styles.priceSymbol}>₹</ThemedText>
                         <ThemedText style={styles.priceText}>{item.price}</ThemedText>
                       </View>
                     </View>
+
                   </View>
                   <View style={styles.featuredCardContent}>
                     <ThemedText style={styles.featuredCardTitle} numberOfLines={1}>{item.title}</ThemedText>

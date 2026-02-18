@@ -244,11 +244,10 @@ export default function AddPropertyScreen() {
         <ThemedText style={styles.label}>Price (₹)</ThemedText>
         <TextInput
           style={[styles.input, { borderColor: colors.border, color: colors.text }]}
-          placeholder="Enter price"
+          placeholder="Enter price (e.g. 50 Lacs)"
           placeholderTextColor={colors.icon}
           value={price}
           onChangeText={setPrice}
-          keyboardType="numeric"
         />
 
         <View style={styles.labelRow}>
