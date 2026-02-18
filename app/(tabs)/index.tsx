@@ -165,11 +165,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000',
   },
-  locationPinButton: {
-    width: 56,
+  searchChipButton: {
+    width: 50,
     height: 56,
-    backgroundColor: '#000000', // Fill color black
-    borderRadius: 20,
+    backgroundColor: '#000000',
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     borderColor: '#F2F2F7',
   },
   activeToggleButton: {
-    backgroundColor: '#000000', // Active background black
+    backgroundColor: '#000000',
     borderColor: '#000000',
   },
   toggleText: {
@@ -197,9 +197,6 @@ const styles = StyleSheet.create({
   },
   activeToggleText: {
     color: '#FFFFFF',
-  },
-  filterButton: {
-    display: 'none', // Hide the old filter button
   },
   scrollContent: {
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
@@ -971,14 +968,20 @@ export default function HomeScreen() {
               />
             </View>
             <Pressable
-              style={styles.locationPinButton}
+              style={styles.searchChipButton}
               onPress={handleLocationRequest}
             >
               {loadingLocation ? (
                 <ActivityIndicator color="#FFF" size="small" />
               ) : (
-                <IconSymbol name="mappin.and.ellipse" size={24} color="#FFF" />
+                <IconSymbol name="mappin.and.ellipse" size={22} color="#FFF" />
               )}
+            </Pressable>
+            <Pressable
+              style={styles.searchChipButton}
+              onPress={() => setMainFilterModalVisible(true)}
+            >
+              <IconSymbol name="slider.horizontal.3" size={22} color="#FFF" />
             </Pressable>
           </View>
 
