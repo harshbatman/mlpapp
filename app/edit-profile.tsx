@@ -2,11 +2,12 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
+import { useNotification } from '@/context/notification-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { useProfile } from '@/context/profile-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -17,6 +18,7 @@ export default function EditProfileScreen() {
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
     const { profile, updateProfile } = useProfile();
+    const { showNotification, showConfirm, showProfessionalError } = useNotification();
 
     const [name, setName] = useState(profile.name);
     const [phone, setPhone] = useState(profile.phone);
@@ -43,7 +45,7 @@ export default function EditProfileScreen() {
         try {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                Alert.alert('Permission Denied', 'Allow location access to fetch your address.');
+                showNotification('warning', 'Permission Denied', 'Allow location access to fetch your address.');
                 setIsLocating(false);
                 return;
             }
@@ -68,7 +70,7 @@ export default function EditProfileScreen() {
                 setAddress(parts.join(', '));
             }
         } catch (error) {
-            Alert.alert('Error', 'Could not fetch location. Please try again.');
+            showProfessionalError(error, 'Location Error');
         } finally {
             setIsLocating(false);
         }
@@ -76,8 +78,14 @@ export default function EditProfileScreen() {
 
     const handleSave = () => {
         updateProfile({ name, phone, email, address, image });
-        Alert.alert('Profile Updated', 'Your changes have been saved successfully.');
-        router.back();
+        showConfirm({
+            title: 'Profile Updated',
+            message: 'Your changes have been saved successfully.',
+            icon: 'checkmark-circle',
+            iconColor: '#10B981',
+            primaryActionText: 'Great!',
+            onPrimaryAction: () => router.back()
+        });
     };
 
     return (

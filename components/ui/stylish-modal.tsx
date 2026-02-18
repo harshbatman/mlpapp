@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 interface StylishModalProps {
     visible: boolean;
@@ -20,8 +22,8 @@ export function StylishModal({
     onClose,
     title,
     message,
-    icon = 'information-circle',
-    iconColor = '#3B82F6',
+    icon = 'sparkles',
+    iconColor = '#000000',
     primaryActionText,
     onPrimaryAction,
     secondaryActionText,
@@ -36,29 +38,34 @@ export function StylishModal({
         >
             <View style={styles.overlay}>
                 <View style={styles.card}>
-                    <View style={[styles.iconContainer, { backgroundColor: iconColor + '15' }]}>
-                        <Ionicons name={icon} size={40} color={iconColor} />
-                    </View>
+                    {/* Top Decorative bar */}
+                    <View style={[styles.glowBar, { backgroundColor: iconColor }]} />
 
-                    <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.message}>{message}</Text>
+                    <View style={styles.content}>
+                        <View style={[styles.iconContainer, { backgroundColor: iconColor }]}>
+                            <Ionicons name={icon} size={32} color="#FFFFFF" />
+                        </View>
 
-                    <View style={styles.footer}>
-                        {secondaryActionText && (
+                        <Text style={styles.title}>{title}</Text>
+                        <Text style={styles.message}>{message}</Text>
+
+                        <View style={styles.footer}>
+                            {secondaryActionText && (
+                                <Pressable
+                                    style={[styles.button, styles.secondaryButton]}
+                                    onPress={onSecondaryAction || onClose}
+                                >
+                                    <Text style={styles.secondaryButtonText}>{secondaryActionText}</Text>
+                                </Pressable>
+                            )}
+
                             <Pressable
-                                style={[styles.button, styles.secondaryButton]}
-                                onPress={onSecondaryAction || onClose}
+                                style={[styles.button, styles.primaryButton, { backgroundColor: '#000000' }]}
+                                onPress={onPrimaryAction || onClose}
                             >
-                                <Text style={styles.secondaryButtonText}>{secondaryActionText}</Text>
+                                <Text style={styles.primaryButtonText}>{primaryActionText || 'Dismiss'}</Text>
                             </Pressable>
-                        )}
-
-                        <Pressable
-                            style={[styles.button, styles.primaryButton, { backgroundColor: iconColor }]}
-                            onPress={onPrimaryAction || onClose}
-                        >
-                            <Text style={styles.primaryButtonText}>{primaryActionText || 'Dismiss'}</Text>
-                        </Pressable>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -69,52 +76,65 @@ export function StylishModal({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
+        padding: 20,
     },
     card: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 32,
-        padding: 32,
+        borderRadius: 28,
         width: '100%',
-        maxWidth: 400,
-        alignItems: 'center',
+        maxWidth: 360,
+        overflow: 'hidden',
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.2,
-                shadowRadius: 20,
+                shadowOffset: { width: 0, height: 20 },
+                shadowOpacity: 0.3,
+                shadowRadius: 30,
             },
             android: {
-                elevation: 10,
+                elevation: 15,
             },
         }),
     },
+    glowBar: {
+        height: 6,
+        width: '100%',
+        opacity: 0.8,
+    },
+    content: {
+        padding: 32,
+        alignItems: 'center',
+    },
     iconContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: 64,
+        height: 64,
+        borderRadius: 32,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 5,
     },
     title: {
-        fontSize: 24,
-        fontWeight: '900',
-        color: '#111827',
+        fontSize: 22,
+        fontWeight: '800',
+        color: '#000000',
         textAlign: 'center',
-        marginBottom: 12,
+        marginBottom: 10,
         letterSpacing: -0.5,
     },
     message: {
-        fontSize: 16,
-        color: '#4B5563',
+        fontSize: 15,
+        color: '#666666',
         textAlign: 'center',
-        lineHeight: 24,
-        marginBottom: 32,
+        lineHeight: 22,
+        marginBottom: 28,
         fontWeight: '500',
     },
     footer: {
@@ -124,13 +144,13 @@ const styles = StyleSheet.create({
     },
     button: {
         flex: 1,
-        height: 56,
+        height: 54,
         borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
     primaryButton: {
-        // backgroundColor set dynamically
+        // backgroundColor set to black
     },
     primaryButtonText: {
         color: '#FFFFFF',
