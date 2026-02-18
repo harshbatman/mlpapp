@@ -61,6 +61,8 @@ const MAPPING: IconMapping = {
   'trash': 'delete',
   'arrow.up': 'arrow-upward',
   'square.dashed': 'straighten',
+  'heart': 'favorite-border',
+  'square.and.arrow.up': 'share',
 };
 
 /**
