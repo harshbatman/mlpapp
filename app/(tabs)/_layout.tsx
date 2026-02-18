@@ -1,18 +1,22 @@
 import { Redirect, Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Image, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
+const ACTIVE_COLOR = '#000000';
+const INACTIVE_COLOR = '#8E8E93';
+
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? 'light';
   const { profile, loading } = useProfile();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   if (!loading && !profile.isLoggedIn) {
     return <Redirect href="/" />;
@@ -23,51 +27,55 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#000000',
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: ACTIVE_COLOR,
+        tabBarInactiveTintColor: INACTIVE_COLOR,
+        tabBarActiveBackgroundColor: 'transparent',
+        tabBarInactiveBackgroundColor: 'transparent',
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
           position: 'absolute',
-          bottom: Platform.OS === 'ios' ? 40 : 25,
-          left: 20,
-          right: 20,
-          height: 72,
-          borderRadius: 35,
+          bottom: insets.bottom + 12,
+          left: 12,
+          right: 12,
+          height: 68,
+          borderRadius: 34,
           backgroundColor: '#FFFFFF',
           borderTopWidth: 0,
-          paddingBottom: 0,
-          paddingTop: 0,
+          paddingBottom: 8,
+          paddingTop: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 12 },
           shadowOpacity: 0.15,
           shadowRadius: 16,
           elevation: 8,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
         },
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '700',
-          marginBottom: 10,
+          fontSize: 9,
+          fontWeight: '600',
+          marginBottom: 0,
+          marginTop: 2,
         },
         tabBarIconStyle: {
-          marginTop: 8,
-        }
+          marginTop: 0,
+        },
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: t('Home'),
-          tabBarIcon: ({ color }) => <IconSymbol size={26} name="house.fill" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={26} name="house.fill" color={focused ? ACTIVE_COLOR : INACTIVE_COLOR} />
+          ),
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           title: t('Search'),
-          tabBarIcon: ({ color }) => <IconSymbol size={26} name="magnifyingglass" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={26} name="magnifyingglass" color={focused ? ACTIVE_COLOR : INACTIVE_COLOR} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -75,15 +83,16 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarButton: (props: any) => {
-            const { style, ...otherProps } = props;
+            const { style, children, ...otherProps } = props;
             return (
               <Pressable
                 {...otherProps}
-                style={[style, styles.postButtonWrapper, { backgroundColor: '#000000' }]}
+                style={styles.postButtonWrapper}
+                android_ripple={{ color: 'rgba(255,255,255,0.25)', borderless: false, radius: 28 }}
               >
                 <View style={styles.postButtonContent}>
-                  <IconSymbol name="plus" size={20} color="#FFFFFF" />
-                  <ThemedText style={styles.postButtonText}>Post</ThemedText>
+                  <IconSymbol name="plus" size={16} color="#FFFFFF" />
+                  <Text style={styles.postButtonText} numberOfLines={1}>Post</Text>
                 </View>
               </Pressable>
             );
@@ -94,22 +103,25 @@ export default function TabLayout() {
         name="saved"
         options={{
           title: t('Saved'),
-          tabBarIcon: ({ color }) => <IconSymbol size={26} name="heart.fill" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={26} name="heart.fill" color={focused ? ACTIVE_COLOR : INACTIVE_COLOR} />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: t('Profile'),
-          tabBarIcon: ({ color }) => {
+          tabBarIcon: ({ color, focused }) => {
+            const iconColor = focused ? ACTIVE_COLOR : INACTIVE_COLOR;
             if (profile.image) {
               return (
-                <View style={[styles.tabAvatarContainer, { borderColor: color === '#000000' ? '#000000' : 'transparent' }]}>
+                <View style={[styles.tabAvatarContainer, { borderColor: focused ? ACTIVE_COLOR : 'transparent' }]}>
                   <Image source={{ uri: profile.image }} style={styles.tabAvatar} />
                 </View>
               );
             }
-            return <IconSymbol size={26} name="person.fill" color={color} />;
+            return <IconSymbol size={26} name="person.fill" color={iconColor} />;
           },
         }}
       />
@@ -130,28 +142,32 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   postButtonWrapper: {
-    marginTop: -8,
-    marginHorizontal: 10,
-    height: 48,
-    paddingHorizontal: 18,
-    borderRadius: 24,
+    marginTop: 0,
+    marginHorizontal: 0,
+    height: 44,
+    paddingHorizontal: 16,
+    minWidth: 90,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#000000',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 6,
   },
   postButtonContent: {
     flexDirection: 'row',
+    flexWrap: 'nowrap',
     alignItems: 'center',
-    gap: 6,
+    justifyContent: 'center',
+    gap: 4,
   },
   postButtonText: {
     color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '800',
-  }
+    fontSize: 14,
+    fontWeight: 'bold',
+    flexShrink: 0,
+  },
 });
-
