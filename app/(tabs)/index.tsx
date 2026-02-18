@@ -709,18 +709,18 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   heroCenterTagline: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontSize: 32,
-    fontWeight: '800',
+    fontWeight: '700',
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
   },
   heroCenterSubtitle: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontSize: 32,
-    fontWeight: '800',
+    fontWeight: '700',
     textAlign: 'center',
     marginTop: 8,
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
@@ -1248,8 +1248,8 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.heroCenterContent}>
-              <ThemedText style={styles.heroCenterTagline}>Buy . Sell . Rent</ThemedText>
-              <ThemedText style={styles.heroCenterSubtitle}>Land & Properties</ThemedText>
+              <RNText style={styles.heroCenterTagline}>Buy . Rent . Sell</RNText>
+              <RNText style={styles.heroCenterSubtitle}>Land & Properties</RNText>
             </View>
           </View>
         </ImageBackground>
