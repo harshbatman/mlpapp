@@ -349,6 +349,20 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontWeight: '600',
   },
+  freeBadge: {
+    backgroundColor: '#FF3B30',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginTop: 2,
+  },
+  freeText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
   rewardAction: {
     marginLeft: 8,
     opacity: 0.8,
@@ -984,7 +998,13 @@ export default function HomeScreen() {
           </View>
           <View style={styles.rewardTextContainer}>
             <ThemedText style={styles.rewardTag}>{t('LIMITED OFFER')}</ThemedText>
-            <ThemedText style={styles.rewardTitle}>{t('Post Free Title')}</ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <ThemedText style={[styles.rewardTitle, { marginBottom: 0 }]}>Post Now - </ThemedText>
+              <View style={styles.freeBadge}>
+                <ThemedText style={styles.freeText}>FREE!</ThemedText>
+              </View>
+              <ThemedText style={[styles.rewardTitle, { marginBottom: 0 }]}> 🎊</ThemedText>
+            </View>
             <ThemedText style={styles.rewardSubtitle}>{t('Post Free Desc')}</ThemedText>
           </View>
           <View style={styles.rewardAction}>
