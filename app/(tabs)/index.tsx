@@ -129,52 +129,76 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  searchRow: {
+  premiumSearchCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginTop: -30, // Pull it over the header
+    padding: 16,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+    zIndex: 100,
+  },
+  searchBarWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 24,
     gap: 12,
+    marginBottom: 16,
   },
-  searchContainer: {
+  searchInputContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    height: 64,
-    borderRadius: 16,
-    backgroundColor: '#F6F6F6',
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+    backgroundColor: '#F2F2F7',
+    height: 56,
+    borderRadius: 20,
+    paddingHorizontal: 16,
   },
-  searchInput: {
+  premiumSearchInput: {
     flex: 1,
     marginLeft: 10,
-    fontSize: 18,
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
   },
-  searchLeft: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  filterButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 16,
+  locationPinButton: {
+    width: 56,
+    height: 56,
+    backgroundColor: '#000000', // Fill color black
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+  },
+  filterToggles: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  toggleButton: {
+    flex: 1,
+    height: 50,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F2F2F7',
+  },
+  activeToggleButton: {
+    backgroundColor: '#000000', // Active background black
+    borderColor: '#000000',
+  },
+  toggleText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#8E8E93',
+  },
+  activeToggleText: {
+    color: '#FFFFFF',
+  },
+  filterButton: {
+    display: 'none', // Hide the old filter button
   },
   scrollContent: {
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
@@ -498,6 +522,7 @@ export default function HomeScreen() {
   const [mainFilterModalVisible, setMainFilterModalVisible] = useState(false);
   const { showNotification, showProfessionalError, showConfirm } = useNotification();
   const { profile } = useProfile();
+  const [activeType, setActiveType] = useState('Buy');
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -961,25 +986,47 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={styles.searchRow}>
-          <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
-            <View style={styles.searchLeft}>
-              <IconSymbol name="magnifyingglass" size={20} color={colors.icon} />
+        <View style={styles.premiumSearchCard}>
+          <View style={styles.searchBarWrapper}>
+            <View style={styles.searchInputContainer}>
+              <IconSymbol name="magnifyingglass" size={20} color="#8E8E93" />
               <TextInput
-                placeholder={t('Search properties, lands...')}
-                placeholderTextColor={colors.icon}
-                style={[styles.searchInput, { color: colors.text }]}
+                placeholder={t('Search city, land, property...')}
+                placeholderTextColor="#ABE"
+                style={styles.premiumSearchInput}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
               />
             </View>
+            <Pressable
+              style={styles.locationPinButton}
+              onPress={handleLocationRequest}
+            >
+              {loadingLocation ? (
+                <ActivityIndicator color="#FFF" size="small" />
+              ) : (
+                <IconSymbol name="mappin.and.ellipse" size={24} color="#FFF" />
+              )}
+            </Pressable>
           </View>
-          <Pressable
-            style={[styles.filterButton, { backgroundColor: colors.tint }]}
-            onPress={() => setMainFilterModalVisible(true)}
-          >
-            <IconSymbol name="slider.horizontal.3" size={24} color="#fff" />
-          </Pressable>
+
+          <View style={styles.filterToggles}>
+            {['Buy', 'Rent', 'Sell'].map((type) => (
+              <Pressable
+                key={type}
+                onPress={() => setActiveType(type)}
+                style={[
+                  styles.toggleButton,
+                  activeType === type && styles.activeToggleButton
+                ]}
+              >
+                <ThemedText style={[
+                  styles.toggleText,
+                  activeType === type && styles.activeToggleText
+                ]}>{t(type)}</ThemedText>
+              </Pressable>
+            ))}
+          </View>
         </View>
 
         {/* Promo Reward Card */}
