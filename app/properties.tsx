@@ -1,21 +1,23 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { auth, db } from '@/config/firebase';
 import { INDIAN_LOCATIONS } from '@/constants/locations';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Dimensions, FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useChat } from '@/context/chat-context';
 import { useProfile } from '@/context/profile-context';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { db, auth } from '@/config/firebase';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Dimensions, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 const { height } = Dimensions.get('window');
 
 export default function PropertyListScreen() {
     const { category } = useLocalSearchParams();
+    const { t } = useTranslation();
     const router = useRouter();
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
@@ -144,24 +146,69 @@ export default function PropertyListScreen() {
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => (
-                    <Pressable style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                        <View style={styles.imagePlaceholder}>
-                            <ThemedText style={{ fontSize: 40 }}>{item.image}</ThemedText>
+                    <Pressable
+                        style={[styles.card, { backgroundColor: colors.background }]}
+                        onPress={() => router.push({ pathname: '/properties/[id]', params: { id: item.id } })}
+                    >
+                        <View style={styles.imageContainer}>
+                            {item.images && item.images.length > 0 ? (
+                                <Image source={{ uri: item.images[0] }} style={styles.image} />
+                            ) : (
+                                <View style={[styles.imagePlaceholder, { backgroundColor: colors.secondary }]}>
+                                    <IconSymbol name="house.fill" size={40} color={colors.icon} />
+                                </View>
+                            )}
+
+                            <View style={styles.badgeRow}>
+                                <View style={[styles.typeBadge, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
+                                    <ThemedText style={styles.typeBadgeText}>{t(item.listingType || 'Sale')}</ThemedText>
+                                </View>
+                                <Pressable style={styles.favoriteButton}>
+                                    <IconSymbol name="heart" size={18} color="#FFF" />
+                                </Pressable>
+                            </View>
+
+                            <View style={styles.floatingPrice}>
+                                <ThemedText style={styles.priceSymbol}>₹</ThemedText>
+                                <ThemedText style={styles.priceText}>{item.price}</ThemedText>
+                            </View>
                         </View>
-                        <View style={styles.cardInfo}>
-                            <ThemedText style={styles.propertyTitle}>{item.title}</ThemedText>
-                            <ThemedText style={styles.propertyLocation}>{item.location}</ThemedText>
-                            <View style={styles.priceRow}>
-                                <ThemedText style={[styles.propertyPrice, { color: colors.accent }]}>{item.price}</ThemedText>
-                                <View style={{ flexDirection: 'row', gap: 8 }}>
+
+                        <View style={styles.cardContent}>
+                            <View style={styles.cardInfo}>
+                                <ThemedText style={styles.propertyTitle} numberOfLines={1}>{item.title}</ThemedText>
+                                <View style={styles.locationRow}>
+                                    <IconSymbol name="mappin.and.ellipse" size={14} color="#8E8E93" />
+                                    <ThemedText style={styles.propertyLocation} numberOfLines={1}>
+                                        {item.location}
+                                    </ThemedText>
+                                </View>
+                            </View>
+
+                            <View style={styles.cardFooter}>
+                                <View style={styles.featuresRow}>
+                                    <View style={styles.featureItem}>
+                                        <IconSymbol name="bed.double.fill" size={14} color="#8E8E93" />
+                                        <ThemedText style={styles.featureText}>3</ThemedText>
+                                    </View>
+                                    <View style={styles.featureItem}>
+                                        <IconSymbol name="shower.fill" size={14} color="#8E8E93" />
+                                        <ThemedText style={styles.featureText}>2</ThemedText>
+                                    </View>
+                                </View>
+
+                                <View style={styles.footerActions}>
                                     <Pressable
-                                        style={[styles.viewButton, { backgroundColor: colors.secondary }]}
+                                        style={[styles.smallActionButton, { backgroundColor: '#F2F2F7' }]}
                                         onPress={() => handleContact(item.ownerId, item.id, item.title)}
                                     >
-                                        <ThemedText style={[styles.viewButtonText, { color: colors.text }]}>Chat</ThemedText>
+                                        <IconSymbol name="message.fill" size={16} color="#000" />
                                     </Pressable>
-                                    <Pressable style={[styles.viewButton, { backgroundColor: colors.primary }]}>
-                                        <ThemedText style={styles.viewButtonText}>View</ThemedText>
+                                    <Pressable
+                                        style={[styles.detailsButton, { backgroundColor: colors.tint }]}
+                                        onPress={() => router.push({ pathname: '/properties/[id]', params: { id: item.id } })}
+                                    >
+                                        <ThemedText style={styles.detailsButtonText}>{t('Details')}</ThemedText>
                                     </Pressable>
                                 </View>
                             </View>
@@ -452,48 +499,145 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },
     card: {
-        borderRadius: 12,
-        borderWidth: 1,
+        borderRadius: 20,
         marginBottom: 20,
         overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 4,
+    },
+    imageContainer: {
+        height: 200,
+        width: '100%',
+        position: 'relative',
+    },
+    image: {
+        width: '100%',
+        height: '100%',
     },
     imagePlaceholder: {
-        height: 180,
-        backgroundColor: '#F0F0F0',
+        width: '100%',
+        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    cardInfo: {
-        padding: 16,
-    },
-    propertyTitle: {
-        fontSize: 18,
-        fontWeight: '700',
-        marginBottom: 4,
-    },
-    propertyLocation: {
-        fontSize: 14,
-        opacity: 0.6,
-        marginBottom: 12,
-    },
-    priceRow: {
+    badgeRow: {
+        position: 'absolute',
+        top: 12,
+        left: 12,
+        right: 12,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    propertyPrice: {
-        fontSize: 18,
+    typeBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 8,
+    },
+    typeBadgeText: {
+        color: '#FFF',
+        fontSize: 10,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+    },
+    favoriteButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    floatingPrice: {
+        position: 'absolute',
+        bottom: 12,
+        left: 12,
+        backgroundColor: '#000',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 10,
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        gap: 2,
+    },
+    priceSymbol: {
+        color: '#FFF',
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    priceText: {
+        color: '#FFF',
+        fontSize: 16,
         fontWeight: '800',
     },
-    viewButton: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 4,
+    cardContent: {
+        padding: 16,
     },
-    viewButtonText: {
-        color: '#FFF',
+    cardInfo: {
+        marginBottom: 12,
+    },
+    propertyTitle: {
+        fontSize: 16,
+        fontWeight: '800',
+        marginBottom: 4,
+        letterSpacing: -0.3,
+    },
+    locationRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    propertyLocation: {
+        fontSize: 12,
+        fontWeight: '500',
+        color: '#8E8E93',
+    },
+    cardFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: '#F2F2F7',
+    },
+    featuresRow: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    featureItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    featureText: {
+        fontSize: 12,
         fontWeight: '600',
-        fontSize: 14,
+        color: '#8E8E93',
+    },
+    footerActions: {
+        flexDirection: 'row',
+        gap: 8,
+        alignItems: 'center',
+    },
+    smallActionButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    detailsButton: {
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 10,
+    },
+    detailsButtonText: {
+        color: '#FFF',
+        fontWeight: '700',
+        fontSize: 13,
     },
     emptyContainer: {
         marginTop: 100,

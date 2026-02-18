@@ -1,6 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { db } from '@/config/firebase';
 import { INDIAN_LOCATIONS } from '@/constants/locations';
 import { Colors } from '@/constants/theme';
 import { useNotification } from '@/context/notification-context';
@@ -8,7 +9,8 @@ import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Dimensions, Image, Modal, Platform, Pressable, Text as RNText, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
@@ -53,8 +55,6 @@ const styles = StyleSheet.create({
   },
   cityText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
     marginRight: 4,
   },
   topHeader: {
@@ -208,18 +208,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     paddingHorizontal: 20,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-    flex: 1,
-  },
   categoriesScroll: {
     marginHorizontal: -20,
   },
@@ -323,6 +311,120 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
+
+  // Redesigned Featured List styles
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  seeAllText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#007AFF',
+  },
+  featuredList: {
+    paddingLeft: 20,
+    paddingRight: 10,
+    paddingBottom: 20,
+  },
+  featuredCard: {
+    width: 260,
+    borderRadius: 20,
+    marginRight: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  featuredImageContainer: {
+    height: 160,
+    width: '100%',
+    position: 'relative',
+  },
+  featuredImage: {
+    width: '100%',
+    height: '100%',
+  },
+  featuredImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  featuredBadgeRow: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+  },
+  featuredTypeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  featuredTypeBadgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+  featuredFloatingPrice: {
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  featuredPriceText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  featuredCardContent: {
+    padding: 12,
+  },
+  featuredCardTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    marginBottom: 4,
+    letterSpacing: -0.3,
+  },
+  featuredLocationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 8,
+  },
+  featuredCardLocation: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#8E8E93',
+  },
+  featuredFeaturesRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  featuredFeatureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  featuredFeatureText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#8E8E93',
   },
   rewardCard: {
     backgroundColor: '#000000', // Sleek Black Premium look
@@ -523,6 +625,8 @@ export default function HomeScreen() {
   const { showNotification, showProfessionalError, showConfirm } = useNotification();
   const { profile } = useProfile();
   const [activeType, setActiveType] = useState('Buy');
+  const [featuredProperties, setFeaturedProperties] = useState<any[]>([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
 
   const indianStates = INDIAN_LOCATIONS;
 
@@ -555,6 +659,23 @@ export default function HomeScreen() {
     { name: 'Gangtok', image: require('@/assets/images/cities/gangtok.png'), color: 'standard' },
     { name: 'Bhubaneswar', image: require('@/assets/images/cities/bhubaneswar.png'), color: 'standard' },
   ];
+
+  useEffect(() => {
+    const q = query(collection(db, 'properties'), orderBy('createdAt', 'desc'), limit(5));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setFeaturedProperties(data);
+      setLoadingFeatured(false);
+    }, (error) => {
+      console.error("Error fetching featured properties:", error);
+      setLoadingFeatured(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleLocationRequest = async () => {
     showConfirm({
@@ -1127,20 +1248,72 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <ThemedText style={styles.sectionTitle}>{t('Featured Listings')}</ThemedText>
-          </View>
-
-          <View style={styles.emptyState}>
-            <IconSymbol name="house.fill" size={60} color={colors.icon} />
-            <ThemedText style={styles.emptyText}>{t('No listings yet.')}</ThemedText>
-            <ThemedText style={styles.emptySubText}>{t('Be the first one to post!')}</ThemedText>
-
-            <Pressable
-              style={[styles.postButton, { backgroundColor: colors.tint }]}
-              onPress={() => router.push('/(tabs)/add')}
-            >
-              <ThemedText style={styles.postButtonText}>{t('Post Now')}</ThemedText>
+            <Pressable onPress={() => router.push('/properties')}>
+              <ThemedText style={styles.seeAllText}>{t('See All')}</ThemedText>
             </Pressable>
           </View>
+
+          {loadingFeatured ? (
+            <ActivityIndicator color={colors.tint} style={{ marginTop: 20 }} />
+          ) : featuredProperties.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.featuredList}>
+              {featuredProperties.map((item) => (
+                <Pressable
+                  key={item.id}
+                  style={[styles.featuredCard, { backgroundColor: colors.background }]}
+                  onPress={() => router.push({ pathname: '/properties/[id]', params: { id: item.id } })}
+                >
+                  <View style={styles.featuredImageContainer}>
+                    {item.images && item.images.length > 0 ? (
+                      <Image source={{ uri: item.images[0] }} style={styles.featuredImage} />
+                    ) : (
+                      <View style={[styles.featuredImagePlaceholder, { backgroundColor: colors.secondary }]}>
+                        <IconSymbol name="house.fill" size={30} color={colors.icon} />
+                      </View>
+                    )}
+                    <View style={styles.featuredBadgeRow}>
+                      <View style={[styles.featuredTypeBadge, { backgroundColor: '#000000' }]}>
+                        <ThemedText style={styles.featuredTypeBadgeText}>{t(item.listingType || 'Sale')}</ThemedText>
+                      </View>
+                    </View>
+                    <View style={styles.featuredFloatingPrice}>
+                      <ThemedText style={styles.featuredPriceText}>₹{item.price}</ThemedText>
+                    </View>
+                  </View>
+                  <View style={styles.featuredCardContent}>
+                    <ThemedText style={styles.featuredCardTitle} numberOfLines={1}>{item.title}</ThemedText>
+                    <View style={styles.featuredLocationRow}>
+                      <IconSymbol name="mappin.and.ellipse" size={12} color="#8E8E93" />
+                      <ThemedText style={styles.featuredCardLocation} numberOfLines={1}>{item.location}</ThemedText>
+                    </View>
+                    <View style={styles.featuredFeaturesRow}>
+                      <View style={styles.featuredFeatureItem}>
+                        <IconSymbol name="bed.double.fill" size={12} color="#8E8E93" />
+                        <ThemedText style={styles.featuredFeatureText}>3</ThemedText>
+                      </View>
+                      <View style={styles.featuredFeatureItem}>
+                        <IconSymbol name="shower.fill" size={12} color="#8E8E93" />
+                        <ThemedText style={styles.featuredFeatureText}>2</ThemedText>
+                      </View>
+                    </View>
+                  </View>
+                </Pressable>
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={styles.emptyState}>
+              <IconSymbol name="house.fill" size={60} color={colors.icon} />
+              <ThemedText style={styles.emptyText}>{t('No listings yet.')}</ThemedText>
+              <ThemedText style={styles.emptySubText}>{t('Be the first one to post!')}</ThemedText>
+
+              <Pressable
+                style={[styles.postButton, { backgroundColor: colors.tint }]}
+                onPress={() => router.push('/(tabs)/add')}
+              >
+                <ThemedText style={styles.postButtonText}>{t('Post Now')}</ThemedText>
+              </Pressable>
+            </View>
+          )}
         </View>
       </ScrollView>
     </ThemedView>
