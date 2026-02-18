@@ -10,7 +10,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { FontAwesome } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { arrayRemove, arrayUnion, doc, getDoc, increment, onSnapshot, updateDoc } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Dimensions, Image, Linking, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 
@@ -31,6 +31,8 @@ export default function PropertyDetailsScreen() {
     const [loading, setLoading] = useState(true);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [isFavorited, setIsFavorited] = useState(false);
+    const scrollRef = useRef<ScrollView>(null);
+
 
 
     useEffect(() => {
@@ -109,6 +111,12 @@ export default function PropertyDetailsScreen() {
         }
     };
 
+    const scrollToImage = (index: number) => {
+        if (index < 0 || index >= (property.images?.length || 0)) return;
+        scrollRef.current?.scrollTo({ x: index * width, animated: true });
+        setActiveImageIndex(index);
+    };
+
     const handleContact = async () => {
         if (!auth.currentUser) {
             router.push('/(auth)/login');
@@ -175,6 +183,7 @@ export default function PropertyDetailsScreen() {
                 {/* Image Slider */}
                 <View style={styles.imageSection}>
                     <ScrollView
+                        ref={scrollRef}
                         horizontal
                         pagingEnabled
                         showsHorizontalScrollIndicator={false}
@@ -194,6 +203,29 @@ export default function PropertyDetailsScreen() {
                             </View>
                         )}
                     </ScrollView>
+
+                    {/* Navigation Arrows */}
+                    {property.images && property.images.length > 1 && (
+                        <>
+                            {activeImageIndex > 0 && (
+                                <Pressable
+                                    onPress={() => scrollToImage(activeImageIndex - 1)}
+                                    style={[styles.navBtn, styles.leftNav]}
+                                >
+                                    <IconSymbol name="chevron.left" size={24} color="#FFF" />
+                                </Pressable>
+                            )}
+                            {activeImageIndex < property.images.length - 1 && (
+                                <Pressable
+                                    onPress={() => scrollToImage(activeImageIndex + 1)}
+                                    style={[styles.navBtn, styles.rightNav]}
+                                >
+                                    <IconSymbol name="chevron.right" size={24} color="#FFF" />
+                                </Pressable>
+                            )}
+                        </>
+                    )}
+
 
                     {/* Image Header Actions */}
                     <View style={styles.imageHeader}>
@@ -375,6 +407,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    navBtn: {
+        position: 'absolute',
+        top: '50%',
+        marginTop: -20,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10,
+    },
+    leftNav: {
+        left: 10,
+    },
+    rightNav: {
+        right: 10,
+    },
+
     indicatorContainer: {
         position: 'absolute',
         bottom: 20,
