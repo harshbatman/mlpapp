@@ -170,19 +170,25 @@ const styles = StyleSheet.create({
   },
   heroBuySellRent: {
     color: '#FFFFFF',
-    fontSize: 36,
+    fontSize: 34,
     fontWeight: '900',
     textAlign: 'center',
-    letterSpacing: -0.5,
-    lineHeight: 44,
+    letterSpacing: 1,
+    lineHeight: 40,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   heroProperties: {
     color: '#FFFFFF',
-    fontSize: 48,
+    fontSize: 52,
     fontWeight: '900',
     textAlign: 'center',
     letterSpacing: -1,
-    lineHeight: 56,
+    lineHeight: 52,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 6,
   },
   premiumSearchCard: {
     backgroundColor: '#FFFFFF',
@@ -974,7 +980,7 @@ export default function HomeScreen() {
         {/* Premium Hero Section */}
         <View style={styles.heroContainer}>
           <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop' }}
+            source={{ uri: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=2070&auto=format&fit=crop' }}
             style={styles.heroImage}
             resizeMode="cover"
           />
