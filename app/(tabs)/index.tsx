@@ -710,7 +710,7 @@ const styles = StyleSheet.create({
   },
   heroCenterTagline: {
     color: '#FFF',
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: '800',
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
@@ -719,10 +719,10 @@ const styles = StyleSheet.create({
   },
   heroCenterSubtitle: {
     color: '#FFF',
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: '800',
     textAlign: 'center',
-    marginTop: -5,
+    marginTop: 8,
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
