@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   heroSection: {
-    height: 340,
+    height: 310,
     width: '100%',
     position: 'relative',
   },
@@ -698,7 +698,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 40,
+    marginTop: -30,
+    marginBottom: 0,
   },
   heroBrandSubtitleTop: {
     color: '#FFF',
@@ -710,7 +711,7 @@ const styles = StyleSheet.create({
   },
   heroCenterTagline: {
     color: '#FFFFFF',
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
@@ -719,10 +720,10 @@ const styles = StyleSheet.create({
   },
   heroCenterSubtitle: {
     color: '#FFFFFF',
-    fontSize: 32,
+    fontSize: 22,
     fontWeight: '700',
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 2,
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
@@ -771,8 +772,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   searchCardOverlay: {
-    marginTop: -60,
-    paddingTop: 10,
+    marginTop: -80,
+    paddingTop: 0,
   },
 });
 
@@ -1317,7 +1318,7 @@ export default function HomeScreen() {
               includeFontPadding: false,
               textAlign: 'center',
               color: '#fff'
-            }}>✨</RNText>
+            }}>🎉</RNText>
           </View>
           <View style={styles.rewardTextContainer}>
             <ThemedText style={styles.rewardTag}>{t('LIMITED OFFER')}</ThemedText>

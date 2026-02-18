@@ -66,6 +66,7 @@ const MAPPING: IconMapping = {
   'heart.fill': 'favorite',
   'square.and.arrow.up': 'share',
   'phone.fill': 'call',
+  'rocket.fill': 'rocket',
 };
 
 /**

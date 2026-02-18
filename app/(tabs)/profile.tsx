@@ -1,12 +1,14 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { auth, db } from '@/config/firebase';
 import { Colors } from '@/constants/theme';
 import { useNotification } from '@/context/notification-context';
 import { useProfile } from '@/context/profile-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
@@ -20,6 +22,40 @@ export default function ProfileScreen() {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [confirmPhone, setConfirmPhone] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [listingsCount, setListingsCount] = useState(0);
+    const [savedCount, setSavedCount] = useState(0);
+
+    useEffect(() => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        // Fetch My Listings Count
+        const listingsQuery = query(
+            collection(db, 'properties'),
+            where('ownerId', '==', currentUser.uid)
+        );
+
+        const unsubscribeListings = onSnapshot(listingsQuery, (snapshot) => {
+            setListingsCount(snapshot.size);
+        });
+
+        // Fetch Saved Count (Placeholder - implementation depends on how you save properties)
+        // If you have a 'saved' collection:
+        /*
+        const savedQuery = query(
+            collection(db, 'saved'),
+            where('userId', '==', currentUser.uid)
+        );
+        const unsubscribeSaved = onSnapshot(savedQuery, (snapshot) => {
+            setSavedCount(snapshot.size);
+        });
+        */
+
+        return () => {
+            unsubscribeListings();
+            // unsubscribeSaved();
+        };
+    }, []);
 
     const handleLogoutClick = () => {
         showConfirm({
@@ -80,7 +116,7 @@ export default function ProfileScreen() {
 
                 <View style={styles.statsRow}>
                     <Pressable style={styles.statBox} onPress={() => router.push('/my-listings')}>
-                        <ThemedText type="subtitle">0</ThemedText>
+                        <ThemedText type="subtitle">{listingsCount}</ThemedText>
                         <ThemedText style={styles.statLabel}>{t('My Listings')}</ThemedText>
                     </Pressable>
                     <Pressable
