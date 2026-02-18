@@ -899,15 +899,15 @@ export default function HomeScreen() {
           <View style={styles.topHeaderRight}>
             <Pressable
               style={styles.notificationBell}
-              onPress={() => router.push('/messages')}
-            >
-              <IconSymbol name="message.fill" size={22} color={colors.icon} />
-            </Pressable>
-            <Pressable
-              style={styles.notificationBell}
               onPress={() => router.push('/notifications')}
             >
               <IconSymbol name="bell.fill" size={22} color={colors.icon} />
+            </Pressable>
+            <Pressable
+              style={styles.notificationBell}
+              onPress={() => router.push('/messages')}
+            >
+              <IconSymbol name="message.fill" size={22} color={colors.icon} />
             </Pressable>
           </View>
         </View>
