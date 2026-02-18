@@ -964,7 +964,7 @@ export default function HomeScreen() {
               <IconSymbol name="magnifyingglass" size={20} color="#8E8E93" />
               <TextInput
                 placeholder={t('Search city, land, property...')}
-                placeholderTextColor="#ABE"
+                placeholderTextColor="#8E8E93"
                 style={styles.premiumSearchInput}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
