@@ -1,5 +1,5 @@
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../config/firebase';
 
@@ -70,8 +70,24 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
 
     const updateProfile = async (data: Partial<ProfileData>) => {
         setProfile(prev => ({ ...prev, ...data }));
-        // In a real app, we would also update Firestore here if user is logged in
+
+        if (auth.currentUser) {
+            try {
+                const userDoc = doc(db, 'users', auth.currentUser.uid);
+                // We use setDoc with merge: true to update or create the document
+                await setDoc(userDoc, {
+                    name: data.name,
+                    phone: data.phone,
+                    address: data.address,
+                    image: data.image,
+                    updatedAt: new Date().toISOString(),
+                }, { merge: true });
+            } catch (error) {
+                console.error('Error updating profile in Firestore:', error);
+            }
+        }
     };
+
 
     const setLoggedInManually = (isLoggedIn: boolean) => {
         setProfile(prev => ({ ...prev, isLoggedIn }));

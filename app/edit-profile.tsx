@@ -6,12 +6,15 @@ import { useNotification } from '@/context/notification-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
+import { auth, storage } from '@/config/firebase';
 import { useProfile } from '@/context/profile-context';
 import * as ImagePicker from 'expo-image-picker';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { Image } from 'react-native';
+
 
 export default function EditProfileScreen() {
     const router = useRouter();
@@ -26,6 +29,8 @@ export default function EditProfileScreen() {
     const [address, setAddress] = useState(profile.address);
     const [image, setImage] = useState(profile.image);
     const [isLocating, setIsLocating] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -76,17 +81,37 @@ export default function EditProfileScreen() {
         }
     };
 
-    const handleSave = () => {
-        updateProfile({ name, phone, email, address, image });
-        showConfirm({
-            title: 'Profile Updated',
-            message: 'Your changes have been saved successfully.',
-            icon: 'checkmark-circle',
-            iconColor: '#10B981',
-            primaryActionText: 'Great!',
-            onPrimaryAction: () => router.back()
-        });
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            let imageUrl = image;
+
+            // Only upload if it's a local URI
+            if (image && !image.startsWith('http')) {
+                const response = await fetch(image);
+                const blob = await response.blob();
+                const storageRef = ref(storage, `profiles/${auth.currentUser?.uid}/avatar-${Date.now()}`);
+                await uploadBytes(storageRef, blob);
+                imageUrl = await getDownloadURL(storageRef);
+            }
+
+            await updateProfile({ name, phone, email, address, image: imageUrl });
+
+            showConfirm({
+                title: 'Profile Updated',
+                message: 'Your changes have been saved successfully.',
+                icon: 'checkmark-circle',
+                iconColor: '#10B981',
+                primaryActionText: 'Great!',
+                onPrimaryAction: () => router.back()
+            });
+        } catch (error) {
+            showProfessionalError(error, 'Update Failed');
+        } finally {
+            setIsSaving(false);
+        }
     };
+
 
     return (
         <ThemedView style={styles.container}>
@@ -95,9 +120,14 @@ export default function EditProfileScreen() {
                     <IconSymbol name="chevron.left" size={28} color={colors.text} />
                 </Pressable>
                 <ThemedText style={styles.appBarTitle}>Edit Profile</ThemedText>
-                <Pressable onPress={handleSave}>
-                    <ThemedText style={[styles.saveText, { color: colors.tint }]}>Save</ThemedText>
+                <Pressable onPress={handleSave} disabled={isSaving}>
+                    {isSaving ? (
+                        <ActivityIndicator size="small" color={colors.tint} />
+                    ) : (
+                        <ThemedText style={[styles.saveText, { color: colors.tint }]}>Save</ThemedText>
+                    )}
                 </Pressable>
+
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -182,9 +212,18 @@ export default function EditProfileScreen() {
                     </View>
                 </View>
 
-                <Pressable style={[styles.saveButton, { backgroundColor: '#000000' }]} onPress={handleSave}>
-                    <ThemedText style={styles.saveButtonText}>Save Changes</ThemedText>
+                <Pressable
+                    style={[styles.saveButton, { backgroundColor: '#000000' }, (isSaving || isLocating) && { opacity: 0.7 }]}
+                    onPress={handleSave}
+                    disabled={isSaving || isLocating}
+                >
+                    {isSaving ? (
+                        <ActivityIndicator color="#fff" />
+                    ) : (
+                        <ThemedText style={styles.saveButtonText}>Save Changes</ThemedText>
+                    )}
                 </Pressable>
+
             </ScrollView>
         </ThemedView>
     );
