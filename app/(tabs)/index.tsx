@@ -980,7 +980,7 @@ export default function HomeScreen() {
         {/* Premium Hero Section */}
         <View style={styles.heroContainer}>
           <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=2070&auto=format&fit=crop' }}
+            source={require('@/assets/images/top.png')}
             style={styles.heroImage}
             resizeMode="cover"
           />
