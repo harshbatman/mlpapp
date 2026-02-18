@@ -13,6 +13,7 @@ import { arrayRemove, arrayUnion, doc, getDoc, increment, onSnapshot, updateDoc 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Dimensions, Image, Linking, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -25,6 +26,7 @@ export default function PropertyDetailsScreen() {
     const { showProfessionalError } = useNotification();
     const { startConversation } = useChat();
     const { profile } = useProfile();
+    const insets = useSafeAreaInsets();
 
     const [property, setProperty] = useState<any>(null);
     const [owner, setOwner] = useState<any>(null);
@@ -135,6 +137,15 @@ export default function PropertyDetailsScreen() {
             showProfessionalError(error, 'Chat Error');
         }
     };
+
+    const handleCall = () => {
+        if (!owner?.phone) {
+            alert("No phone number available for this owner.");
+            return;
+        }
+        Linking.openURL(`tel:${owner.phone}`);
+    };
+
 
     const toggleFavorite = async () => {
         if (!auth.currentUser) {
@@ -356,15 +367,31 @@ export default function PropertyDetailsScreen() {
             </ScrollView>
 
             {/* Sticky Floating Footer */}
-            <View style={[styles.footer, { backgroundColor: colors.background }]}>
-                <Pressable
-                    style={[styles.contactBtn, { backgroundColor: colors.tint }]}
-                    onPress={handleContact}
-                >
-                    <IconSymbol name="message.fill" size={20} color="#FFF" />
-                    <ThemedText style={styles.contactBtnText}>{t('Contact Owner')}</ThemedText>
-                </Pressable>
+            <View style={[
+                styles.footer,
+                {
+                    backgroundColor: colors.background,
+                    paddingBottom: Math.max(insets.bottom, 24)
+                }
+            ]}>
+                <View style={styles.footerButtons}>
+                    <Pressable
+                        style={[styles.callBtn, { borderColor: colors.tint }]}
+                        onPress={handleCall}
+                    >
+                        <IconSymbol name="phone.fill" size={20} color={colors.tint} />
+                        <ThemedText style={[styles.callBtnText, { color: colors.tint }]}>{t('Call Owner')}</ThemedText>
+                    </Pressable>
+                    <Pressable
+                        style={[styles.contactBtn, { backgroundColor: colors.tint }]}
+                        onPress={handleContact}
+                    >
+                        <IconSymbol name="message.fill" size={20} color="#FFF" />
+                        <ThemedText style={styles.contactBtnText}>{t('Message Owner')}</ThemedText>
+                    </Pressable>
+                </View>
             </View>
+
         </ThemedView>
     );
 }
@@ -590,14 +617,18 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        padding: 24,
-        paddingBottom: Platform.OS === 'ios' ? 40 : 24,
+        padding: 20,
         borderTopWidth: 1,
         borderTopColor: '#F2F2F7',
     },
+    footerButtons: {
+        flexDirection: 'row',
+        gap: 12,
+    },
     contactBtn: {
-        height: 60,
-        borderRadius: 18,
+        flex: 1.5,
+        height: 56,
+        borderRadius: 16,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
@@ -605,12 +636,26 @@ const styles = StyleSheet.create({
         elevation: 4,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.15,
         shadowRadius: 8,
+    },
+    callBtn: {
+        flex: 1,
+        height: 56,
+        borderRadius: 16,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 8,
+        borderWidth: 2,
     },
     contactBtnText: {
         color: '#FFF',
-        fontSize: 18,
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    callBtnText: {
+        fontSize: 16,
         fontWeight: '700',
     },
     imagePlaceholder: {
@@ -623,3 +668,4 @@ const styles = StyleSheet.create({
         backgroundColor: '#000', // Matches image section background
     }
 });
+
