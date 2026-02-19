@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   searchCardOverlay: {
-    marginTop: -80,
+    marginTop: -55,
     paddingTop: 0,
   },
 });

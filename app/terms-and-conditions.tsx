@@ -83,7 +83,7 @@ export default function TermsAndConditionsScreen() {
 
                 <View style={styles.footer}>
                     <ThemedText style={styles.footerText}>
-                        If you have any questions about these Terms, please contact us at support@mahto.com
+                        If you have any questions about these Terms, please contact us at support@mahtoji.tech
                     </ThemedText>
                 </View>
             </ScrollView>
