@@ -41,16 +41,9 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
             Extrapolate.CLAMP
         );
 
-        const borderRadius = interpolate(
-            expansion.value,
-            [0, 1],
-            [26, 26], // Consistent pill shape
-            Extrapolate.CLAMP
-        );
-
         return {
             width,
-            borderRadius,
+            borderRadius: 26,
         };
     });
 
@@ -59,7 +52,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
             opacity: interpolate(expansion.value, [0.8, 1], [0, 1], Extrapolate.CLAMP),
             flexDirection: 'row',
             flex: 1,
-            paddingHorizontal: 6,
+            paddingHorizontal: 4,
             justifyContent: 'space-around',
             alignItems: 'center',
             pointerEvents: isMinimized ? 'none' : 'auto',
@@ -106,27 +99,26 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
     return (
         <View style={[styles.outerContainer, { bottom: insets.bottom + 16 }]}>
             <Animated.View style={[styles.container, animatedContainerStyle]}>
-                {/* Minimized View (Current Active Icon) */}
+                {/* Minimized View */}
                 <Animated.View style={animatedMinimizedIconStyle}>
-                    <Pressable
-                        onPress={() => setIsMinimized(false)}
-                        style={({ pressed }) => [
-                            styles.minimizedButton,
-                            { opacity: pressed ? 0.7 : 1 }
-                        ]}
-                        android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true, radius: 24 }}
-                    >
-                        <View style={styles.minimizedIconCircle}>
-                            {activeRouteName === 'profile' ? (
-                                renderProfileIcon(true, 20)
-                            ) : (
-                                <IconSymbol name={getIconName(activeRouteName, true)} size={20} color="#FFFFFF" />
-                            )}
-                        </View>
-                    </Pressable>
+                    <View style={styles.circularButtonContainer}>
+                        <Pressable
+                            onPress={() => setIsMinimized(false)}
+                            style={styles.fullCircularPressable}
+                            android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true, radius: 24 }}
+                        >
+                            <View style={styles.minimizedIconCircle}>
+                                {activeRouteName === 'profile' ? (
+                                    renderProfileIcon(true, 20)
+                                ) : (
+                                    <IconSymbol name={getIconName(activeRouteName, true)} size={20} color="#FFFFFF" />
+                                )}
+                            </View>
+                        </Pressable>
+                    </View>
                 </Animated.View>
 
-                {/* Expanded View (All Tabs) */}
+                {/* Expanded View */}
                 <Animated.View style={animatedIconContainerStyle}>
                     {state.routes.map((route: any, index: number) => {
                         const isFocused = state.index === index;
@@ -143,52 +135,42 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                             }
                         };
 
-                        // Custom handle for "Add" button
-                        if (route.name === 'add') {
-                            return (
+                        return (
+                            <View key={route.key} style={styles.tabItemContainer}>
                                 <Pressable
-                                    key={route.key}
                                     onPress={onPress}
                                     style={({ pressed }) => [
-                                        styles.addButton,
-                                        { opacity: pressed ? 0.8 : 1 }
+                                        styles.fullCircularPressable,
+                                        { opacity: pressed ? 0.7 : 1 }
                                     ]}
-                                    android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true, radius: 20 }}
+                                    android_ripple={{
+                                        color: isFocused ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
+                                        borderless: true,
+                                        radius: 24
+                                    }}
                                 >
-                                    <IconSymbol name="plus" size={20} color="#FFFFFF" />
-                                </Pressable>
-                            );
-                        }
-
-                        return (
-                            <Pressable
-                                key={route.key}
-                                onPress={onPress}
-                                style={({ pressed }) => [
-                                    styles.tabItem,
-                                    { opacity: pressed ? 0.7 : 1 }
-                                ]}
-                                android_ripple={{
-                                    color: isFocused ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
-                                    borderless: true,
-                                    radius: 20
-                                }}
-                            >
-                                <View style={[
-                                    styles.iconWrapper,
-                                    isFocused && styles.activeIconWrapper
-                                ]}>
-                                    {route.name === 'profile' ? (
-                                        renderProfileIcon(isFocused, 20)
+                                    {route.name === 'add' ? (
+                                        <View style={styles.addButton}>
+                                            <IconSymbol name="plus" size={20} color="#FFFFFF" />
+                                        </View>
                                     ) : (
-                                        <IconSymbol
-                                            name={getIconName(route.name, isFocused)}
-                                            size={20}
-                                            color={isFocused ? '#FFFFFF' : '#000000'}
-                                        />
+                                        <View style={[
+                                            styles.iconWrapper,
+                                            isFocused && styles.activeIconWrapper
+                                        ]}>
+                                            {route.name === 'profile' ? (
+                                                renderProfileIcon(isFocused, 20)
+                                            ) : (
+                                                <IconSymbol
+                                                    name={getIconName(route.name, isFocused)}
+                                                    size={20}
+                                                    color={isFocused ? '#FFFFFF' : '#000000'}
+                                                />
+                                            )}
+                                        </View>
                                     )}
-                                </View>
-                            </Pressable>
+                                </Pressable>
+                            </View>
                         );
                     })}
                 </Animated.View>
@@ -219,8 +201,6 @@ const styles = StyleSheet.create({
     container: {
         height: TAB_BAR_HEIGHT,
         backgroundColor: '#FFFFFF',
-        flexDirection: 'row',
-        overflow: 'hidden',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.15,
@@ -228,13 +208,26 @@ const styles = StyleSheet.create({
         elevation: 10,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.05)',
+        flexDirection: 'row',
     },
-    tabItem: {
+    tabItemContainer: {
         flex: 1,
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 26, // Half of TAB_BAR_HEIGHT to make it circular
+    },
+    circularButtonContainer: {
+        width: TAB_BAR_HEIGHT,
+        height: TAB_BAR_HEIGHT,
+        borderRadius: TAB_BAR_HEIGHT / 2,
+        overflow: 'hidden',
+    },
+    fullCircularPressable: {
+        width: TAB_BAR_HEIGHT,
+        height: TAB_BAR_HEIGHT,
+        borderRadius: TAB_BAR_HEIGHT / 2,
+        justifyContent: 'center',
+        alignItems: 'center',
         overflow: 'hidden',
     },
     iconWrapper: {
@@ -252,13 +245,6 @@ const styles = StyleSheet.create({
         height: 38,
         borderRadius: 19,
         backgroundColor: '#000000',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginHorizontal: 4,
-    },
-    minimizedButton: {
-        width: '100%',
-        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
