@@ -221,6 +221,8 @@ const styles = StyleSheet.create({
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+        borderRadius: 26, // Half of TAB_BAR_HEIGHT to make it circular
+        overflow: 'hidden',
     },
     iconWrapper: {
         width: 38,
