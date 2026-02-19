@@ -112,16 +112,16 @@ export default function PropertyListScreen() {
 
     return (
         <ThemedView style={styles.container}>
-            <View style={[styles.header, { backgroundColor: colors.tint, paddingTop: insets.top + 12 }]}>
+            <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
                 <View style={styles.headerTop}>
                     <Pressable
                         onPress={() => router.back()}
-                        style={styles.backButton}
+                        style={[styles.backButton, { backgroundColor: colors.secondary }]}
                     >
-                        <IconSymbol name="chevron.left" size={24} color="#FFF" />
+                        <IconSymbol name="chevron.left" size={24} color={colors.text} />
                     </Pressable>
-                    <ThemedText style={styles.headerTitle}>{category || 'All Properties'}</ThemedText>
-                    <View style={{ width: 40 }} />
+                    <ThemedText style={[styles.headerTitle, { color: colors.text }]}>{category || 'All Properties'}</ThemedText>
+                    <View style={{ width: 44 }} />
                 </View>
             </View>
 
@@ -468,7 +468,6 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -476,11 +475,10 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: '800',
         letterSpacing: -0.5,
-        color: '#FFF',
     },
     searchSection: {
         paddingHorizontal: 20,
-        marginTop: -32, // Offset to pull search box into header area if desired, or just space out
+        marginTop: 10,
         zIndex: 10,
     },
     searchRow: {
