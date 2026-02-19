@@ -1,10 +1,11 @@
 import { ThemedText } from '@/components/themed-text';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import * as NavigationBar from 'expo-navigation-bar';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, Platform, StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
 import '../config/i18n';
 
@@ -30,7 +31,13 @@ export default function RootLayout() {
   const scaleAnim = useState(new Animated.Value(0.95))[0];
 
   useEffect(() => {
-    // Hide native splash screen immediately so our coded one shows up
+    // Enable edge-to-edge on Android
+    if (Platform.OS === 'android') {
+      NavigationBar.setBehaviorAsync('inset-touch');
+      NavigationBar.setBackgroundColorAsync('#00000000');
+    }
+
+    // Hide native splash screen immediately
     SplashScreen.hideAsync();
 
     // Scale in animation

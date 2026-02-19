@@ -21,6 +21,11 @@
       "versionCode": 33,
       "package": "com.mahto.landproperties",
       "googleServicesFile": "./google-services.json",
+      "softwareKeyboardLayoutMode": "pan",
+      "navigationBar": {
+        "barStyle": "dark-content",
+        "backgroundColor": "#00000000"
+      },
       "adaptiveIcon": {
         "backgroundColor": "#000000",
         "foregroundImage": "./assets/images/launcher.jpg",
