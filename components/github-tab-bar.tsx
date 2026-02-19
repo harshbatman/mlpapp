@@ -44,7 +44,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
         const borderRadius = interpolate(
             expansion.value,
             [0, 1],
-            [32, 24],
+            [26, 26], // Consistent pill shape
             Extrapolate.CLAMP
         );
 
@@ -59,7 +59,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
             opacity: interpolate(expansion.value, [0.8, 1], [0, 1], Extrapolate.CLAMP),
             flexDirection: 'row',
             flex: 1,
-            paddingHorizontal: 8,
+            paddingHorizontal: 6,
             justifyContent: 'space-around',
             alignItems: 'center',
             pointerEvents: isMinimized ? 'none' : 'auto',
@@ -92,7 +92,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                         width: size + 2,
                         height: size + 2,
                         borderRadius: (size + 2) / 2,
-                        borderColor: isFocused ? '#000000' : 'transparent',
+                        borderColor: isFocused ? '#FFFFFF' : 'transparent',
                         borderWidth: isFocused ? 1.5 : 0
                     }
                 ]}>
@@ -100,7 +100,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                 </View>
             );
         }
-        return <IconSymbol name="person.fill" size={size} color={isFocused ? '#000000' : 'rgba(255,255,255,0.6)'} />;
+        return <IconSymbol name="person.fill" size={size} color={isFocused ? '#FFFFFF' : '#000000'} />;
     };
 
     return (
@@ -117,7 +117,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                             {activeRouteName === 'profile' ? (
                                 renderProfileIcon(true, 20)
                             ) : (
-                                <IconSymbol name={getIconName(activeRouteName, true)} size={20} color="#000000" />
+                                <IconSymbol name={getIconName(activeRouteName, true)} size={20} color="#FFFFFF" />
                             )}
                         </View>
                     </TouchableOpacity>
@@ -149,7 +149,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                                     style={styles.addButton}
                                     activeOpacity={0.8}
                                 >
-                                    <IconSymbol name="plus" size={20} color="#000000" />
+                                    <IconSymbol name="plus" size={20} color="#FFFFFF" />
                                 </TouchableOpacity>
                             );
                         }
@@ -171,7 +171,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                                         <IconSymbol
                                             name={getIconName(route.name, isFocused)}
                                             size={20}
-                                            color={isFocused ? '#000000' : 'rgba(255,255,255,0.6)'}
+                                            color={isFocused ? '#FFFFFF' : '#000000'}
                                         />
                                     )}
                                 </View>
@@ -200,21 +200,21 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         alignItems: 'flex-start',
-        paddingLeft: 20,
+        paddingLeft: 24,
         zIndex: 1000,
     },
     container: {
         height: TAB_BAR_HEIGHT,
-        backgroundColor: '#000000',
+        backgroundColor: '#FFFFFF',
         flexDirection: 'row',
         overflow: 'hidden',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.4,
-        shadowRadius: 16,
-        elevation: 15,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 10,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(0,0,0,0.05)',
     },
     tabItem: {
         flex: 1,
@@ -223,28 +223,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     iconWrapper: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
+        width: 38,
+        height: 38,
+        borderRadius: 19,
         justifyContent: 'center',
         alignItems: 'center',
     },
     activeIconWrapper: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#000000',
     },
     addButton: {
         width: 38,
         height: 38,
         borderRadius: 19,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#000000',
         justifyContent: 'center',
         alignItems: 'center',
         marginHorizontal: 4,
-        shadowColor: '#FFF',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 3,
     },
     minimizedButton: {
         width: '100%',
@@ -256,7 +251,7 @@ const styles = StyleSheet.create({
         width: 38,
         height: 38,
         borderRadius: 19,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#000000',
         justifyContent: 'center',
         alignItems: 'center',
     },
