@@ -14,9 +14,9 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const TAB_BAR_WIDTH_EXPANDED = SCREEN_WIDTH - 40;
-const TAB_BAR_WIDTH_MINIMIZED = 64;
-const TAB_BAR_HEIGHT = 64;
+const TAB_BAR_WIDTH_EXPANDED = SCREEN_WIDTH - 48;
+const TAB_BAR_WIDTH_MINIMIZED = 52;
+const TAB_BAR_HEIGHT = 52;
 
 export function GitHubTabBar({ state, descriptors, navigation }: any) {
     const insets = useSafeAreaInsets();
@@ -83,17 +83,17 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
 
     const activeRouteName = state.routes[state.index].name;
 
-    const renderProfileIcon = (isFocused: boolean, size: number = 24) => {
+    const renderProfileIcon = (isFocused: boolean, size: number = 22) => {
         if (profile.image) {
             return (
                 <View style={[
                     styles.tabAvatarContainer,
                     {
-                        width: size + 4,
-                        height: size + 4,
-                        borderRadius: (size + 4) / 2,
+                        width: size + 2,
+                        height: size + 2,
+                        borderRadius: (size + 2) / 2,
                         borderColor: isFocused ? '#000000' : 'transparent',
-                        borderWidth: isFocused ? 2 : 0
+                        borderWidth: isFocused ? 1.5 : 0
                     }
                 ]}>
                     <Image source={{ uri: profile.image }} style={styles.tabAvatar} />
@@ -115,9 +115,9 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                     >
                         <View style={styles.minimizedIconCircle}>
                             {activeRouteName === 'profile' ? (
-                                renderProfileIcon(true, 24)
+                                renderProfileIcon(true, 20)
                             ) : (
-                                <IconSymbol name={getIconName(activeRouteName, true)} size={24} color="#000000" />
+                                <IconSymbol name={getIconName(activeRouteName, true)} size={20} color="#000000" />
                             )}
                         </View>
                     </TouchableOpacity>
@@ -166,11 +166,11 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                                     isFocused && styles.activeIconWrapper
                                 ]}>
                                     {route.name === 'profile' ? (
-                                        renderProfileIcon(isFocused, 24)
+                                        renderProfileIcon(isFocused, 20)
                                     ) : (
                                         <IconSymbol
                                             name={getIconName(route.name, isFocused)}
-                                            size={24}
+                                            size={20}
                                             color={isFocused ? '#000000' : 'rgba(255,255,255,0.6)'}
                                         />
                                     )}
@@ -223,9 +223,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     iconWrapper: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -233,9 +233,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
     },
     addButton: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
+        width: 38,
+        height: 38,
+        borderRadius: 19,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
@@ -253,9 +253,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     minimizedIconCircle: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
+        width: 38,
+        height: 38,
+        borderRadius: 19,
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
