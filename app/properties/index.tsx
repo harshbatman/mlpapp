@@ -13,6 +13,7 @@ import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestor
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height } = Dimensions.get('window');
 
@@ -25,6 +26,7 @@ export default function PropertyListScreen() {
     const { startConversation } = useChat();
     const { profile } = useProfile();
     const { showNotification } = useNotification();
+    const insets = useSafeAreaInsets();
 
     const [properties, setProperties] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -110,13 +112,13 @@ export default function PropertyListScreen() {
 
     return (
         <ThemedView style={styles.container}>
-            <View style={[styles.header, { backgroundColor: colors.tint }]}>
+            <View style={[styles.header, { backgroundColor: colors.tint, paddingTop: insets.top + 12 }]}>
                 <View style={styles.headerTop}>
                     <Pressable
                         onPress={() => router.back()}
                         style={styles.backButton}
                     >
-                        <IconSymbol name="chevron.left" size={28} color="#FFF" />
+                        <IconSymbol name="chevron.left" size={24} color="#FFF" />
                     </Pressable>
                     <ThemedText style={styles.headerTitle}>{category || 'All Properties'}</ThemedText>
                     <View style={{ width: 40 }} />
@@ -454,8 +456,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        paddingTop: 60,
-        paddingBottom: 24,
+        paddingBottom: 20,
         paddingHorizontal: 20,
     },
     headerTop: {
@@ -464,9 +465,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     backButton: {
-        width: 40,
-        height: 40,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
         justifyContent: 'center',
+        alignItems: 'center',
     },
     headerTitle: {
         fontSize: 22,
