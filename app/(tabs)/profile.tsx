@@ -5,6 +5,7 @@ import { auth, db } from '@/config/firebase';
 import { Colors } from '@/constants/theme';
 import { useNotification } from '@/context/notification-context';
 import { useProfile } from '@/context/profile-context';
+import { useTabVisibility } from '@/context/tab-visibility-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
@@ -19,6 +20,7 @@ export default function ProfileScreen() {
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
     const { profile, logout } = useProfile();
+    const { handleScroll } = useTabVisibility();
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [confirmPhone, setConfirmPhone] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -94,7 +96,11 @@ export default function ProfileScreen() {
 
     return (
         <ThemedView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+            >
                 <View style={styles.header}>
                     <View style={[styles.avatarContainer, { backgroundColor: colors.secondary, overflow: 'hidden' }]}>
                         {profile.image ? (

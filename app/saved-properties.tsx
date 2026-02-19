@@ -3,6 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { auth, db } from '@/config/firebase';
 import { Colors } from '@/constants/theme';
+import { useTabVisibility } from '@/context/tab-visibility-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
@@ -14,6 +15,7 @@ export default function SavedPropertiesScreen() {
     const colorScheme = useColorScheme() ?? 'light';
     const colors = Colors[colorScheme as 'light' | 'dark'];
     const [savedProperties, setSavedProperties] = useState<any[]>([]);
+    const { handleScroll } = useTabVisibility();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -114,6 +116,8 @@ export default function SavedPropertiesScreen() {
                     renderItem={renderItem}
                     ListEmptyComponent={renderEmpty}
                     contentContainerStyle={styles.listContent}
+                    onScroll={handleScroll}
+                    scrollEventThrottle={16}
                     showsVerticalScrollIndicator={false}
                 />
             )}

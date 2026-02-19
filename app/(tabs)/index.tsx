@@ -6,6 +6,7 @@ import { INDIAN_LOCATIONS } from '@/constants/locations';
 import { Colors } from '@/constants/theme';
 import { useNotification } from '@/context/notification-context';
 import { useProfile } from '@/context/profile-context';
+import { useTabVisibility } from '@/context/tab-visibility-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import * as ExpoLocation from 'expo-location';
 import { useRouter } from 'expo-router';
@@ -791,6 +792,7 @@ export default function HomeScreen() {
   const [mainFilterModalVisible, setMainFilterModalVisible] = useState(false);
   const { showNotification, showProfessionalError, showConfirm } = useNotification();
   const { profile } = useProfile();
+  const { handleScroll } = useTabVisibility();
   const [activeType, setActiveType] = useState('Buy');
   const [featuredProperties, setFeaturedProperties] = useState<any[]>([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
@@ -1205,6 +1207,8 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
         <ImageBackground
           source={require('@/assets/images/gurugram.png')}

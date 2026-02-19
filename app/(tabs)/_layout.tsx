@@ -1,3 +1,4 @@
+import { GitHubTabBar } from '@/components/github-tab-bar';
 import { Redirect, Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -26,6 +27,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      tabBar={(props) => <GitHubTabBar {...props} />}
       screenOptions={{
         tabBarActiveTintColor: ACTIVE_COLOR,
         tabBarInactiveTintColor: INACTIVE_COLOR,

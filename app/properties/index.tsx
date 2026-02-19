@@ -7,6 +7,7 @@ import { Colors } from '@/constants/theme';
 import { useChat } from '@/context/chat-context';
 import { useNotification } from '@/context/notification-context';
 import { useProfile } from '@/context/profile-context';
+import { useTabVisibility } from '@/context/tab-visibility-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
@@ -26,6 +27,7 @@ export default function PropertyListScreen() {
     const { startConversation } = useChat();
     const { profile } = useProfile();
     const { showNotification } = useNotification();
+    const { handleScroll } = useTabVisibility();
     const insets = useSafeAreaInsets();
 
     const [properties, setProperties] = useState<any[]>([]);
@@ -149,6 +151,8 @@ export default function PropertyListScreen() {
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
                 renderItem={({ item }) => (
                     <Pressable
                         style={[styles.card, { backgroundColor: colors.background }]}
