@@ -15,12 +15,14 @@ type IconSymbolName = string;
  */
 const MAPPING: IconMapping = {
   'house.fill': 'home',
+  'house': 'home',
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
   'plus': 'add',
   'plus.circle.fill': 'add-circle',
   'person.fill': 'person',
+  'person': 'person',
   'mountain.2.fill': 'landscape',
   'building.2.fill': 'business',
   'mappin.and.ellipse': 'place',
