@@ -1,8 +1,9 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useProfile } from '@/context/profile-context';
 import { useTabVisibility } from '@/context/tab-visibility-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import React, { useEffect } from 'react';
-import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, {
     Extrapolate,
     interpolate,
@@ -20,6 +21,7 @@ const TAB_BAR_HEIGHT = 64;
 export function GitHubTabBar({ state, descriptors, navigation }: any) {
     const insets = useSafeAreaInsets();
     const { isMinimized, setIsMinimized } = useTabVisibility();
+    const { profile } = useProfile();
     const colorScheme = useColorScheme() ?? 'light';
 
     const expansion = useSharedValue(1);
@@ -81,6 +83,26 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
 
     const activeRouteName = state.routes[state.index].name;
 
+    const renderProfileIcon = (isFocused: boolean, size: number = 24) => {
+        if (profile.image) {
+            return (
+                <View style={[
+                    styles.tabAvatarContainer,
+                    {
+                        width: size + 4,
+                        height: size + 4,
+                        borderRadius: (size + 4) / 2,
+                        borderColor: isFocused ? '#000000' : 'transparent',
+                        borderWidth: isFocused ? 2 : 0
+                    }
+                ]}>
+                    <Image source={{ uri: profile.image }} style={styles.tabAvatar} />
+                </View>
+            );
+        }
+        return <IconSymbol name="person.fill" size={size} color={isFocused ? '#000000' : 'rgba(255,255,255,0.6)'} />;
+    };
+
     return (
         <View style={[styles.outerContainer, { bottom: insets.bottom + 16 }]}>
             <Animated.View style={[styles.container, animatedContainerStyle]}>
@@ -92,7 +114,11 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                         activeOpacity={0.7}
                     >
                         <View style={styles.minimizedIconCircle}>
-                            <IconSymbol name={getIconName(activeRouteName, true)} size={24} color="#000000" />
+                            {activeRouteName === 'profile' ? (
+                                renderProfileIcon(true, 24)
+                            ) : (
+                                <IconSymbol name={getIconName(activeRouteName, true)} size={24} color="#000000" />
+                            )}
                         </View>
                     </TouchableOpacity>
                 </Animated.View>
@@ -139,11 +165,15 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                                     styles.iconWrapper,
                                     isFocused && styles.activeIconWrapper
                                 ]}>
-                                    <IconSymbol
-                                        name={getIconName(route.name, isFocused)}
-                                        size={24}
-                                        color={isFocused ? '#000000' : 'rgba(255,255,255,0.6)'}
-                                    />
+                                    {route.name === 'profile' ? (
+                                        renderProfileIcon(isFocused, 24)
+                                    ) : (
+                                        <IconSymbol
+                                            name={getIconName(route.name, isFocused)}
+                                            size={24}
+                                            color={isFocused ? '#000000' : 'rgba(255,255,255,0.6)'}
+                                        />
+                                    )}
                                 </View>
                             </TouchableOpacity>
                         );
@@ -229,5 +259,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    tabAvatarContainer: {
+        overflow: 'hidden',
+    },
+    tabAvatar: {
+        width: '100%',
+        height: '100%',
     }
 });
