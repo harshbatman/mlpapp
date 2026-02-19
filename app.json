@@ -3,7 +3,7 @@
     "name": "MAHTO Land & Properties",
     "slug": "mlp",
     "owner": "mahtobuild",
-    "version": "1.1.26",
+    "version": "1.1.30",
     "extra": {
       "eas": {
         "projectId": "6f491b62-838e-45d4-bd82-0a4c932c9494"
@@ -18,7 +18,7 @@
       "icon": "./assets/images/launcher.jpg"
     },
     "android": {
-      "versionCode": 26,
+      "versionCode": 30,
       "package": "com.mahto.landproperties",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
