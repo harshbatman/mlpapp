@@ -3,7 +3,7 @@ import { useProfile } from '@/context/profile-context';
 import { useTabVisibility } from '@/context/tab-visibility-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import React, { useEffect } from 'react';
-import { Dimensions, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
     Extrapolate,
     interpolate,
@@ -108,10 +108,13 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
             <Animated.View style={[styles.container, animatedContainerStyle]}>
                 {/* Minimized View (Current Active Icon) */}
                 <Animated.View style={animatedMinimizedIconStyle}>
-                    <TouchableOpacity
+                    <Pressable
                         onPress={() => setIsMinimized(false)}
-                        style={styles.minimizedButton}
-                        activeOpacity={0.7}
+                        style={({ pressed }) => [
+                            styles.minimizedButton,
+                            { opacity: pressed ? 0.7 : 1 }
+                        ]}
+                        android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true, radius: 24 }}
                     >
                         <View style={styles.minimizedIconCircle}>
                             {activeRouteName === 'profile' ? (
@@ -120,7 +123,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                                 <IconSymbol name={getIconName(activeRouteName, true)} size={20} color="#FFFFFF" />
                             )}
                         </View>
-                    </TouchableOpacity>
+                    </Pressable>
                 </Animated.View>
 
                 {/* Expanded View (All Tabs) */}
@@ -143,23 +146,33 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                         // Custom handle for "Add" button
                         if (route.name === 'add') {
                             return (
-                                <TouchableOpacity
+                                <Pressable
                                     key={route.key}
                                     onPress={onPress}
-                                    style={styles.addButton}
-                                    activeOpacity={0.8}
+                                    style={({ pressed }) => [
+                                        styles.addButton,
+                                        { opacity: pressed ? 0.8 : 1 }
+                                    ]}
+                                    android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true, radius: 20 }}
                                 >
                                     <IconSymbol name="plus" size={20} color="#FFFFFF" />
-                                </TouchableOpacity>
+                                </Pressable>
                             );
                         }
 
                         return (
-                            <TouchableOpacity
+                            <Pressable
                                 key={route.key}
                                 onPress={onPress}
-                                style={styles.tabItem}
-                                activeOpacity={0.7}
+                                style={({ pressed }) => [
+                                    styles.tabItem,
+                                    { opacity: pressed ? 0.7 : 1 }
+                                ]}
+                                android_ripple={{
+                                    color: isFocused ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
+                                    borderless: true,
+                                    radius: 20
+                                }}
                             >
                                 <View style={[
                                     styles.iconWrapper,
@@ -175,7 +188,7 @@ export function GitHubTabBar({ state, descriptors, navigation }: any) {
                                         />
                                     )}
                                 </View>
-                            </TouchableOpacity>
+                            </Pressable>
                         );
                     })}
                 </Animated.View>
